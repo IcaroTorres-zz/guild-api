@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 
 namespace lumen.api.Controllers
 {
-    [Route("lumen.api/[controller]")]
+    [Route("lumen.api/")]
     [Produces("application/json")]
     [ApiController]
     public class GuildController : ControllerBase
@@ -17,6 +17,12 @@ namespace lumen.api.Controllers
         private readonly IUnitOfWork _unitOfWork;
         // injected unit of work from startup.cs configure services
         public GuildController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+
+        
+        public ActionResult<object> Index() => new {
+            users = _unitOfWork.Users.GetAll(),
+            guilds = _unitOfWork.Guilds.GetAll()
+        };
 
         [HttpGet("create/{guildname}/{mastername}")]
         public ActionResult<bool> Create(string guildname, string mastername)
