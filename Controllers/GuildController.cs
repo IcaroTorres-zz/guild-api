@@ -21,11 +21,29 @@ namespace lumen.api.Controllers
         [HttpGet("create/{guildname}/{mastername}")]
         public ActionResult<bool> Create(string guildname, string mastername)
         {
-            try {  return _unitOfWork.Guilds.CreateGuild(guildname,mastername); }
+            bool result = false;
+            try { 
+                result = _unitOfWork.Guilds.CreateGuild(guildname,mastername); 
+                _unitOfWork.Complete();
+            }
             catch(Exception e) {
                 _unitOfWork.Rollback();
-                return false;
             }
+            return result;
+        }
+        [HttpGet("user/{username}")]
+        public ActionResult<string> User(string username){
+            var user  =_unitOfWork.Users.Get(username);
+            if (user == null) {
+                try {
+                    _unitOfWork.Users.Add(new User { Name = username });
+                    _unitOfWork.Complete();
+                    return $"Created {user.Name}";
+                } catch (Exception e) {
+                    _unitOfWork.Rollback();
+                    return "Error: Failure getting user.";
+                }
+            } else return $"Got {user.Name}";
         }
 
         [HttpGet("guilds")]

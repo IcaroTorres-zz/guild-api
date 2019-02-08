@@ -11,5 +11,6 @@ namespace lumen.api.Repositories
     bool TransferOwnership(string guildname, string userName);
     IEnumerable<string> GetNthGuilds(int count = 20);
     Dictionary<string, dynamic> GuildInfo(string guildName);
+    new Guild Get (string name);
   }
 }

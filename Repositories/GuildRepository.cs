@@ -17,17 +17,21 @@ namespace lumen.api.Repositories
     public bool CreateGuild(string guildName, string masterName)
     {
       var guild = Get(guildName);
-      var master = GetUser(masterName) ?? new User() { Name = masterName };
+      var master = GetUser(masterName) ?? new User() { Name = masterName, Guild = guild };
       
       if (master.Guild != null || guild != null) return false;
       try
       {
-        Add(new Guild
+        var newGuild = new Guild
         {
           Name = guildName,
           Master = master,
-          Members = new List<User>() { master }
-        });
+          MasterName = master.Name,
+        };
+        master.Guild = newGuild;
+        master.GuildName = newGuild.Name;
+        newGuild.Members = new List<User>() { master };
+        Add(newGuild);
         return true;
       }
       catch (Exception e)
@@ -89,13 +93,22 @@ namespace lumen.api.Repositories
       return true;
     }
     public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Name);
-
+    public new Guild Get (string name)
+    {
+      var guild =Context.Set<Guild> ().Find (name);
+      if (guild != null) {
+        guild.Members = LumenContext.Users.Where(u => u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+        guild.Master = guild.Members.FirstOrDefault(u => u.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase));
+      }
+      return guild;
+    }
     public Dictionary<string, dynamic> GuildInfo(string guildName)
     {
       var info = new Dictionary<string, dynamic>(StringComparer.OrdinalIgnoreCase);
       var guild = Get(guildName);
+      
       info["guild"] = guild != null
-        ? new Dictionary<string, dynamic>() { { "name", guild.Name }, { "guildmaster", guild.MasterName }, { "members", guild.Members } }
+        ? new Dictionary<string, dynamic>() { { "name", guild.Name }, { "guildmaster", guild.MasterName }, { "members", guild.Members.Select(m => m.Name) } }
         : info["erro"] = "guild not found.";
       return info;
     }

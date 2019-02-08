@@ -9,5 +9,7 @@ namespace lumen.api.Repositories
     bool LeaveTheGuild(string userName, string guildName);
     Guild GetGuild(string guildName);
     Guild UserGuild(string userName);
+
+    new User Get(string name);
   }
 }

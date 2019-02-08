@@ -19,7 +19,7 @@ namespace lumen.api.Repositories
       user.Guild = guild;
       return true;
     }
-
+    public new User Get (string name) => Context.Set<User> ().Find (name);
     public bool LeaveTheGuild(string userName, string guildName)
     {
       var user = Get(userName);
