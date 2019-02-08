@@ -56,7 +56,7 @@ namespace lumen.api.Repositories
           return false;
 
         guild.Members.Remove(memberName);
-        if (guild.Members.Count == 0)
+        if (!guild.Members.Any())
           Remove(guild);
       } catch(Exception) { return false; }
       member.GuildName = null;
