@@ -153,3 +153,21 @@ public class Guild
     protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseInMemoryDatabase("lumenInMemoryDB");
   }
 ```
+
+### Dependency Injection Setup (Startup.cs)
+> this turns the IoC possible and the dependencies available to be injected (used on this project as Constructor type), On HomeController, Repositories and UnitOfWork.
+> The Inmemory Provider is also setup here to register our context.
+```c#
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMvc()
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+    services.AddEntityFrameworkInMemoryDatabase()
+            .AddDbContext<LumenContext>((serviceProvider, options) => options.UseInMemoryDatabase("lumenInMemoryDB")
+                                                                             .UseInternalServiceProvider(serviceProvider));
+    services.AddTransient<IGuildRepository, GuildRepository>(); 
+    services.AddTransient<IUserRepository, UserRepository>();
+    services.AddTransient<IUnitOfWork, UnitOfWork>();                             
+}   
+```
