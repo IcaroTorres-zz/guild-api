@@ -13,11 +13,11 @@ namespace lumen.api.Models {
     }
     [Key]
     public string Name { get; set; }
-    public string GuildName { get; set; }
     public int Level { get; set; }
     public Double Gold { get; set; }
     public virtual Guild Guild { get; set; }
     public DateTime CreationDate { get; set; }
+    public string GuildName { get => Guild.Name; }
     public bool IsGuildMaster { get => Name.Equals(Guild?.MasterName); }
     public string FormatDate { get => CreationDate.ToString("d"); }
   }
