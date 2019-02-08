@@ -32,7 +32,7 @@ namespace lumen.api.Controllers
                 result = _unitOfWork.Guilds.CreateGuild(guildname,mastername); 
                 _unitOfWork.Complete();
             }
-            catch(Exception e) {
+            catch(Exception) {
                 _unitOfWork.Rollback();
             }
             return result;
@@ -46,7 +46,7 @@ namespace lumen.api.Controllers
                     _unitOfWork.Users.Add(user);
                     _unitOfWork.Complete();
                     return $"Created {user.Name}";
-                } catch (Exception e) {
+                } catch (Exception) {
                     _unitOfWork.Rollback();
                     return "Error: Failure getting user.";
                 }
@@ -67,7 +67,7 @@ namespace lumen.api.Controllers
             {
                 result = _unitOfWork.Guilds.GuildInfo(guildname);
                 _unitOfWork.Complete();
-            } catch (Exception e)
+            } catch (Exception)
             {
                 _unitOfWork.Rollback();
             }
@@ -84,7 +84,7 @@ namespace lumen.api.Controllers
                     result = _unitOfWork.Users.EnterTheGuild(guildname, username);
 
                 _unitOfWork.Complete();
-            } catch (Exception e)
+            } catch (Exception)
             {
                 _unitOfWork.Rollback();
             }
@@ -101,7 +101,7 @@ namespace lumen.api.Controllers
                     result = _unitOfWork.Users.LeaveTheGuild(username, guildname);
 
                 _unitOfWork.Complete();
-            } catch (Exception e)
+            } catch (Exception)
             {
                 _unitOfWork.Rollback();
             }
@@ -116,7 +116,7 @@ namespace lumen.api.Controllers
             {   
                 result = _unitOfWork.Guilds.TransferOwnership(guildname, username);
                 _unitOfWork.Complete();
-            } catch (Exception e)
+            } catch (Exception)
             {
                 _unitOfWork.Rollback();
             }
