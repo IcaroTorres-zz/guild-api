@@ -36,7 +36,8 @@ namespace lumen.api.Controllers
             var user  =_unitOfWork.Users.Get(username);
             if (user == null) {
                 try {
-                    _unitOfWork.Users.Add(new User { Name = username });
+                    user = new User { Name = username };
+                    _unitOfWork.Users.Add(user);
                     _unitOfWork.Complete();
                     return $"Created {user.Name}";
                 } catch (Exception e) {
