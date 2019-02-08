@@ -17,6 +17,7 @@ namespace lumen.api.Repositories {
         Users = new UserRepository (_lumenContext);
     }
     public void Complete () => _lumenContext.SaveChanges ();
+    public void Rollback() => _lumenContext.ChangeTracker.Entries().ToList().ForEach(x => x.Reload());
     public void Dispose () => _lumenContext.Dispose ();
   }
 }

@@ -11,5 +11,6 @@ namespace lumen.api.Repositories
     IGuildRepository Guilds { get; }
     IUserRepository Users { get; }
     void Complete();
+    void Rollback();
   }
 }
