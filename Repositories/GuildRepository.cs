@@ -69,7 +69,7 @@ namespace lumen.api.Repositories
 
         if (! guild.Members.Contains(member, memberComparer) )
           return false;
-        if (member.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase))
+        if (member.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase) && guild.Members.Count() > 1)
           return false;
 
         guild.Members.Remove(member);
