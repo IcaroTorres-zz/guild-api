@@ -17,8 +17,8 @@ namespace lumen.api.Controllers
         // injected unit of work from startup.cs configure services
         public GuildController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-        [HttpGet("[action]/{guildname}/{mastername}")]
-        public bool CreateGuild(string guildname, string mastername)
+        [HttpPost("[action]/{guildname}/{mastername}")]
+        public bool Create(string guildname, string mastername)
         {
             try {  return _unitOfWork.Guilds.CreateGuild(guildname,mastername); }
             catch(Exception e) {
@@ -28,13 +28,13 @@ namespace lumen.api.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<string> GetGuilds() => _unitOfWork.Guilds.GetNthGuilds();
+        public IEnumerable<string> Guilds() => _unitOfWork.Guilds.GetNthGuilds();
 
         [HttpGet("[action]/{count}")]
-        public IEnumerable<string> GetGuilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
+        public IEnumerable<string> Guilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
         
         [HttpGet("[action]/{guildname}")]
-        public Dictionary<string, dynamic> GuildInfo(string guildname)
+        public Dictionary<string, dynamic> Info(string guildname)
         {
             Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
             try
@@ -49,7 +49,7 @@ namespace lumen.api.Controllers
         }
 
         [HttpPut("[action]/{guildname}/{username}")]
-        public bool EnterTheGuild(string guildname, string username)
+        public bool Enter(string guildname, string username)
         {
             bool result = false;
             try
@@ -66,7 +66,7 @@ namespace lumen.api.Controllers
         }
 
         [HttpDelete("[action]/{username}/{guildname}")]
-        public bool LeaveTheGuild(string username, string guildname)
+        public bool Leave(string username, string guildname)
         {
             bool result = false;
             try
@@ -83,7 +83,7 @@ namespace lumen.api.Controllers
         }
 
         [HttpPut("[action]/{guildname}/{username}")]
-        public bool TransferOwnership(string guildname, string username)
+        public bool Transfer(string guildname, string username)
         {
             var result = false;
             try
