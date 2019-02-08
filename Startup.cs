@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using lumen.api.Context;
+using lumen.api.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,8 +34,9 @@ namespace lumen.api
             services.AddEntityFrameworkInMemoryDatabase()
                     .AddDbContext<LumenContext>((serviceProvider, options) => options.UseInMemoryDatabase("lumenInMemoryDB")
                                                                                      .UseInternalServiceProvider(serviceProvider));
-            
-                                                                                    
+            services.AddTransient<IGuildRepository, GuildRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();                             
     }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
