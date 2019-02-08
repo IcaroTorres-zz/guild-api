@@ -12075,7 +12075,7 @@
     ".NETCoreApp,Version=v2.2": [
       "Microsoft.AspNetCore.App >= 2.2.0",
       "Microsoft.AspNetCore.Razor.Design >= 2.2.0",
-      "Microsoft.EntityFrameworkCore.Inmemory",
+      "Microsoft.EntityFrameworkCore.Inmemory >= 2.2.1",
       "Microsoft.NETCore.App >= 2.2.0"
     ]
   },
@@ -12133,7 +12133,7 @@
           },
           "Microsoft.EntityFrameworkCore.Inmemory": {
             "target": "Package",
-            "version": "(, )"
+            "version": "[2.2.1, )"
           },
           "Microsoft.NETCore.App": {
             "suppressParent": "All",
