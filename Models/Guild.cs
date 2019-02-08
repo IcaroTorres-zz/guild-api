@@ -18,4 +18,20 @@ namespace lumen.api.Models {
     public virtual ICollection<User> Members { get; set; }
     public DateTime CreationDate { get; set; }
   }
+  class GuildEqualityComparer : IEqualityComparer<Guild>
+  {
+      public bool Equals(Guild g1, Guild g2)
+      {
+          if (u2 == null && g1 == null)
+            return true;
+          else if (g1 == null || u2 == null)
+            return false;
+          else if(g1.Name.Equals(u2.Name, StringComparison.OrdinalIgnoreCase))
+              return true;
+          else
+              return false;
+      }
+
+      public int GetHashCode(Guild g) => g.Name.GetHashCode();
+  }
 }
