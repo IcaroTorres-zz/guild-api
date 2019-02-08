@@ -97,7 +97,8 @@ namespace lumen.api.Repositories
     {
       var guild =Context.Set<Guild> ().Find (name);
       if (guild != null) {
-        guild.Members = LumenContext.Users.Where(u => u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+        guild.Members = LumenContext.Users.Where(u => !string.IsNullOrEmpty(u.GuildName)
+          && u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase)).ToList();
       }
       return guild;
     }
