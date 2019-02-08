@@ -21,66 +21,46 @@ namespace lumen.api.Repositories
       
       if (!string.IsNullOrEmpty(master.GuildName)) return false;
       try
-      {
-        var newGuild = new Guild
-        {
-          Name = guildName,
-          MasterName = master.Name,
-        };
-        master.GuildName = guildName;
-        master.IsGuildMaster = true;
-        newGuild.Members = new List<User>() { master };
-        Add(newGuild);
-        return true;
-      }
-      catch (Exception e)
-      {
-        return false;
-      }
+      { Add(new Guild
+        { Name = guildName, MasterName = masterName, Members = new HashSet<string>() { masterName } });
+      } catch (Exception) { return false; }
+      master.GuildName = guildName;
+      master.IsGuildMaster = true;
+      return true;
     }
 
     public bool AddMember(string guildName, string memberName)
     {
       var guild = Get(guildName);
       var member = GetUser(memberName);
-      if (guild == null || member == null) return false;
-
       try
       {
-        if ( guild.Members.Contains(member, new UserEqualityComparer()) )
+        if ( (guild == null || member == null)
+           || guild.Members.Any(m => m.Equals(memberName, StringComparison.OrdinalIgnoreCase))
+           || ( !string.IsNullOrEmpty(member.GuildName) && !RemoveMember(memberName, guildName)) )
           return false;
-        if (!string.IsNullOrEmpty(member.GuildName) && !RemoveMember(memberName, guildName))
-          return false;
-
-        guild.Members.Add(member);
-        return true;
-      } catch(Exception e) {
-        return false;
-      }
+        guild.Members.Add(memberName);
+      } catch(Exception) { return false; }
+      member.GuildName = guildName;
+      return true;
     }
     public bool RemoveMember(string memberName, string guildName)
     {
       var guild = Get(guildName);
       var member = GetUser(memberName);
-      if (guild == null || member == null) return false;
       try
       {
-        var memberComparer = new UserEqualityComparer();
-
-        if (! guild.Members.Contains(member, memberComparer) )
-          return false;
-        if (member.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase) && guild.Members.Count() > 1)
+        if ( (guild == null || member == null)
+           || ! guild.Members.Any(m => m.Equals(memberName, StringComparison.OrdinalIgnoreCase))
+           || (member.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase) && guild.Members.Count() > 1) )
           return false;
 
-        guild.Members.Remove(member);
-
+        guild.Members.Remove(memberName);
         if (guild.Members.Count == 0)
           Remove(guild);
-
-        return true;
-      } catch(Exception e) {
-        return false;
-      }
+      } catch(Exception) { return false; }
+      member.GuildName = null;
+      return true;
     }
     public bool TransferOwnership(string guildName, string userName)
     {
@@ -93,12 +73,14 @@ namespace lumen.api.Repositories
       return true;
     }
     public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Name);
-    public new Guild Get (string name)
+    public new Guild Get (string guildName)
     {
-      var guild =Context.Set<Guild> ().Find (name);
+      var guild =Context.Set<Guild> ().Find(guildName);
       if (guild != null) {
-        guild.Members = LumenContext.Users.Where(u => !string.IsNullOrEmpty(u.GuildName)
-          && u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+        guild.Members = LumenContext.Users
+          .Where(u => !string.IsNullOrEmpty(u.GuildName)
+            && u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase))
+          .Select(u => u.Name).ToHashSet();
       }
       return guild;
     }
@@ -108,7 +90,7 @@ namespace lumen.api.Repositories
       var guild = Get(guildName);
       
       info["guild"] = guild != null
-        ? new Dictionary<string, dynamic>() { { "name", guild.Name }, { "guildmaster", guild.MasterName }, { "members", guild.Members.Select(m => m.Name) } }
+        ? new Dictionary<string, dynamic>() { { "name", guild.Name }, { "guildmaster", guild.MasterName }, { "members", guild.Members } }
         : info["erro"] = "guild not found.";
       return info;
     }
