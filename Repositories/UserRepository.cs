@@ -24,7 +24,11 @@ namespace lumen.api.Repositories
     {
       var user = Get(userName);
       var guild = GetGuild(guildName);
-      if (guild == null || user == null || string.IsNullOrEmpty(user.GuildName) || user.IsGuildMaster) return false;
+      if (guild == null
+        || user == null
+        || string.IsNullOrEmpty(user.GuildName)
+        || (user.IsGuildMaster && guild.Members.Count() > 1))
+        return false;
       user.GuildName = null;
       return true;
     }
