@@ -22,11 +22,11 @@ namespace lumen.api.Models {
   {
       public bool Equals(Guild g1, Guild g2)
       {
-          if (u2 == null && g1 == null)
+          if (g2 == null && g1 == null)
             return true;
-          else if (g1 == null || u2 == null)
+          else if (g1 == null || g2 == null)
             return false;
-          else if(g1.Name.Equals(u2.Name, StringComparison.OrdinalIgnoreCase))
+          else if(g1.Name.Equals(g2.Name, StringComparison.OrdinalIgnoreCase))
               return true;
           else
               return false;
