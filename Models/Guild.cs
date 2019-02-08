@@ -8,6 +8,6 @@ namespace lumen.api.Models {
     [Key]
     public string Name { get; set; }
     public string MasterName { get; set; }
-    public ICollection<string> Members { get; set; }
+    public HashSet<User> Members { get; set; }
   }
 }

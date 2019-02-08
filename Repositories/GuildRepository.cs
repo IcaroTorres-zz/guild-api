@@ -22,7 +22,7 @@ namespace lumen.api.Repositories
       if (!string.IsNullOrEmpty(master.GuildName)) return false;
       try
       { Add(new Guild
-        { Name = guildName, MasterName = masterName, Members = new List<string>() { masterName } });
+        { Name = guildName, MasterName = masterName, Members = new HashSet<User>() { master } });
       } catch (Exception) { return false; }
       master.GuildName = guildName;
       master.IsGuildMaster = true;
@@ -36,10 +36,10 @@ namespace lumen.api.Repositories
       try
       {
         if ( (guild == null || member == null)
-           || guild.Members.Any(m => m.Equals(memberName, StringComparison.OrdinalIgnoreCase))
+           || guild.Members.Contains(member)
            || ( !string.IsNullOrEmpty(member.GuildName) && !RemoveMember(memberName, guildName)) )
           return false;
-        guild.Members.Add(memberName);
+        guild.Members.Add(member);
       } catch(Exception) { return false; }
       member.GuildName = guildName;
       return true;
@@ -51,11 +51,11 @@ namespace lumen.api.Repositories
       try
       {
         if ( (guild == null || member == null)
-           || ! guild.Members.Any(m => m.Equals(memberName, StringComparison.OrdinalIgnoreCase))
+           || ! guild.Members.Contains(member)
            || (member.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase) && guild.Members.Count() > 1) )
           return false;
 
-        guild.Members.Remove(memberName);
+        guild.Members.Remove(member);
         if (!guild.Members.Any())
           Remove(guild);
       } catch(Exception) { return false; }
@@ -80,7 +80,7 @@ namespace lumen.api.Repositories
         guild.Members = LumenContext.Users
           .Where(u => !string.IsNullOrEmpty(u.GuildName)
             && u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase))
-          .Select(u => u.Name).ToList();
+          .ToHashSet();
       }
       return guild;
     }
