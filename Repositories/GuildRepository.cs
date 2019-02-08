@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using lumen.api.Context;
@@ -17,19 +18,35 @@ namespace lumen.api.Repositories
       throw new NotImplementedException();
     }
 
-    public bool CreateGuild(string guildName, string masterName)
+    public bool CreateGuild(string guildName, User master)
     {
-      throw new NotImplementedException();
+      try
+      {
+        Add(new Guild
+        {
+          Name = guildName,
+          MasterName = master.Name,
+          Master = master,
+          Members = new List<User>() { master }
+        });
+        return true;
+      }
+      catch (Exception e)
+      {
+        return false;
+      }
     }
 
-    public IEnumerable<string> GetGuilds(int count = 20)
-    {
-      throw new NotImplementedException();
-    }
+    public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Name);
 
     public Dictionary<string, dynamic> GuildInfo(string guildName)
     {
-      throw new NotImplementedException();
+      var info = new Dictionary<string, dynamic>(StringComparer.OrdinalIgnoreCase);
+      var guild = Get(guildName);
+      info["guild"] = guild != null
+        ? new Dictionary<string, dynamic>() { { "name", guild.Name }, { "guildmaster", guild.MasterName }, { "members", guild.Members } }
+        : info["erro"] = "guild not found.";
+      return info;
     }
 
     public bool RemoveMember(string userName, string guildName)
