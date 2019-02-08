@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 namespace lumen.api.Controllers
 {
     [Route("lumen.api/[controller]")]
+    [Produces("application/json")]
     [ApiController]
     public class GuildController : ControllerBase
     {
@@ -17,8 +18,8 @@ namespace lumen.api.Controllers
         // injected unit of work from startup.cs configure services
         public GuildController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-        [HttpPost("[action]/{guildname}/{mastername}")]
-        public bool Create(string guildname, string mastername)
+        [HttpGet("create/{guildname}/{mastername}")]
+        public ActionResult<bool> Create(string guildname, string mastername)
         {
             try {  return _unitOfWork.Guilds.CreateGuild(guildname,mastername); }
             catch(Exception e) {
@@ -27,13 +28,13 @@ namespace lumen.api.Controllers
             }
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("guilds")]
         public IEnumerable<string> Guilds() => _unitOfWork.Guilds.GetNthGuilds();
 
-        [HttpGet("[action]/{count}")]
+        [HttpGet("guilds/{count}")]
         public IEnumerable<string> Guilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
         
-        [HttpGet("[action]/{guildname}")]
+        [HttpGet("info/{guildname}")]
         public Dictionary<string, dynamic> Info(string guildname)
         {
             Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
@@ -48,8 +49,8 @@ namespace lumen.api.Controllers
             return result;
         }
 
-        [HttpPut("[action]/{guildname}/{username}")]
-        public bool Enter(string guildname, string username)
+        [HttpGet("enter/{guildname}/{username}")]
+        public ActionResult<bool>  Enter(string guildname, string username)
         {
             bool result = false;
             try
@@ -65,8 +66,8 @@ namespace lumen.api.Controllers
             return result;
         }
 
-        [HttpDelete("[action]/{username}/{guildname}")]
-        public bool Leave(string username, string guildname)
+        [HttpGet("leave/{username}/{guildname}")]
+        public ActionResult<bool>  Leave(string username, string guildname)
         {
             bool result = false;
             try
@@ -82,8 +83,8 @@ namespace lumen.api.Controllers
             return result;
         }
 
-        [HttpPut("[action]/{guildname}/{username}")]
-        public bool Transfer(string guildname, string username)
+        [HttpGet("transfer/{guildname}/{username}")]
+        public ActionResult<bool> Transfer(string guildname, string username)
         {
             var result = false;
             try
