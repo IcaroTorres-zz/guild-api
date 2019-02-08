@@ -12,11 +12,11 @@ namespace lumen.api.Controllers
     [Route("lumen.api/")]
     [Produces("application/json")]
     [ApiController]
-    public class GuildController : ControllerBase
+    public class HomeController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
         // injected unit of work from startup.cs configure services
-        public GuildController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+        public HomeController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
         
         public ActionResult<object> Index() => new {
@@ -37,7 +37,7 @@ namespace lumen.api.Controllers
             }
             return result;
         }
-        [HttpGet("user/{username}")]
+        [HttpGet("[action]/{username}")]
         public ActionResult<string> User(string username){
             var user  =_unitOfWork.Users.Get(username);
             if (user == null) {
