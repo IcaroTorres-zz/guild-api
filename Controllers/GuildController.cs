@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using lumen.api.Models;
 using lumen.api.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.Serialization;
 
 namespace lumen.api.Controllers
 {
@@ -15,36 +17,84 @@ namespace lumen.api.Controllers
         // injected unit of work from startup.cs configure services
         public GuildController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-        // GET api/values
+        [HttpPost("{guildname}/{mastername}")]
+        public bool CreateGuild(string guildname, string mastername)
+        {
+            try {  return _unitOfWork.Guilds.CreateGuild(guildname,mastername); }
+            catch(Exception e) {
+                _unitOfWork.Rollback();
+                return false;
+            }
+        }
+
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public IEnumerable<string> GetGuilds() => _unitOfWork.Guilds.GetNthGuilds();
+
+        [HttpGet("{count}")]
+        public IEnumerable<string> GetGuilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
+        
+        [HttpGet("{guildname}")]
+        public Dictionary<string, dynamic> GuildInfo(string guildname)
         {
-            return new string[] { "value1", "value2" };
+            Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
+            try
+            {
+                result = _unitOfWork.Guilds.GuildInfo(guildname);
+                _unitOfWork.Complete();
+            } catch (Exception e)
+            {
+                _unitOfWork.Rollback();
+            }
+            return result;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        [HttpPut("{guildname}/{username}")]
+        public bool EnterTheGuild(string guildname, string username)
         {
-            return "value";
+            bool result = false;
+            try
+            {   
+                if (_unitOfWork.Guilds.AddMember(guildname, username))
+                    result = _unitOfWork.Users.EnterTheGuild(guildname, username);
+
+                _unitOfWork.Complete();
+            } catch (Exception e)
+            {
+                _unitOfWork.Rollback();
+            }
+            return result;
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpDelete("{username}/{guildname}")]
+        public bool LeaveTheGuild(string username, string guildname)
         {
+            bool result = false;
+            try
+            {   
+                if (_unitOfWork.Guilds.RemoveMember(username, guildname))
+                    result = _unitOfWork.Users.LeaveTheGuild(username, guildname);
+
+                _unitOfWork.Complete();
+            } catch (Exception e)
+            {
+                _unitOfWork.Rollback();
+            }
+            return result;
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("{guildname}/{username}")]
+        public bool TransferOwnership(string guildname, string username)
         {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var result = false;
+            try
+            {   
+                result = _unitOfWork.Guilds.TransferOwnership(guildname, username);
+                _unitOfWork.Complete();
+            } catch (Exception e)
+            {
+                _unitOfWork.Rollback();
+            }
+            return result;
         }
     }
 }
