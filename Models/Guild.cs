@@ -5,12 +5,10 @@ using System.ComponentModel.DataAnnotations;
 namespace lumen.api.Models {
   public class Guild
   {
-    public Guild () {  }
     [Key]
     public string Name { get; set; }
     public string MasterName { get; set; }
-    public int Level { get; set; }
-    public virtual ICollection<User> Members { get; set; }
+    public HashSet<string> Members { get; set; }
   }
   class GuildEqualityComparer : IEqualityComparer<Guild>
   {

@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 namespace lumen.api.Models {
   public class User
   {
-    public User () { }
     [Key]
     public string Name { get; set; }
     public string GuildName { get; set; }
