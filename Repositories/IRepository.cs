@@ -10,7 +10,7 @@ namespace lumen.api.Repositories
     public interface IRepository<TEntity> where TEntity : class
     {
         // group of methods to get objects
-        TEntity Get(int id);
+        TEntity Get(string name);
         IEnumerable<TEntity> GetAll();
         IEnumerable<TEntity> Find(
             Expression<Func<TEntity, bool>> predicate = null,

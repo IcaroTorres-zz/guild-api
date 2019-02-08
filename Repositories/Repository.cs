@@ -14,7 +14,7 @@ namespace lumen.api.Repositories {
         public void AddRange (IEnumerable<TEntity> entities) => Context.Set<TEntity> ().AddRange (entities);
 
         // retrieval methods
-        public TEntity Get (int id) => Context.Set<TEntity> ().Find (id);
+        public TEntity Get (string name) => Context.Set<TEntity> ().Find (name);
         public IEnumerable<TEntity> Find (
             Expression<Func<TEntity, bool>> predicate = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
