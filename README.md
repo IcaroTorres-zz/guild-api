@@ -56,7 +56,7 @@ ___
 | Info | GET | https://[server]/lumen.api/info/[guildname] |
 | Enter | GET | https://[server]/lumen.api/enter/[guildname]/[username] |
 | Leave | GET | https://[server]/lumen.api/leave/[username]/[guildname] |
-| Transfer | GET | https://[server]/lumen.api/transfer[guildname]/[string] |
+| Transfer | GET | https://[server]/lumen.api/transfer/[guildname]/[username] |
 
 > **Index or / (bonus)**
 > Receives no params .
