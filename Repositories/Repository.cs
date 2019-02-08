@@ -29,7 +29,7 @@ namespace lumen.api.Repositories {
 
             return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
-        public IEnumerable<TEntity> GetAll () => Context.Set<TEntity> ().ToHashSet();
+        public IEnumerable<TEntity> GetAll () => Context.Set<TEntity> ().ToList();
 
         // removal methods
         public void Remove (TEntity entity) => Context.Set<TEntity> ().Remove (entity);

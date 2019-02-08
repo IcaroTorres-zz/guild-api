@@ -22,7 +22,7 @@ namespace lumen.api.Repositories
       if (!string.IsNullOrEmpty(master.GuildName)) return false;
       try
       { Add(new Guild
-        { Name = guildName, MasterName = masterName, Members = new HashSet<string>() { masterName } });
+        { Name = guildName, MasterName = masterName, Members = new List<string>() { masterName } });
       } catch (Exception) { return false; }
       master.GuildName = guildName;
       master.IsGuildMaster = true;
@@ -80,7 +80,7 @@ namespace lumen.api.Repositories
         guild.Members = LumenContext.Users
           .Where(u => !string.IsNullOrEmpty(u.GuildName)
             && u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase))
-          .Select(u => u.Name).ToHashSet();
+          .Select(u => u.Name).ToList();
       }
       return guild;
     }
