@@ -12,11 +12,10 @@ namespace lumen.api.Models {
     }
     [Key]
     public string Name { get; set; }
+    public string MasterName { get; set; }
     public int Level { get; set; }
-    public virtual User Master { get; set; }
     public virtual ICollection<User> Members { get; set; }
     public DateTime CreationDate { get; set; }
-    public string MasterName { get; set; }
   }
   class GuildEqualityComparer : IEqualityComparer<Guild>
   {

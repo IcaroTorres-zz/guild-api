@@ -17,19 +17,17 @@ namespace lumen.api.Repositories
     public bool CreateGuild(string guildName, string masterName)
     {
       var guild = Get(guildName);
-      var master = GetUser(masterName) ?? new User() { Name = masterName, Guild = guild };
+      var master = GetUser(masterName) ?? new User() { Name = masterName };
       
-      if (master.Guild != null || guild != null) return false;
+      if (!string.IsNullOrEmpty(master.GuildName)) return false;
       try
       {
         var newGuild = new Guild
         {
           Name = guildName,
-          Master = master,
           MasterName = master.Name,
         };
-        master.Guild = newGuild;
-        master.GuildName = newGuild.Name;
+        master.GuildName = guildName;
         newGuild.Members = new List<User>() { master };
         Add(newGuild);
         return true;
@@ -50,7 +48,7 @@ namespace lumen.api.Repositories
       {
         if ( guild.Members.Contains(member, new UserEqualityComparer()) )
           return false;
-        if (member.Guild != null && !RemoveMember(memberName, guildName))
+        if (!string.IsNullOrEmpty(member.GuildName) && !RemoveMember(memberName, guildName))
           return false;
 
         guild.Members.Add(member);
@@ -87,9 +85,9 @@ namespace lumen.api.Repositories
     {
       var guild = Get(guildName);
       var user = GetUser(userName);
-      if (user == null || guild == null || user.Guild != guild)
+      if (user == null || guild == null || user.GuildName != guildName)
         return false;
-      guild.Master = user;
+      guild.MasterName = userName;
       return true;
     }
     public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Name);
@@ -98,7 +96,6 @@ namespace lumen.api.Repositories
       var guild =Context.Set<Guild> ().Find (name);
       if (guild != null) {
         guild.Members = LumenContext.Users.Where(u => u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase)).ToList();
-        guild.Master = guild.Members.FirstOrDefault(u => u.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase));
       }
       return guild;
     }
