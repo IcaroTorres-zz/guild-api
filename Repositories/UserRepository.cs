@@ -16,7 +16,7 @@ namespace lumen.api.Repositories
       var user = Get(userName);
       var guild = GetGuild(guildName);
       if (guild == null || user == null || user.IsGuildMaster) return false;
-      user.Guild = guild;
+      user.GuildName = guildName;
       return true;
     }
     public new User Get (string name) => Context.Set<User> ().Find (name);
@@ -24,8 +24,8 @@ namespace lumen.api.Repositories
     {
       var user = Get(userName);
       var guild = GetGuild(guildName);
-      if (guild == null || user == null || user.Guild == null || user.IsGuildMaster) return false;
-      user.Guild = null;
+      if (guild == null || user == null || string.IsNullOrEmpty(user.GuildName) || user.IsGuildMaster) return false;
+      user.GuildName = null;
       return true;
     }
     

@@ -28,6 +28,7 @@ namespace lumen.api.Repositories
           MasterName = master.Name,
         };
         master.GuildName = guildName;
+        master.IsGuildMaster = true;
         newGuild.Members = new List<User>() { master };
         Add(newGuild);
         return true;
@@ -88,6 +89,7 @@ namespace lumen.api.Repositories
       if (user == null || guild == null || user.GuildName != guildName)
         return false;
       guild.MasterName = userName;
+      user.IsGuildMaster = true;
       return true;
     }
     public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Name);
