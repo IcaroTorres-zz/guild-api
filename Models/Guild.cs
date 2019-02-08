@@ -16,7 +16,7 @@ namespace lumen.api.Models {
     public virtual User Master { get; set; }
     public virtual ICollection<User> Members { get; set; }
     public DateTime CreationDate { get; set; }
-    public string MasterName { get => Master.Name; }
+    public string MasterName { get; set; }
   }
   class GuildEqualityComparer : IEqualityComparer<Guild>
   {

@@ -17,7 +17,7 @@ namespace lumen.api.Controllers
         // injected unit of work from startup.cs configure services
         public GuildController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-        [HttpPost("{guildname}/{mastername}")]
+        [HttpGet("[action]/{guildname}/{mastername}")]
         public bool CreateGuild(string guildname, string mastername)
         {
             try {  return _unitOfWork.Guilds.CreateGuild(guildname,mastername); }
@@ -27,13 +27,13 @@ namespace lumen.api.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("[action]")]
         public IEnumerable<string> GetGuilds() => _unitOfWork.Guilds.GetNthGuilds();
 
-        [HttpGet("{count}")]
+        [HttpGet("[action]/{count}")]
         public IEnumerable<string> GetGuilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
         
-        [HttpGet("{guildname}")]
+        [HttpGet("[action]/{guildname}")]
         public Dictionary<string, dynamic> GuildInfo(string guildname)
         {
             Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
@@ -48,7 +48,7 @@ namespace lumen.api.Controllers
             return result;
         }
 
-        [HttpPut("{guildname}/{username}")]
+        [HttpPut("[action]/{guildname}/{username}")]
         public bool EnterTheGuild(string guildname, string username)
         {
             bool result = false;
@@ -65,7 +65,7 @@ namespace lumen.api.Controllers
             return result;
         }
 
-        [HttpDelete("{username}/{guildname}")]
+        [HttpDelete("[action]/{username}/{guildname}")]
         public bool LeaveTheGuild(string username, string guildname)
         {
             bool result = false;
@@ -82,7 +82,7 @@ namespace lumen.api.Controllers
             return result;
         }
 
-        [HttpPut("{guildname}/{username}")]
+        [HttpPut("[action]/{guildname}/{username}")]
         public bool TransferOwnership(string guildname, string username)
         {
             var result = false;

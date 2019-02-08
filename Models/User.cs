@@ -17,7 +17,7 @@ namespace lumen.api.Models {
     public Double Gold { get; set; }
     public virtual Guild Guild { get; set; }
     public DateTime CreationDate { get; set; }
-    public string GuildName { get => Guild.Name; }
+    public string GuildName { get; set; }
     public bool IsGuildMaster { get => Name.Equals(Guild?.MasterName); }
     public string FormatDate { get => CreationDate.ToString("d"); }
   }
