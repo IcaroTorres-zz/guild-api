@@ -11,29 +11,5 @@ namespace lumen.api.Repositories
   {
     public UserRepository(LumenContext context) : base(context) { }
     public LumenContext LumenContext => Context as LumenContext;
-    public bool EnterTheGuild(string guildName, string userName)
-    {
-      var user = Get(userName);
-      var guild = GetGuild(guildName);
-      if (guild == null || user == null || user.IsGuildMaster) return false;
-      user.GuildName = guildName;
-      return true;
-    }
-    public new User Get (string name) => Context.Set<User> ().Find (name);
-    public bool LeaveTheGuild(string userName, string guildName)
-    {
-      var user = Get(userName);
-      var guild = GetGuild(guildName);
-      if (guild == null
-        || user == null
-        || string.IsNullOrEmpty(user.GuildName)
-        || (user.IsGuildMaster && guild.Members.Count() > 1))
-        return false;
-      user.GuildName = null;
-      return true;
-    }
-    
-    public Guild GetGuild(string guildname) => LumenContext.Guilds.FirstOrDefault(g => g.Name.Equals(guildname, StringComparison.OrdinalIgnoreCase));
-    public Guild UserGuild(string username) => LumenContext.Guilds.FirstOrDefault(g => g.Name.Equals(Get(username).GuildName, StringComparison.OrdinalIgnoreCase));
   }
 }

@@ -80,9 +80,7 @@ namespace lumen.api.Controllers
             bool result = false;
             try
             {   
-                if (_unitOfWork.Guilds.AddMember(guildname, username))
-                    result = _unitOfWork.Users.EnterTheGuild(guildname, username);
-
+                result = _unitOfWork.Guilds.AddMember(guildname, username);
                 _unitOfWork.Complete();
             } catch (Exception)
             {
@@ -97,9 +95,7 @@ namespace lumen.api.Controllers
             bool result = false;
             try
             {   
-                if (_unitOfWork.Guilds.RemoveMember(username, guildname))
-                    result = _unitOfWork.Users.LeaveTheGuild(username, guildname);
-
+                result =_unitOfWork.Guilds.RemoveMember(username, guildname);
                 _unitOfWork.Complete();
             } catch (Exception)
             {

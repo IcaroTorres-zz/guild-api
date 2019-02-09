@@ -56,6 +56,7 @@ namespace lumen.api.Repositories
           return false;
 
         guild.Members.Remove(member);
+        member.IsGuildMaster = false;
         if (!guild.Members.Any())
           Remove(guild);
       } catch(Exception) { return false; }
@@ -68,8 +69,10 @@ namespace lumen.api.Repositories
       var user = GetUser(userName);
       if (user == null || guild == null || user.GuildName != guildName)
         return false;
-      guild.MasterName = userName;
+      var oldMaster = GetUser(guild.MasterName);
+      oldMaster.IsGuildMaster = false;
       user.IsGuildMaster = true;
+      guild.MasterName = userName;
       return true;
     }
     public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Name);
