@@ -101,19 +101,19 @@ ___
 
 > **Leave**
 > Receives 2 params `(string username, string guildname,)` to remove a member from a guild.
-> Fails if: 
-+ guild or user not found;
-+ trying to remove a user currently out of the guild;
-+ user is guildmaster (nedding to Trasfer the guild ownership to other member) and is not the last one to quit the Guild.
+>> Fails if: 
+>+ guild or user not found;
+>+ trying to remove a user currently out of the guild;
+>+ user is guildmaster (nedding to Trasfer the guild ownership to other member) and is not the last one to quit the Guild.
 + _Return a boolean corresponding the success status_.
 
 > **Transfer**
 > Receives 2 params `(string guildname, string username,)` to pass the guild ownership position to another member from the guild.
 > Need to be performed before a guildmaster leaves a guild.
-> Fails if: 
-+ guild or user not found;
-+ trying to remove a user currently out of the guild;
-+ user is guildmaster (nedding to Trasfer the guild ownership to other member).
+>> Fails if: 
+>+ guild or user not found;
+>+ trying to remove a user currently out of the guild;
+>+ user is guildmaster (nedding to Trasfer the guild ownership to other member).
 + _Return a boolean corresponding the success status_.
 
 ___
