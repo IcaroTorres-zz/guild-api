@@ -2,7 +2,7 @@
 ## Guild API using .netCore 2.2 and EF Core Inmemory Provider
 
 ### The API
-> Developed with **.Net Core 2.2**, **EF Core 2**, **Microsoft.EntityFrameworkCore.Inmemory** package, **Repository Pattern** and **Dependency Injection**, as a **Technical test** proposed by **[Lumen Games](https://lumen.games/ "Lumen Games")**.
+> **Sample API** Developed with **.Net Core 2.2**, **EF Core 2**, **Microsoft.EntityFrameworkCore.Inmemory** package, **Repository Pattern** and **Dependency Injection**, as a **Technical test** proposed by **[Lumen Games](https://lumen.games/ "Lumen Games")**.
 
 ### Setup
 
