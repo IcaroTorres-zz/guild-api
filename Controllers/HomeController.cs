@@ -9,114 +9,122 @@ using System.Runtime.Serialization;
 
 namespace lumen.api.Controllers
 {
-    [Route("lumen.api/")]
+    [Route("lumen.api")]
     [Produces("application/json")]
     [ApiController]
     public class HomeController : ControllerBase
-    {
+    {        
         private readonly IUnitOfWork _unitOfWork;
         // injected unit of work from startup.cs configure services
         public HomeController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-        
-        public ActionResult<object> Index() => new {
-            users = _unitOfWork.Users.GetAll(),
-            guilds = _unitOfWork.Guilds.GetAll()
-        };
-
-        [HttpGet("create/{guildname}/{mastername}")]
-        public ActionResult<bool> Create(string guildname, string mastername)
+        [HttpGet("[action]/{guildname}/{mastername}")]
+        public bool CreateGuild(string guildname, string mastername)
         {
-            bool result = false;
             try { 
-                result = _unitOfWork.Guilds.CreateGuild(guildname,mastername); 
-                _unitOfWork.Complete();
+                if (_unitOfWork.Guilds.CreateGuild(guildname,mastername) != null)
+                    _unitOfWork.Complete();
+                else 
+                    throw new Exception($"error: fails creating [{guildname}] as a new guild.");
+
+                return true;
             }
             catch(Exception) {
                 _unitOfWork.Rollback();
+                return false;
             }
-            return result;
         }
-        [HttpGet("[action]/{username}")]
-        public ActionResult<string> User(string username){
-            var user  =_unitOfWork.Users.Get(username);
-            if (user == null) {
-                try {
-                    user = new User { Name = username };
-                    _unitOfWork.Users.Add(user);
-                    _unitOfWork.Complete();
-                    return $"Created {user.Name}";
-                } catch (Exception) {
-                    _unitOfWork.Rollback();
-                    return "Error: Failure getting user.";
-                }
-            } else return $"Got {user.Name}";
-        }
-
-        [HttpGet("guilds")]
-        public IEnumerable<string> Guilds() => _unitOfWork.Guilds.GetNthGuilds();
-
-        [HttpGet("guilds/{count}")]
+                
+        [HttpGet("[action]/{count=20}")]
         public IEnumerable<string> Guilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
-        
-        [HttpGet("info/{guildname}")]
-        public Dictionary<string, dynamic> Info(string guildname)
+
+        [HttpGet("[action]/{username}")]
+        public Dictionary<string, dynamic> UserInfo(string username)
+        {
+            Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
+            try {
+                var user =_unitOfWork.Users.Get(username);
+                if (user != null)
+                    return new Dictionary<string, dynamic>{ { "user found", user } };
+
+                user = new User(){ Id = username };
+                _unitOfWork.Users.Add(user);
+                _unitOfWork.Complete();
+                return new Dictionary<string, dynamic>{ { "user created", user } };
+            } catch (Exception) {
+                _unitOfWork.Rollback();
+                return new Dictionary<string, dynamic>{ { "error", $"Fails on user [{username}]." } };
+            }
+        }
+
+        [HttpGet("[action]/{guildname}")]
+        public Dictionary<string, dynamic> GuildInfo(string guildname)
         {
             Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
             try
             {
                 result = _unitOfWork.Guilds.GuildInfo(guildname);
                 _unitOfWork.Complete();
-            } catch (Exception)
+            } catch (Exception e)
             {
                 _unitOfWork.Rollback();
+                return new Dictionary<string, dynamic>() { { "error", e.Message } };
             }
             return result;
         }
 
-        [HttpGet("enter/{guildname}/{username}")]
-        public ActionResult<bool>  Enter(string guildname, string username)
+        [HttpGet("[action]/{guildname}/{username}")]
+        public bool EnterGuild(string guildname, string username)
         {
-            bool result = false;
             try
             {   
-                result = _unitOfWork.Guilds.AddMember(guildname, username);
-                _unitOfWork.Complete();
+                if (_unitOfWork.Guilds.AddMember(guildname, username))
+                    _unitOfWork.Complete();
+                else 
+                    throw new Exception($"error: fails adding user [{username}] as member of [{guildname}] guild.");
+                
+                return true;
             } catch (Exception)
             {
                 _unitOfWork.Rollback();
+                return false;
             }
-            return result;
         }
 
-        [HttpGet("leave/{username}/{guildname}")]
-        public ActionResult<bool>  Leave(string username, string guildname)
+        [HttpGet("[action]/{username}/{guildname}")]
+        public bool LeaveGuild(string username, string guildname)
         {
-            bool result = false;
             try
             {   
-                result =_unitOfWork.Guilds.RemoveMember(username, guildname);
-                _unitOfWork.Complete();
+                if (_unitOfWork.Guilds.RemoveMember(username, guildname))
+                    _unitOfWork.Complete();
+                else 
+                    throw new Exception($"error: fails removing user [{username}] from members of [{guildname}] guild.");
+                
+                return true;
             } catch (Exception)
             {
                 _unitOfWork.Rollback();
+                return false;
             }
-            return result;
         }
 
-        [HttpGet("transfer/{guildname}/{username}")]
-        public ActionResult<bool> Transfer(string guildname, string username)
+        [HttpGet("[action]/{guildname}/{username}")]
+        public bool Transfer(string guildname, string username)
         {
-            var result = false;
             try
             {   
-                result = _unitOfWork.Guilds.TransferOwnership(guildname, username);
-                _unitOfWork.Complete();
+                if (_unitOfWork.Guilds.TransferOwnership(guildname, username))
+                    _unitOfWork.Complete();
+                else 
+                    throw new Exception($"error: fails transfering position of GuildMaster of [{guildname}] guild to user [{username}].");
+
+                return true;
             } catch (Exception)
             {
                 _unitOfWork.Rollback();
+                return false;
             }
-            return result;
         }
     }
 }
