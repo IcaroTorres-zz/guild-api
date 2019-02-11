@@ -136,10 +136,6 @@ namespace lumen.api.Repositories
         throw error ?? new ArgumentException($"fails getting {guildName} information.");
       }
     }
-    //new Get method including mapped navigation properties
-    public new Guild Get(string id) => Find(u => u.Id.Equals(id),
-                                            includeProperties: "Members,Master")
-                                            .FirstOrDefault();
     public User GetUser(string username) => LumenContext.Users.FirstOrDefault(u => u.Id.Equals(username, StringComparison.OrdinalIgnoreCase));
   }
 }

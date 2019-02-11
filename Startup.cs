@@ -28,15 +28,16 @@ namespace lumen.api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
             services.AddMvc()
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-                    
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                    .AddJsonOptions(options => options.SerializerSettings
+                                                      .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
             // your context dependency registration
             services.AddEntityFrameworkInMemoryDatabase()
-                    .AddDbContext<LumenContext>((serviceProvider, options)
-                    => options.UseInMemoryDatabase("lumenInMemoryDB")
-                              .UseInternalServiceProvider(serviceProvider));
-            
+                    .AddDbContext<LumenContext>(options => options.UseLazyLoadingProxies()
+                                                                  .UseInMemoryDatabase("lumenInMemoryDB"));
             // your repositories and unit of work dependecy registration
             services.AddTransient<IGuildRepository, GuildRepository>(); 
             services.AddTransient<IUserRepository, UserRepository>();

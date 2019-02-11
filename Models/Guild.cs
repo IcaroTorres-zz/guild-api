@@ -6,7 +6,7 @@ namespace lumen.api.Models {
   {
     public string Id { get; set; }
     public string MasterId { get; set; }
-    public User Master { get; set; }
-    public List<User> Members { get; set; }
+    public virtual User Master { get; set; }
+    public virtual ICollection<User> Members { get; set; }
   }
 }

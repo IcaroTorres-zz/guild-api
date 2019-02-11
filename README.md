@@ -127,7 +127,7 @@ public class User
 {
   public string Id { get; set; }
   public string GuildId { get; set; }
-  public Guild Guild { get; set; }
+  public virtual Guild Guild { get; set; }
   public bool? IsGuildMaster { get => Guild?.MasterId.Equals(Id); }
 }
 ```
@@ -138,8 +138,8 @@ public class Guild
 {
   public string Id { get; set; }
   public string MasterId { get; set; }
-  public User Master { get; set; }
-  public List<User> Members { get; set; }
+  public virtual User Master { get; set; }
+  public virtual ICollection<User> Members { get; set; }
 }
 ```
 
@@ -152,15 +152,12 @@ public class LumenContext : DbContext
   public LumenContext(DbContextOptions<LumenContext> options) : base(options) { }
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    // explicitly needed to map this one-sided navigation property on Guild Entity
     modelBuilder.Entity<Guild>()
       .HasOne(g => g.Master)
-      .WithOne() // without any navigation property on User entity
+      .WithOne() 
       .HasForeignKey<Guild>(g => g.MasterId);
       // the foreignKey here is needed cause there is no navigation property on the other relation size
-
-    modelBuilder.Entity<Guild>()
-      .HasMany(g => g.Members) // navigation property 1:*
-      .WithOne(u => u.Guild); // with Guild reference navigation property on User entity
   }
 }
 ```
@@ -171,15 +168,15 @@ public class LumenContext : DbContext
 ```c#
 public void ConfigureServices(IServiceCollection services)
 {
+  // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
   services.AddMvc()
-          .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-          
+          .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+          .AddJsonOptions(options => options.SerializerSettings
+                                            .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
   // your context dependency registration
   services.AddEntityFrameworkInMemoryDatabase()
-          .AddDbContext<LumenContext>((serviceProvider, options)
-          => options.UseInMemoryDatabase("lumenInMemoryDB")
-                    .UseInternalServiceProvider(serviceProvider));
-  
+          .AddDbContext<LumenContext>(options => options.UseLazyLoadingProxies()
+                                                        .UseInMemoryDatabase("lumenInMemoryDB"));
   // your repositories and unit of work dependecy registration
   services.AddTransient<IGuildRepository, GuildRepository>(); 
   services.AddTransient<IUserRepository, UserRepository>();

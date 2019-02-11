@@ -12,15 +12,12 @@ namespace lumen.api.Context {
     public LumenContext(DbContextOptions<LumenContext> options) : base(options) { }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+      // explicitly needed to map this one-sided navigation property on Guild Entity
       modelBuilder.Entity<Guild>()
         .HasOne(g => g.Master)
-        .WithOne() // without any navigation property on User entity
+        .WithOne() 
         .HasForeignKey<Guild>(g => g.MasterId);
         // the foreignKey here is needed cause there is no navigation property on the other relation size
-
-      modelBuilder.Entity<Guild>()
-        .HasMany(g => g.Members) // navigation property 1:*
-        .WithOne(u => u.Guild); // with Guild reference navigation property on User entity
     }
   }
 }

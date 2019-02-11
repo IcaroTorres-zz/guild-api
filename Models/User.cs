@@ -6,7 +6,7 @@ namespace lumen.api.Models {
   {
     public string Id { get; set; }
     public string GuildId { get; set; }
-    public Guild Guild { get; set; }
+    public virtual Guild Guild { get; set; }
     public bool? IsGuildMaster { get => Guild?.MasterId.Equals(Id); }
   }
 }
