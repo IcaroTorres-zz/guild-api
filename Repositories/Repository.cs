@@ -10,8 +10,10 @@ namespace lumen.api.Repositories {
         public Repository (DbContext context) => Context = context;
 
         // incremental methods
-        public void Add (TEntity entity) => Context.Set<TEntity> ().Add (entity);
+        public void Add (TEntity entity) => Context.Set<TEntity>().Add (entity);
         public void AddRange (IEnumerable<TEntity> entities) => Context.Set<TEntity> ().AddRange (entities);
+        public void Update (TEntity entity) => Context.Set<TEntity>().Update (entity);
+        public void UpdateRange (IEnumerable<TEntity> entities) => Context.Set<TEntity>().UpdateRange (entities);
 
         // retrieval methods
         public TEntity Get (string name) => Context.Set<TEntity> ().Find (name);

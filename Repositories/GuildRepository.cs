@@ -14,19 +14,32 @@ namespace lumen.api.Repositories
     public GuildRepository(LumenContext context) : base(context) { }
     public LumenContext LumenContext => Context as LumenContext;
 
-    public bool CreateGuild(string guildName, string masterName)
+    public Guild CreateGuild(string guildName, string masterName)
     {
-      var guild = Get(guildName);
-      var master = GetUser(masterName) ?? new User() { Name = masterName };
-      
-      if (!string.IsNullOrEmpty(master.GuildName)) return false;
       try
-      { Add(new Guild
-        { Name = guildName, MasterName = masterName, Members = new HashSet<User>() { master } });
-      } catch (Exception) { return false; }
-      master.GuildName = guildName;
-      master.IsGuildMaster = true;
-      return true;
+      {
+        if (Get(guildName) != null)
+          throw new ArgumentException($"error: Guild [{guildName}] already exist.");
+
+        var master = GetUser(masterName);
+        if (master != null)
+        {
+          if ( !string.IsNullOrEmpty(master.GuildId))
+            throw new ArgumentException($"error: User [{master.Id}] already in guild [{guildName}].");
+        }
+        else
+        {
+          master = new User { GuildId = guildName, Id = masterName };
+        }
+        var newGuild = new Guild
+        {
+          Id = guildName,
+          MasterId = master.Id,
+          Members = new List<User>() { master }
+        };
+        Add(newGuild);
+        return newGuild;
+      } catch (Exception e) { throw e; }
     }
 
     public bool AddMember(string guildName, string memberName)
@@ -35,14 +48,22 @@ namespace lumen.api.Repositories
       var member = GetUser(memberName);
       try
       {
-        if ( (guild == null || member == null)
-           || guild.Members.Contains(member)
-           || ( !string.IsNullOrEmpty(member.GuildName) && !RemoveMember(memberName, guildName)) )
-          return false;
+        if (guild == null)
+          throw new ArgumentException($"error: target guild [{guildName}] not found.");
+        if (member == null)
+          throw new ArgumentException($"error: target user [{memberName}] not found.");
+        if (guild.Members.Contains(member))
+          throw new ArgumentException($"error: member [{memberName}] already in target [{guildName}] guild.");
+        if (!string.IsNullOrEmpty(member.GuildId) && !RemoveMember(memberName, guildName))
+          throw new ArgumentException($"error: member [{memberName}] is the Guildmaster of the other guild [{member.GuildId}].\n" +
+                                      "Guildmasters can only leave guilds as the last remaining member.\n" +
+                                      $"(You can try 'lumen.api/transfer/{member.GuildId}/[otherValidMemberName]/')");
         guild.Members.Add(member);
-      } catch(Exception) { return false; }
-      member.GuildName = guildName;
-      return true;
+        Update(guild);
+        member.GuildId = guild.Id;
+        LumenContext.Users.Update(member);
+        return true;
+      } catch(Exception e) { throw e; }
     }
     public bool RemoveMember(string memberName, string guildName)
     {
@@ -50,54 +71,75 @@ namespace lumen.api.Repositories
       var member = GetUser(memberName);
       try
       {
-        if ( (guild == null || member == null)
-           || ! guild.Members.Contains(member)
-           || (member.Name.Equals(guild.MasterName, StringComparison.OrdinalIgnoreCase) && guild.Members.Count() > 1) )
-          return false;
-
+        if (guild == null)
+          throw new ArgumentException($"error: target guild [{guildName}] not found.");
+        if (member == null)
+          throw new ArgumentException($"error: target user [{memberName}] not found.");
+        if (!guild.Members.Contains(member))
+          throw new ArgumentException($"error: member [{memberName}] not in target [{guildName}] guild.");
+        if (member.Id.Equals(guild.MasterId, StringComparison.OrdinalIgnoreCase) && guild.Members.Count() > 1)
+          throw new ArgumentException($"error: member [{memberName}] is the Guildmaster of target [{guildName}] guild.\n" +
+                                      "Guildmasters can only leave guilds as the last remaining member.\n" +
+                                      "(You can try 'lumen.api/transfer/{guildName}/[otherValidMemberName]/')");
+                                      
         guild.Members.Remove(member);
-        member.IsGuildMaster = false;
+        Update(guild);
+        // LumenContext.Users.Update(member);
         if (!guild.Members.Any())
           Remove(guild);
-      } catch(Exception) { return false; }
-      member.GuildName = null;
-      return true;
+        return true;
+      } catch (Exception e) { throw e; }
     }
     public bool TransferOwnership(string guildName, string userName)
     {
       var guild = Get(guildName);
       var user = GetUser(userName);
-      if (user == null || guild == null || user.GuildName != guildName)
-        return false;
-      var oldMaster = GetUser(guild.MasterName);
-      oldMaster.IsGuildMaster = false;
-      user.IsGuildMaster = true;
-      guild.MasterName = userName;
+      if (guild == null)
+        throw new ArgumentException($"error: target guild [{guildName}] not found.");
+      if (user == null)
+        throw new ArgumentException($"error: target user [{userName}] not found.");
+      if (user.GuildId != guildName)
+        throw new ArgumentException($"error: target user [{userName}] already is in a different guild [{user.GuildId}], and can not become GuildMaster of [{guildName}] guild.");
+      
+      // var previousMaster = guild.Master;
+      guild.MasterId = userName;
+      Update(guild);
       return true;
     }
-    public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Name);
-    public new Guild Get (string guildName)
-    {
-      var guild =Context.Set<Guild> ().Find(guildName);
-      if (guild != null) {
-        guild.Members = LumenContext.Users
-          .Where(u => !string.IsNullOrEmpty(u.GuildName)
-            && u.GuildName.Equals(guild.Name, StringComparison.OrdinalIgnoreCase))
-          .ToHashSet();
-      }
-      return guild;
-    }
+    public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Id);
     public Dictionary<string, dynamic> GuildInfo(string guildName)
     {
-      var info = new Dictionary<string, dynamic>(StringComparer.OrdinalIgnoreCase);
-      var guild = Get(guildName);
-      
-      info["guild"] = guild != null
-        ? new Dictionary<string, dynamic>() { { "name", guild.Name }, { "guildmaster", guild.MasterName }, { "members", guild.Members } }
-        : info["erro"] = "guild not found.";
-      return info;
+      ArgumentException error = null;
+      try
+      {
+        var guild = Get(guildName);
+        if (guild != null)
+        {
+          return new Dictionary<string, dynamic>()
+          {
+            {
+              "guild",
+              new Dictionary<string, dynamic>()
+              {
+                { "name", guild.Id },
+                { "guildmaster", guild.MasterId },
+                { "members", guild.Members.Select(m => m.Id) }
+              }
+            }
+          };
+        }
+        error = new ArgumentException($"guild [{guildName}] not found");
+        throw error;
+      }
+      catch (Exception)
+      {
+        throw error ?? new ArgumentException($"fails getting {guildName} information.");
+      }
     }
-
-    public User GetUser(string username) => LumenContext.Users.FirstOrDefault(u => u.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
+    //new Get method including mapped navigation properties
+    public new Guild Get(string id) => Find(u => u.Id.Equals(id),
+                                            includeProperties: "Members,Master")
+                                            .FirstOrDefault();
+    public User GetUser(string username) => LumenContext.Users.FirstOrDefault(u => u.Id.Equals(username, StringComparison.OrdinalIgnoreCase));
   }
 }

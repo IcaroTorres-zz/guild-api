@@ -11,5 +11,10 @@ namespace lumen.api.Repositories
   {
     public UserRepository(LumenContext context) : base(context) { }
     public LumenContext LumenContext => Context as LumenContext;
+    
+    //new Get method including mapped navigation properties
+    public new User Get(string id) => Find(u => u.Id.Equals(id),
+                                           includeProperties: "Guild")
+                                           .FirstOrDefault();
   }
 }
