@@ -30,14 +30,18 @@ namespace lumen.api
         {
             services.AddMvc()
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+                    
+            // your context dependency registration
             services.AddEntityFrameworkInMemoryDatabase()
-                    .AddDbContext<LumenContext>((serviceProvider, options) => options.UseInMemoryDatabase("lumenInMemoryDB")
-                                                                                     .UseInternalServiceProvider(serviceProvider));
-            services.AddTransient<IGuildRepository, GuildRepository>();
+                    .AddDbContext<LumenContext>((serviceProvider, options)
+                    => options.UseInMemoryDatabase("lumenInMemoryDB")
+                              .UseInternalServiceProvider(serviceProvider));
+            
+            // your repositories and unit of work dependecy registration
+            services.AddTransient<IGuildRepository, GuildRepository>(); 
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();                             
-        }   
+        }    
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
