@@ -48,7 +48,7 @@ ___
 | Action | Method | Endpoint URI format | Example |
 | -------| -------| --------------------------------| -------------| 
 | User | GET | [API]/user/[username] | [API]/user/icaro torres |
-| Create | GET | [API]/createguild/[guildname]/[mastername] |[API]/createguild/myguild/icaro torres |
+| Create | POST | [API]/createguild | [API]/createguild/ |
 | Guilds | GET | [API]/guilds | |
 | Guilds | GET | [API]/guilds/[count] | [API]/guilds/100 |
 | Info | GET | [API]/guildinfo/[guildname] | [API]/guildinfo/myguild |
@@ -57,14 +57,23 @@ ___
 | Leave | GET | [API]/leaveguild/[username]/[guildname] | [API]/leaveguild/john doe/myguild |
 | Transfer | GET | [API]/transfer/[guildname]/[username] | [API]/transfer/myguild/jane doe |
 
+> **Disclaimer**
+> _All actions below fails with BadRequest if not receiving properly formatted requests, avoiding the need to add this as possible return of each described action in this section._
+
 > **CreateGuild**
-> Receives 2 params `(string guildname, string mastername)` to create a new Guild.
+> Receives 1 json formatted param with two properties to create a new Guild as following:
+``` js
+{
+  Id: [string], // representing the guild's name
+  MasterId: [string] // representing the guildmaster's name
+}
+```
 > if the user do not already exists, creates a brand new one setting it as a member and guildmaster of the resulting new Guild.
 > Fails if guild already exists.
-+ _Return a boolean corresponding the the success status_.
++ _Return the new Guild object with Created response._
 
 > **Guilds**
-> Receives 1 param `(int count)` to return the Nth first Guilds or no params to return the first 20ths.
+> Receives 1 _optional_ param `(int count)` to return the Nth first Guilds or no params to return the first 20ths.
 + _Return a list of guilds found_.
 
 > **UserInfo**
