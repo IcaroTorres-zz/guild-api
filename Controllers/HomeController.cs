@@ -18,20 +18,20 @@ namespace lumen.api.Controllers
         // injected unit of work from startup.cs configure services
         public HomeController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-        [HttpGet("[action]/{guildname}/{mastername}")]
-        public bool CreateGuild(string guildname, string mastername)
+        [HttpPost("[action]")]
+        public ActionResult CreateGuild([FromBody] Guild guildInfo)
         {
             try { 
-                if (_unitOfWork.Guilds.CreateGuild(guildname,mastername) != null)
+                var createdGuild = _unitOfWork.Guilds.CreateGuild(guildInfo.Id, guildInfo.MasterId);
+                if (createdGuild != null)
                     _unitOfWork.Complete();
                 else 
-                    throw new Exception($"error: fails creating [{guildname}] as a new guild.");
-
-                return true;
+                    throw new Exception($"error: fails creating [{guildInfo.Id}] as a new guild.");
+                return Created("lumen.api/createguild", createdGuild);
             }
-            catch(Exception) {
+            catch(Exception e) {
                 _unitOfWork.Rollback();
-                return false;
+                return BadRequest(e.Message);
             }
         }
                 
