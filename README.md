@@ -44,7 +44,7 @@ ___
 
 ### Content
 **Disclaimer**
-> _All actions below fails with BadRequest if not receiving properly formatted requests, avoiding the need to add this as possible return of each described action in this section._
+> _All actions below fails with BadRequest if not receiving properly formatted requests, avoiding the need of adding this as possible return of each described action in this section._
 
 #### Actions, Methods and Endpoints. ([API] present below correspond to https://[server]/lumen.api).
 | Action | Method | Endpoint URI format | Example |
@@ -76,18 +76,19 @@ ___
 + _Return a list of guilds found_.
 
 > **UserInfo**
-> Receives 1 params `(string username)` to check if user exists, else create a new one.
-+ _Return a key-value pair object like one of following options, depending on operation success:_.
+> Receives 1 params `(string username)` to get an existing user or create a new one and return it.
++ _Return a json formatted  User object_.
 ```js
-{ "user created": [User Object Representation] }
-//or
-{ "user found": [User Object Representation] }
-//or
-{ "error":  "Fails on user [{username}]." }
+{
+  "Id": [string], //username as the model's key
+  "GuildId":  [string] // guildname's ForeignKey
+  "IsGuildMaster": [nullable boolean],
+  "Guild": [nullable Guild object representation]
+}
 ```
 
 > **GuildInfo**
-> Receives 1 param `(string guildname)` display an JSON Object with the guildname, guildmaster and a list of members.
+> Receives 1 param `(string guildname)` display a JSON Object with the guildname, guildmaster and a list of members.
 > Fails if the guild do not exists.
 > if fail, returns an object containing `{ "error":  "guild not found."}`.
 + _Return expected_.

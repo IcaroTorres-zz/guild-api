@@ -39,21 +39,20 @@ namespace lumen.api.Controllers
         public IEnumerable<string> Guilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
 
         [HttpGet("[action]/{username}")]
-        public Dictionary<string, dynamic> UserInfo(string username)
+        public ActionResult UserInfo(string username)
         {
-            Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
             try {
                 var user =_unitOfWork.Users.Get(username);
                 if (user != null)
-                    return new Dictionary<string, dynamic>{ { "user found", user } };
+                    return Ok(user);
 
                 user = new User(){ Id = username };
                 _unitOfWork.Users.Add(user);
                 _unitOfWork.Complete();
-                return new Dictionary<string, dynamic>{ { "user created", user } };
-            } catch (Exception) {
+                return Created("lumen.api/userinfo", user);
+            } catch (Exception e) {
                 _unitOfWork.Rollback();
-                return new Dictionary<string, dynamic>{ { "error", $"Fails on user [{username}]." } };
+                return BadRequest($"error: Fails on user [{username}]. Exception found: {e.Message}.");
             }
         }
 
