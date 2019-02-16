@@ -43,6 +43,8 @@ and publish production files:
 ___
 
 ### Content
+**Disclaimer**
+> _All actions below fails with BadRequest if not receiving properly formatted requests, avoiding the need to add this as possible return of each described action in this section._
 
 #### Actions, Methods and Endpoints. ([API] present below correspond to https://[server]/lumen.api).
 | Action | Method | Endpoint URI format | Example |
@@ -56,9 +58,6 @@ ___
 | Enter | GET | [API]/enterguild/[guildname]/[username] | [API]/enterguild/myguild/john doe |
 | Leave | GET | [API]/leaveguild/[username]/[guildname] | [API]/leaveguild/john doe/myguild |
 | Transfer | GET | [API]/transfer/[guildname]/[username] | [API]/transfer/myguild/jane doe |
-
-> **Disclaimer**
-> _All actions below fails with BadRequest if not receiving properly formatted requests, avoiding the need to add this as possible return of each described action in this section._
 
 > **CreateGuild**
 > Receives 1 json formatted param with two properties to create a new Guild as following:
