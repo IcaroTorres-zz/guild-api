@@ -44,40 +44,24 @@ ___
 
 ### Content
 **Disclaimer**
-> _All actions below fails with BadRequest if not receiving properly formatted requests, avoiding the need of adding this as possible return of each described action in this section._
+> + _All actions below fails with BadRequest if not receiving properly formatted requests, avoiding the need of adding this as possible return of each described action in this section._
+> + _All responses are formated as JSON_
 
 #### Actions, Methods and Endpoints. ([API] present below correspond to https://[server]/lumen.api).
 | Action | Method | Endpoint URI format | Example |
 | -------| -------| --------------------------------| -------------| 
-| User | GET | [API]/user/[username] | [API]/user/icaro torres |
-| Create | POST | [API]/createguild | [API]/createguild/ |
-| Guilds | GET | [API]/guilds | |
-| Guilds | GET | [API]/guilds/[count] | [API]/guilds/100 |
-| Info | GET | [API]/guildinfo/[guildname] | [API]/guildinfo/myguild |
-| Info | GET | [API]/userinfo/[username] | [API]/userinfo/myguild |
-| Enter | GET | [API]/enterguild/[guildname]/[username] | [API]/enterguild/myguild/john doe |
-| Leave | GET | [API]/leaveguild/[username]/[guildname] | [API]/leaveguild/john doe/myguild |
-| Transfer | GET | [API]/transfer/[guildname]/[username] | [API]/transfer/myguild/jane doe |
+| CreateUser | PUT | [API]/createuser/{username} | [API]/createuser/icaro torres |
+| UserInfo | GET | [API]/userinfo/{username} | [API]/userinfo/icaro torres |
+| CreateGuild | POST | [API]/createguild | [API]/createguild/ |
+| GuildInfo | GET | [API]/guildinfo/{guildname} | [API]/guildinfo/myguild |
+| Guilds | GET | [API]/guilds/{count=20} | [API]/guilds/100 |
+| EnterGuild | PUT | [API]/enterguild/{guildname} | [API]/enterguild/myguild |
+| LeaveGuild | DELETE | [API]/leaveguild/{guildname} | [API]/leaveguild/myguild |
+| Transfer | PATCH | [API]/transfer/{guildname} | [API]/transfer/myguild/ |
 
-> **CreateGuild**
-> Receives 1 json formatted param with two properties to create a new Guild as following:
-``` js
-{
-  Id: [string], // representing the guild's name
-  MasterId: [string] // representing the guildmaster's name
-}
-```
-> if the user do not already exists, creates a brand new one setting it as a member and guildmaster of the resulting new Guild.
-> Fails if guild already exists.
-+ _Return the new Guild object with Created response._
-
-> **Guilds**
-> Receives 1 _optional_ param `(int count)` to return the Nth first Guilds or no params to return the first 20ths.
-+ _Return a list of guilds found_.
-
-> **UserInfo**
-> Receives 1 params `(string username)` to get an existing user or create a new one and return it.
-+ _Return a json formatted  User object_.
+> **CreateUser**
+> Receives 1 params `(string username)` to create a new one and return it.
++ _Return a new User object with Created response status (201)._
 ```js
 {
   "Id": [string], //username as the model's key
@@ -86,23 +70,63 @@ ___
   "Guild": [nullable Guild object representation]
 }
 ```
+> **UserInfo**
+> Receives 1 params `(string username)` to get an existing user and return it.
++ _Return an User object got with Ok response status (200)._
+```js
+{
+  "Id": [string], //username as the model's key
+  "GuildId":  [string] // guildname's ForeignKey
+  "IsGuildMaster": [nullable boolean],
+  "Guild": [nullable Guild object representation]
+}
+```
+> **CreateGuild**
+> Receives 1 json formatted param with two properties to create a new Guild as following:
+``` js
+{
+  "Id": [string], // representing the guild's name
+  "MasterId": [string] // representing the guildmaster's name
+}
+```
+> if the user do not already exists, creates a brand new one setting it as a member and guildmaster of the resulting new Guild.
+> Fails if guild already exists.
++ _Return a new Guild object with Created response status (201)._
 
 > **GuildInfo**
 > Receives 1 param `(string guildname)` display a JSON Object with the guildname, guildmaster and a list of members.
 > Fails if the guild do not exists.
 > if fail, returns an object containing `{ "error":  "guild not found."}`.
-+ _Return expected_.
++ _Return a new Guild object with OK response status (200)._
 ``` js
 {
-  "guild": {
-    "name": [string guildname],
-    "guildmaster": [string master name],
-    "members" : [
-      //... a list of member names
-    ]
-  }
+  "Id": [string], // guildname as the model's key
+  "MasterId": [string], // guildmaster's name as ForeignKey 
+  "Master": [User object representation] 
+  "members" : [
+      //... a list of User objects
+  ]
 }
 ```
+
+> **Guilds**
+> Receives 1 _optional_ param `(int count)` to return the Nth first Guilds or no params to return the first 20ths.
++ _Return a list of guilds found_.
+``` js
+// list of guilds found
+[
+  {
+    "Id": [string], // guildname as the model's key
+    "MasterId": [string], // guildmaster's name as ForeignKey 
+    "Master": [User object representation] 
+    "members" : [
+      //... a list of User objects
+    ]
+  },
+  // . . .
+]
+```
+
 > **EnterGuild**
 > Receives 2 params `(string guildname, string username)` to insert a new member to a guild.
 >> Fails if: 

@@ -14,11 +14,71 @@ namespace lumen.api.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {        
-        private readonly IUnitOfWork _unitOfWork;
         // injected unit of work from startup.cs configure services
+        private readonly IUnitOfWork _unitOfWork;
         public HomeController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-        [HttpPost("[action]")]
+        [HttpPost("users")]
+        public ActionResult CreateUser([FromBody] string username)
+        {
+            try {
+                var user =_unitOfWork.Users.Get(username);
+                if (user != null)
+                    throw new ArgumentException($"{username} already exists.");
+
+                user = new User(){ Id = username };
+                _unitOfWork.Users.Add(user);
+                _unitOfWork.Complete();
+                return Created("lumen.api/users", user);
+            } catch (Exception e) {
+                _unitOfWork.Rollback();
+                return BadRequest($"error: Fails on user [{username}]. Exception found: {e.Message}.");
+            }
+        }
+        [HttpGet("users/{username:string}")]
+        public ActionResult GetUser(string username)
+        {
+            try {
+                var user =_unitOfWork.Users.Get(username);
+                if (user != null) return Ok(user);
+                else return NotFound(username);
+            } catch (Exception e) {
+                _unitOfWork.Rollback();
+                return BadRequest($"error: Fails on user [{username}]. Exception found: {e.Message}.");
+            }
+        }
+        [HttpPut("users/{username:string}")]
+        public ActionResult UpdateUser(string username, [FromBody] User updatedUser)
+        {
+            if (!username.Equals(updatedUser.Id)) return BadRequest("Ids not matching on Request URL and Body.");
+            try {
+                var user =_unitOfWork.Users.Get(username);
+                if (user == null) return NotFound(username);
+                else
+                {
+                    user = updatedUser;
+                    _unitOfWork.Users.Update(user);
+                    _unitOfWork.Complete();
+                    return Ok(user);
+                }
+            } catch (Exception e) {
+                _unitOfWork.Rollback();
+                return BadRequest($"error: Fails on user [{username}]. Exception found: {e.Message}.");
+            }
+        }
+        [HttpGet("users/{count=20}")]
+        public ActionResult GetUsers(int count)
+        {
+            try {
+                var users = _unitOfWork.Users.GetNthUsers(count);
+                if (users.Any()) return Ok(users);
+                else return NoContent();
+            } catch (Exception e) {
+                _unitOfWork.Rollback();
+                return BadRequest($"error: Fails on retrieving users. Exception found: {e.Message}.");
+            }
+        }
+        [HttpPost("guilds")]
         public ActionResult CreateGuild([FromBody] Guild guildInfo)
         {
             try { 
@@ -34,43 +94,20 @@ namespace lumen.api.Controllers
                 return BadRequest(e.Message);
             }
         }
-                
-        [HttpGet("[action]/{count=20}")]
-        public IEnumerable<string> Guilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
-
-        [HttpGet("[action]/{username}")]
-        public ActionResult UserInfo(string username)
+        [HttpGet("[action]/{guildname}")]
+        public ActionResult GuildInfo(string guildname)
         {
             try {
-                var user =_unitOfWork.Users.Get(username);
-                if (user != null)
-                    return Ok(user);
-
-                user = new User(){ Id = username };
-                _unitOfWork.Users.Add(user);
-                _unitOfWork.Complete();
-                return Created("lumen.api/userinfo", user);
+                var guild =_unitOfWork.Guilds.Get(guildname);
+                if (guild != null) return Ok(guild);
+                else return NotFound(guildname);
             } catch (Exception e) {
                 _unitOfWork.Rollback();
-                return BadRequest($"error: Fails on user [{username}]. Exception found: {e.Message}.");
+                return BadRequest($"error: Fails on guild [{guildname}]. Exception found: {e.Message}.");
             }
         }
-
-        [HttpGet("[action]/{guildname}")]
-        public Dictionary<string, dynamic> GuildInfo(string guildname)
-        {
-            Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
-            try
-            {
-                result = _unitOfWork.Guilds.GuildInfo(guildname);
-                _unitOfWork.Complete();
-            } catch (Exception e)
-            {
-                _unitOfWork.Rollback();
-                return new Dictionary<string, dynamic>() { { "error", e.Message } };
-            }
-            return result;
-        }
+        [HttpGet("[action]/{count=20}")]
+        public IEnumerable<string> Guilds(int count) => _unitOfWork.Guilds.GetNthGuilds(count);
 
         [HttpGet("[action]/{guildname}/{username}")]
         public bool EnterGuild(string guildname, string username)
@@ -90,39 +127,58 @@ namespace lumen.api.Controllers
             }
         }
 
-        [HttpGet("[action]/{username}/{guildname}")]
-        public bool LeaveGuild(string username, string guildname)
+        [HttpDelete("[action]/{guildname:string}")]
+        public ActionResult LeaveGuild([FromBody] string username, string guildname)
         {
             try
-            {   
+            {
+                var guild =_unitOfWork.Guilds.Get(guildname);
+                if (guild == null) return NotFound("Guild");
+                var user =_unitOfWork.Users.Get(username);
+                if (user == null) return NotFound("User");
+
                 if (_unitOfWork.Guilds.RemoveMember(username, guildname))
+                {
                     _unitOfWork.Complete();
-                else 
-                    throw new Exception($"error: fails removing user [{username}] from members of [{guildname}] guild.");
-                
-                return true;
-            } catch (Exception)
+                    return Ok(_unitOfWork.Guilds.Get(updatedGuild.Id));
+                }
+                else
+                {
+                    Response.StatusCode = 304;
+                    return NoContent();
+                }
+            } catch (Exception e)
             {
                 _unitOfWork.Rollback();
-                return false;
+                return BadRequest($"error: fails removing user [{username}] from members of [{guildname}] guild. Exception found: {e.Message}." );
             }
         }
 
-        [HttpGet("[action]/{guildname}/{username}")]
-        public bool Transfer(string guildname, string username)
+        [HttpPatch("[action]/{guildname:string}")]
+        public ActionResult Transfer(string guildname, [FromBody] Guild updatedGuild)
         {
+            if (guildname != updatedGuild.Id) return BadRequest("Route and Body Guild Id parameters not matching.");
             try
-            {   
-                if (_unitOfWork.Guilds.TransferOwnership(guildname, username))
-                    _unitOfWork.Complete();
-                else 
-                    throw new Exception($"error: fails transfering position of GuildMaster of [{guildname}] guild to user [{username}].");
+            {
+                var guild =_unitOfWork.Guilds.Get(guildname);
+                if (guild == null) return NotFound("Guild");
+                var user =_unitOfWork.Users.Get(updatedGuild.MasterId);
+                if (user == null) return NotFound("User");
 
-                return true;
-            } catch (Exception)
+                if (_unitOfWork.Guilds.TransferOwnership(updatedGuild.Id, updatedGuild.MasterId))
+                {
+                    _unitOfWork.Complete();
+                    return Ok(_unitOfWork.Guilds.Get(updatedGuild.Id));
+                }
+                else
+                {
+                    Response.StatusCode = 304;
+                    return NoContent();
+                }
+            } catch (Exception e)
             {
                 _unitOfWork.Rollback();
-                return false;
+                return BadRequest($"error: fails transfering [{updatedGuild.Id}'s] GuildMaster to [{updatedGuild.MasterId}]. Exception found: {e.Message}.");
             }
         }
     }

@@ -17,7 +17,8 @@ namespace lumen.api.Repositories {
 
         // retrieval methods
         public TEntity Get (string name) => Context.Set<TEntity> ().Find (name);
-        public IEnumerable<TEntity> Find (
+        public IQueryable<TEntity> GetAll () => Context.Set<TEntity> ();
+        public IQueryable<TEntity> Find (
             Expression<Func<TEntity, bool>> predicate = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "") {
@@ -29,10 +30,8 @@ namespace lumen.api.Repositories {
             foreach (var includeProperty in includeProperties.Split (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 query = query.Include (includeProperty);
 
-            return orderBy != null ? orderBy(query).ToList() : query.ToList();
+            return orderBy != null ? orderBy(query) : query;
         }
-        public IEnumerable<TEntity> GetAll () => Context.Set<TEntity> ().ToList();
-
         // removal methods
         public void Remove (TEntity entity) => Context.Set<TEntity> ().Remove (entity);
         public void RemoveRange (IEnumerable<TEntity> entities) => Context.Set<TEntity> ().RemoveRange (entities);

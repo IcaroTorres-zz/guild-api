@@ -11,5 +11,6 @@ namespace lumen.api.Repositories
   {
     public UserRepository(LumenContext context) : base(context) { }
     public LumenContext LumenContext => Context as LumenContext;
+    public IQueryable<User> GetNthUsers(int count = 20) => GetAll().Take(count);
   }
 }

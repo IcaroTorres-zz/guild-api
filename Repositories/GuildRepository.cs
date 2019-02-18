@@ -106,36 +106,7 @@ namespace lumen.api.Repositories
       Update(guild);
       return true;
     }
-    public IEnumerable<string> GetNthGuilds(int count = 20) => GetAll().Take(count).Select(g => g.Id);
-    public Dictionary<string, dynamic> GuildInfo(string guildName)
-    {
-      ArgumentException error = null;
-      try
-      {
-        var guild = Get(guildName);
-        if (guild != null)
-        {
-          return new Dictionary<string, dynamic>()
-          {
-            {
-              "guild",
-              new Dictionary<string, dynamic>()
-              {
-                { "name", guild.Id },
-                { "guildmaster", guild.MasterId },
-                { "members", guild.Members.Select(m => m.Id) }
-              }
-            }
-          };
-        }
-        error = new ArgumentException($"guild [{guildName}] not found");
-        throw error;
-      }
-      catch (Exception)
-      {
-        throw error ?? new ArgumentException($"fails getting {guildName} information.");
-      }
-    }
+    public IQueryable<Guild> GetNthGuilds(int count = 20) => GetAll().Take(count);
     public User GetUser(string username) => LumenContext.Users.FirstOrDefault(u => u.Id.Equals(username, StringComparison.OrdinalIgnoreCase));
   }
 }
