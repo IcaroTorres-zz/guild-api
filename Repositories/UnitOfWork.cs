@@ -4,17 +4,17 @@ using api.Context;
 namespace api.Repositories
 {
   public class UnitOfWork : IUnitOfWork {
-    private readonly LumenContext _lumenContext;
+    private readonly ApiContext _ApiContext;
     public IGuildRepository Guilds { get; private set; }
     public IUserRepository Users { get; private set; }
-    public UnitOfWork (LumenContext lumenContext)
+    public UnitOfWork (ApiContext ApiContext)
     {
-        _lumenContext = lumenContext;
-        Guilds = new GuildRepository (_lumenContext);
-        Users = new UserRepository (_lumenContext);
+        _ApiContext = ApiContext;
+        Guilds = new GuildRepository (_ApiContext);
+        Users = new UserRepository (_ApiContext);
     }
-    public void Complete () => _lumenContext.SaveChanges ();
-    public void Rollback() => _lumenContext.ChangeTracker.Entries().ToList().ForEach(x => x.Reload());
-    public void Dispose () => _lumenContext.Dispose ();
+    public void Complete () => _ApiContext.SaveChanges ();
+    public void Rollback() => _ApiContext.ChangeTracker.Entries().ToList().ForEach(x => x.Reload());
+    public void Dispose () => _ApiContext.Dispose ();
   }
 }

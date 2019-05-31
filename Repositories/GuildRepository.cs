@@ -11,11 +11,11 @@ namespace api.Repositories
 {
   public class GuildRepository : Repository<Guild>, IGuildRepository
   {
-    public GuildRepository(LumenContext context) : base(context) { }
-    public LumenContext LumenContext => Context as LumenContext;
+    public GuildRepository(ApiContext context) : base(context) { }
+    public ApiContext ApiContext => Context as ApiContext;
 
     public User GetUser(string name) =>
-      LumenContext.Users
+      ApiContext.Users
                   .FirstOrDefault(u => u.Name.Equals(name,
                                                      StringComparison.InvariantCultureIgnoreCase));
     public Guild CreateGuild(string guildName, string masterName)
@@ -64,7 +64,7 @@ namespace api.Repositories
       }
       Update(guild);
       // member.GuildName = guild.Name;
-      // LumenContext.Users.Update(member);
+      // ApiContext.Users.Update(member);
       return true;
     }
     public bool RemoveMember( string name, string memberName)
@@ -88,7 +88,7 @@ namespace api.Repositories
                                     
       guild.Members.Remove(member);
       Update(guild);
-      // LumenContext.Users.Update(member);
+      // ApiContext.Users.Update(member);
       if (!guild.Members.Any()) Remove(guild);
       return true;
     }

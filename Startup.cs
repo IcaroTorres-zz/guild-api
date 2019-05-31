@@ -29,8 +29,8 @@ namespace api
 
             // your context dependency registration
             services.AddEntityFrameworkInMemoryDatabase()
-                    .AddDbContext<LumenContext>(options => options.UseLazyLoadingProxies()
-                                                                  .UseInMemoryDatabase("lumenInMemoryDB"));
+                    .AddDbContext<ApiContext>(options => options.UseLazyLoadingProxies()
+                                                                  .UseInMemoryDatabase("ApiInMemoryDB"));
             // your repositories and unit of work dependecy registration
             services.AddTransient<IGuildRepository, GuildRepository>(); 
             services.AddTransient<IUserRepository, UserRepository>();
