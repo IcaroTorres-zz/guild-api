@@ -162,6 +162,157 @@ Transfer-Encoding: chunked
 ]
 ```
 
+---
+### Guild Update.
++ Method: `PUT`
++ URI: `[API]/guilds/:name`
++ Controller Action: `UpdateGuild`
++ Params:
+  + `name: string`
+  + `payload: GuildForm`
++ Sample request:
+```
+$ curl -i -X PUT http://localhost:5000/api/guilds/a \
+-d '{"name": "a", "masterName": "u2", "members": ["u1", "u2"]}' \
+-H 'Content-type: application/json'
+```
+> Expected output sample:
+> + Response header
+```
+HTTP/1.1 200 OK
+Date: <Response DateTime>
+Content-Type: application/json; charset=utf-8
+Server: Kestrel
+Transfer-Encoding: chunked
+```
+> + Response body
+```
+{
+  "name":"a",
+  "masterName":"u2",
+  "master":{
+    "name":"u2",
+    "guildName":"a",
+    "isGuildMaster":true
+  },
+  "members":[
+    {
+      "name":"u1",
+      "guildName":"a",
+      "isGuildMaster":false
+    },
+    {
+      "name":"u2",
+      "guildName":"a",
+      "isGuildMaster":true
+    }
+  ]
+}
+```
+---
+### Add member to guild.
++ Method: `PATCH`
++ URI: `[API]/guilds/:name`
++ Controller Action(s): `PatchGuild > UpdateMembers`
++ Params:
+  + `name: string`
+  + `payload: {"addedMember": string}`
++ Sample request:
+```
+$ curl -i -X PATCH http://localhost:5000/api/guilds/a \
+-d '{"addedMember": "u9"}' \
+-H 'Content-type: application/json'
+```
+> Expected output sample:
+> + Response header
+```
+HTTP/1.1 200 OK
+Date: <Response DateTime>
+Content-Type: application/json; charset=utf-8
+Server: Kestrel
+Transfer-Encoding: chunked
+```
+> + Response body
+```true```
+---
+
+### Remove member from guild.
++ Method: `PATCH`
++ URI: `[API]/guilds/:name`
++ Controller Action(s): `PatchGuild > UpdateMembers`
++ Params:
+  + `name: string`
+  + `payload: {"removedMember": string}`
++ Sample request:
+```
+$ curl -i -X PATCH http://localhost:5000/api/guilds/a \
+-d '{"removedMember": "u9"}' \
+-H 'Content-type: application/json'
+```
+> Expected output sample:
+> + Response header
+```
+HTTP/1.1 200 OK
+Date: <Response DateTime>
+Content-Type: application/json; charset=utf-8
+Server: Kestrel
+Transfer-Encoding: chunked
+```
+> + Response body
+```true```
+
+---
+
+### Transfer guild master ownership.
++ Method: `PATCH`
++ URI: `[API]/guilds/:name`
++ Controller Action(s): `PatchGuild > Transfer`
++ Params:
+  + `name: string`
+  + `payload: {"newMasterName": string}`
++ Sample request:
+```
+$ curl -i -X PATCH http://localhost:5000/api/guilds/a \
+-d '{"newMasterName": "u3"}' \
+-H 'Content-type: application/json'
+```
+> Expected output sample:
+> + Response header
+```
+HTTP/1.1 200 OK
+Date: <Response DateTime>
+Content-Type: application/json; charset=utf-8
+Server: Kestrel
+Transfer-Encoding: chunked
+```
+> + Response body
+```true```
+
+---
+
+### Delete Guild.
++ Method: `DELETE`
++ URI: `[API]/guilds/:name`
++ Controller Action(s): `DeleteGuild`
++ Params: `name: string`
++ Sample request:
+```
+$ curl -i -X DELETE http://localhost:5000/api/guilds/a
+```
+> Expected output sample:
+> + Response header
+```
+HTTP/1.1 200 OK
+Date: <Response DateTime>
+Content-Type: application/json; charset=utf-8
+Server: Kestrel
+Transfer-Encoding: chunked
+```
+> + Response body
+```true```
+
+---
+
 ### Models
 #### User.cs
 ```c#
