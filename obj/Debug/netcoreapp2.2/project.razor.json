@@ -1,7 +1,5 @@
 {
-  "ProjectFilePath": "c:\\workspaces\\github\\lumen.api\\lumen.api.csproj",
-  "TargetFramework": "netcoreapp2.2",
-  "TagHelpers": [],
+  "FilePath": "d:\\repos\\github\\guild.api\\lumen.api.csproj",
   "Configuration": {
     "ConfigurationName": "MVC-2.1",
     "LanguageVersion": "2.1",
@@ -10,5 +8,11 @@
         "ExtensionName": "MVC-2.1"
       }
     ]
-  }
+  },
+  "ProjectWorkspaceState": {
+    "TagHelpers": [],
+    "CSharpLanguageVersion": 703
+  },
+  "RootNamespace": "lumen.api",
+  "Documents": []
 }

@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace lumen.api.Models {
+namespace api.Models {
   public class User
   {
-    public string Id { get; set; }
-    public string GuildId { get; set; }
+    [Key]
+    public string Name { get; set; }
+    public string GuildName { get; set; }
+
+    [ForeignKey("GuildName")]
     public virtual Guild Guild { get; set; }
-    public bool? IsGuildMaster { get => Guild?.MasterId.Equals(Id); }
+    public bool IsGuildMaster { get => Guild?.MasterName?.Equals(Name) ?? false; }
   }
 }

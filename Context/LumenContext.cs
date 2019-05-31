@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using lumen.api.Models;
+using api.Models;
 using System.Collections.Generic;
 
-namespace lumen.api.Context {
+namespace api.Context {
   public class LumenContext : DbContext
   {
     public DbSet<Guild> Guilds { get; set; }
@@ -16,7 +16,7 @@ namespace lumen.api.Context {
       modelBuilder.Entity<Guild>()
         .HasOne(g => g.Master)
         .WithOne() 
-        .HasForeignKey<Guild>(g => g.MasterId);
+        .HasForeignKey<Guild>(g => g.MasterName);
         // the foreignKey here is needed cause there is no navigation property on the other relation size
     }
   }
