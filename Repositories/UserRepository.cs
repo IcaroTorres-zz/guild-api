@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using lumen.api.Context;
-using lumen.api.Models;
+using api.Context;
+using api.Models;
 
-namespace lumen.api.Repositories
+namespace api.Repositories
 {
   public class UserRepository : Repository<User>, IUserRepository
   {

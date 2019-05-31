@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace lumen.api.Repositories
+namespace api.Repositories
 {
-    public interface IRepository<TEntity> where TEntity : class
+  public interface IRepository<TEntity> where TEntity : class
     {
         // group of methods to get objects
-        TEntity Get(string name);
+        TEntity Get(string key);
         IQueryable<TEntity> GetAll();
         IQueryable<TEntity> Find(
             Expression<Func<TEntity, bool>> predicate = null,

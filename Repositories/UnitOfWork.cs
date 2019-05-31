@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using lumen.api.Context;
+using api.Context;
 
-namespace lumen.api.Repositories {
+namespace api.Repositories
+{
   public class UnitOfWork : IUnitOfWork {
     private readonly LumenContext _lumenContext;
     public IGuildRepository Guilds { get; private set; }

@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
-using lumen.api.Models;
+using api.Models;
 
-namespace lumen.api.Repositories
+namespace api.Repositories
 {
   public interface IUserRepository : IRepository<User> { 
     IQueryable<User> GetNthUsers(int count = 20);

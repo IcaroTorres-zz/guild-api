@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using lumen.api.Models;
+using api.Models;
 
-namespace lumen.api.Repositories
+namespace api.Repositories
 {
   public interface IGuildRepository : IRepository<Guild>
   {

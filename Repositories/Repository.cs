@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-namespace lumen.api.Repositories {
+namespace api.Repositories {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class {
         protected readonly DbContext Context;
         public Repository (DbContext context) => Context = context;
@@ -16,7 +16,7 @@ namespace lumen.api.Repositories {
         public void UpdateRange (IEnumerable<TEntity> entities) => Context.Set<TEntity>().UpdateRange (entities);
 
         // retrieval methods
-        public TEntity Get (string name) => Context.Set<TEntity> ().Find (name);
+        public TEntity Get (string key) => Context.Set<TEntity> ().Find (key.ToLowerInvariant());
         public IQueryable<TEntity> GetAll () => Context.Set<TEntity> ();
         public IQueryable<TEntity> Find (
             Expression<Func<TEntity, bool>> predicate = null,
