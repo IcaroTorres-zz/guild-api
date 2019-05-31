@@ -7,10 +7,10 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("lumen.api")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("guild.api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
-[assembly: System.Reflection.AssemblyProductAttribute("lumen.api")]
-[assembly: System.Reflection.AssemblyTitleAttribute("lumen.api")]
+[assembly: System.Reflection.AssemblyProductAttribute("guild.api")]
+[assembly: System.Reflection.AssemblyTitleAttribute("guild.api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

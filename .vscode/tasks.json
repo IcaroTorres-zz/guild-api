@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/lumen.api.csproj"
+                "${workspaceFolder}/guild.api.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

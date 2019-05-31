@@ -1,0 +1,14 @@
+D:\repos\github\guild.api\bin\Debug\netcoreapp2.2\guild.api.deps.json
+D:\repos\github\guild.api\bin\Debug\netcoreapp2.2\guild.api.runtimeconfig.json
+D:\repos\github\guild.api\bin\Debug\netcoreapp2.2\guild.api.runtimeconfig.dev.json
+d:\repos\github\guild.api\bin\Debug\netcoreapp2.2\guild.api.dll
+d:\repos\github\guild.api\bin\Debug\netcoreapp2.2\guild.api.pdb
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.csprojAssemblyReference.cache
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.csproj.CoreCompileInputs.cache
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.RazorAssemblyInfo.cache
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.RazorAssemblyInfo.cs
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.AssemblyInfoInputs.cache
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.AssemblyInfo.cs
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.RazorTargetAssemblyInfo.cache
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.dll
+d:\repos\github\guild.api\obj\Debug\netcoreapp2.2\guild.api.pdb

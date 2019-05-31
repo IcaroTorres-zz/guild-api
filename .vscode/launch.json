@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.2/lumen.api.dll",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.2/guild.api.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

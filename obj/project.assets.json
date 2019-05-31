@@ -7490,6 +7490,7 @@
       "path": "newtonsoft.json/11.0.2",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.md",
         "lib/net20/Newtonsoft.Json.dll",
         "lib/net20/Newtonsoft.Json.xml",
@@ -7635,6 +7636,7 @@
       "path": "runtime.native.system.net.http/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -7661,6 +7663,7 @@
       "path": "runtime.native.system.security.cryptography.openssl/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -8774,6 +8777,7 @@
       "path": "system.diagnostics.tracesource/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -10116,6 +10120,7 @@
       "path": "system.reflection.emit.lightweight/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -12415,11 +12420,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\repos\\github\\guild.api\\lumen.api.csproj",
-      "projectName": "lumen.api",
-      "projectPath": "d:\\repos\\github\\guild.api\\lumen.api.csproj",
+      "projectUniqueName": "D:\\repos\\github\\guild.api\\guild.api.csproj",
+      "projectName": "guild.api",
+      "projectPath": "D:\\repos\\github\\guild.api\\guild.api.csproj",
       "packagesPath": "C:\\Users\\Icaro Torres\\.nuget\\packages\\",
-      "outputPath": "d:\\repos\\github\\guild.api\\obj\\",
+      "outputPath": "D:\\repos\\github\\guild.api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
