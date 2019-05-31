@@ -259,6 +259,7 @@ Server: Kestrel
 Transfer-Encoding: chunked
 ```
 > + Response body
+
 ```true```
 
 ---
@@ -286,6 +287,7 @@ Server: Kestrel
 Transfer-Encoding: chunked
 ```
 > + Response body
+
 ```true```
 
 ---
@@ -309,6 +311,7 @@ Server: Kestrel
 Transfer-Encoding: chunked
 ```
 > + Response body
+
 ```true```
 
 ---
