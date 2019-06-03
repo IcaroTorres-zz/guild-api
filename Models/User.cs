@@ -4,14 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace api.Models {
-  public class User
+  public class User : IEntity<string>
   {
-    [Key]
-    public string Name { get; set; }
-    public string GuildName { get; set; }
-
-    [ForeignKey("GuildName")]
+    public string Id { get; set; }
+    public string GuildId { get; set; }
     public virtual Guild Guild { get; set; }
-    public bool IsGuildMaster { get => Guild?.MasterName?.Equals(Name) ?? false; }
+    public bool IsGuildMaster { get => Guild?.MasterId?.Equals(Id) ?? false; }
   }
 }

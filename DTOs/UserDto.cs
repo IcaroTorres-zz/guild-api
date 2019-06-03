@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-namespace api.Models {
-  public class UserForm
+namespace api.DTOs {
+  public class UserDto
   {
     public string Name { get; set; }
     public string GuildName { get; set; }

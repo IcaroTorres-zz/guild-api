@@ -16,7 +16,7 @@ namespace api.Context {
       modelBuilder.Entity<Guild>()
         .HasOne(g => g.Master)
         .WithOne() 
-        .HasForeignKey<Guild>(g => g.MasterName);
+        .HasForeignKey<Guild>(g => g.MasterId);
         // the foreignKey here is needed cause there is no navigation property on the other relation size
     }
   }
