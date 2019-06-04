@@ -44,22 +44,18 @@ Compile project with `dotnet build` and Publish production folder with `dotnet p
 # Resources
 #### Disclaimer
 + All responses are formated as JSON;
-+ [API] Will represent the root api URL. Example: *http://localhost:5000/api*.
++ [domain] Will represent the root domain URL. Example: *http://localhost:5000*.
 
-## Guilds
-### Creating a guild.
-+ Method: `POST`
-+ URI: `[API]/guilds`
-+ Controller Action: `CreateGuild`
-+ Params:
-  + name: string
-  + masterName: string
+## Guilds = _`[domain]/api/guilds`_
++ Objective: **Creating a guild**.
++ Method: **`POST`**
++ Params: **`([FromBody] GuildDto)`**
 + Sample request:
-```
+**```
 $ curl -i -X POST http://localhost:5000/api/guilds \
--d '{"name": "a", "masterName": "u1"}' \
+-d '{"id": "a", "masterid": "u1"}' \
 -H 'Content-type: application/json'
-```
+```**
 > Expected output sample:
 > + Response header
 ```
