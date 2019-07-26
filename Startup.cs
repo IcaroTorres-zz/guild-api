@@ -23,6 +23,11 @@ namespace api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // enable acces Current HttpContext in class within dependency injection container
+            services.AddHttpContextAccessor();
+            // if < .NET Core 2.2 use this
+            //services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
             services.AddMvc()
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
@@ -39,7 +44,8 @@ namespace api
             // your repositories and unit of work dependecy registration
             services.AddTransient<IGuildRepository, GuildRepository>(); 
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();                             
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+
             // your custom service layer dependecy registration
             services.AddTransient<IGuildService, GuildService>();                           
         }    

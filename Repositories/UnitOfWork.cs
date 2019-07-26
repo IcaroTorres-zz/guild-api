@@ -10,11 +10,11 @@ namespace api.Repositories
     public UnitOfWork (ApiContext ApiContext)
     {
         _ApiContext = ApiContext;
-        Guilds = new GuildRepository (_ApiContext);
-        Users = new UserRepository (_ApiContext);
+        Guilds = Guilds ?? new GuildRepository (_ApiContext);
+        Users = Users ?? new UserRepository (_ApiContext);
     }
-    public void Complete () => _ApiContext.SaveChanges ();
+    public void Complete () => _ApiContext.SaveChanges();
     public void Rollback() => _ApiContext.ChangeTracker.Entries().ToList().ForEach(x => x.Reload());
-    public void Dispose () => _ApiContext.Dispose ();
+    public void Dispose () => _ApiContext.Dispose();
   }
 }
