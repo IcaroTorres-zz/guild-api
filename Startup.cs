@@ -1,6 +1,6 @@
-﻿using api.Context;
+﻿using Guild.Context;
 using api.Repositories;
-using api.Services;
+using Guild.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace api
 {
-  public class Startup
+    public class Startup
     {
         public Startup(IConfiguration configuration)
         {
@@ -37,26 +37,21 @@ namespace api
             // your context dependency registration
             services.AddEntityFrameworkInMemoryDatabase()
                     .AddDbContext<ApiContext>(options => options.UseLazyLoadingProxies()
-                                                                .UseInMemoryDatabase("ApiInMemoryDB"));
+                                                                .UseInMemoryDatabase($"InMemory{nameof(ApiContext)}"));
 
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Guild.api", Version = "v1" }); });
 
-            // your repositories and unit of work dependecy registration
-            services.AddTransient<IGuildRepository, GuildRepository>(); 
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
-
             // your custom service layer dependecy registration
-            services.AddTransient<IGuildService, GuildService>();                           
-        }    
+            services.AddTransient<IGuildService, GuildService>();
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IService<ApiContext> service)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                // app.UseWebApiExceptionHandler(_UoW);
+                app.UseWebApiExceptionHandler(service);
             }
             else
             {
@@ -67,8 +62,11 @@ namespace api
             Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
 
             app.UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; });
-            app.UseSwaggerUI(option => { option.SwaggerEndpoint(swaggerOptions.UiEndpoint,
-                                                                swaggerOptions.Description); });
+            app.UseSwaggerUI(option =>
+            {
+                option.SwaggerEndpoint(swaggerOptions.UiEndpoint,
+                                       swaggerOptions.Description);
+            });
 
             app.UseHttpsRedirection();
             app.UseMvc();

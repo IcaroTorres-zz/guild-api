@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\icaro\\Source\\Repos\\guild.api\\guild.api.csproj": {}
+    "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\guild.api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\icaro\\Source\\Repos\\guild.api\\guild.api.csproj": {
+    "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\guild.api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\icaro\\Source\\Repos\\guild.api\\guild.api.csproj",
+        "projectUniqueName": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\guild.api.csproj",
         "projectName": "guild.api",
-        "projectPath": "C:\\Users\\icaro\\Source\\Repos\\guild.api\\guild.api.csproj",
-        "packagesPath": "C:\\Users\\icaro\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\icaro\\Source\\Repos\\guild.api\\obj\\",
+        "projectPath": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\guild.api.csproj",
+        "packagesPath": "C:\\Users\\Icaro Torres\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\icaro\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Icaro Torres\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -25,7 +25,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://bibliotecas.banese.com.br/repository/nuget-all": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp2.2": {
@@ -51,6 +51,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[2.2.0, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[2.2.6, )"
             },
             "Microsoft.EntityFrameworkCore.Inmemory": {
               "target": "Package",
