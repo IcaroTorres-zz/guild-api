@@ -1,15 +1,8 @@
-namespace Guild.DTOs
+namespace DTOs
 {
-    public class PatchDto
+    public class PatchDto //deprecated
     {
         public string PropertyName { get; set; }
         public string PropertyValue { get; set; }
-        // public PatchAction Action { get; set; }
     }
-    // public enum PatchAction
-    // {
-    //     Add,
-    //     Remove,
-    //     Transfer
-    // }
 }

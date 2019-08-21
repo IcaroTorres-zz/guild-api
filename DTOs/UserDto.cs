@@ -1,6 +1,6 @@
 using System;
 
-namespace Guild.DTOs
+namespace DTOs
 {
     public class UserDto
     {

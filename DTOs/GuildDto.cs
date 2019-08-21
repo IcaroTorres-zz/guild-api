@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Guild.DTOs
+namespace DTOs
 {
     public class GuildDto
     {
@@ -9,6 +9,6 @@ namespace Guild.DTOs
         public Guid MasterId { get; set; }
         public string Name { get; set; }
         public string MasterName { get; set; }
-        public HashSet<string> Members { get; set; }
+        public HashSet<Guid> Members { get; set; }
     }
 }
