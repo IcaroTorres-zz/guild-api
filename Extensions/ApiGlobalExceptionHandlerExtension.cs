@@ -1,6 +1,5 @@
-using api.Repositories;
-using Guild.Context;
-using Guild.Services;
+using Context;
+using Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
