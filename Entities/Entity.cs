@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Guild.Entities
+namespace Entities
 {
     public abstract class Entity<TKey>
     {
