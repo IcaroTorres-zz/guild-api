@@ -12531,9 +12531,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\guild.api.csproj",
-      "projectName": "guild.api",
-      "projectPath": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\guild.api.csproj",
+      "projectUniqueName": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\Api.csproj",
+      "projectName": "Api",
+      "projectPath": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\Api.csproj",
       "packagesPath": "C:\\Users\\Icaro Torres\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api\\obj\\",
       "projectStyle": "PackageReference",

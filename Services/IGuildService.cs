@@ -1,16 +1,18 @@
-using Guild.Context;
-using Guild.DTOs;
+using Context;
+using DTOs;
+using Entities;
+using System;
 using System.Linq;
 
-namespace Guild.Services
+namespace Services
 {
     public interface IGuildService : IService<ApiContext>
     {
-        Entities.Guild CreateGuild(GuildDto payload);
-        Entities.Guild UpdateGuild(GuildDto payload);
-        bool AddMember(string guildId, string memberId);
-        bool RemoveMember(string member, string guildId);
-        bool Transfer(string guildId, string userId);
-        IQueryable<Entities.Guild> List(int count = 20);
+        Guild CreateGuild(GuildDto payload);
+        Guild UpdateGuild(GuildDto payload);
+        Guild AddMember(Guid id, string memberName);
+        Guild RemoveMember(Guid id, string memberName);
+        Guild Transfer(Guid id, string masterName);
+        IQueryable<Guild> List(int count = 20);
     }
 }

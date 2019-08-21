@@ -1,6 +1,5 @@
-﻿using Guild.Context;
-using api.Repositories;
-using Guild.Services;
+﻿using Context;
+using Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +12,7 @@ namespace api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Startup(IConfiguration configuration) => Configuration = configuration;
 
         public IConfiguration Configuration { get; }
 
@@ -24,12 +20,12 @@ namespace api
         public void ConfigureServices(IServiceCollection services)
         {
             // enable acces Current HttpContext in class within dependency injection container
-            services.AddHttpContextAccessor();
-            // if < .NET Core 2.2 use this
-            //services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor()
+                    // if < .NET Core 2.2 use this
+                    //services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
-            services.AddMvc()
+                    // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
+                    .AddMvc()
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                     .AddJsonOptions(options => options.SerializerSettings
                                                       .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -37,12 +33,14 @@ namespace api
             // your context dependency registration
             services.AddEntityFrameworkInMemoryDatabase()
                     .AddDbContext<ApiContext>(options => options.UseLazyLoadingProxies()
-                                                                .UseInMemoryDatabase($"InMemory{nameof(ApiContext)}"));
+                                                                .UseInMemoryDatabase($"InMemory{nameof(ApiContext)}"))
 
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Guild.api", Version = "v1" }); });
+                    .AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Guild.api", Version = "v1" }); })
 
-            // your custom service layer dependecy registration
-            services.AddTransient<IGuildService, GuildService>();
+                    // your custom service layer dependecy registration
+                    .AddTransient<DbContext, ApiContext>()
+                    .AddTransient<IService<ApiContext>, Service<ApiContext>>()
+                    .AddTransient<IGuildService, GuildService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,15 +59,14 @@ namespace api
             var swaggerOptions = new SwaggerOptions();
             Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
 
-            app.UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; });
-            app.UseSwaggerUI(option =>
-            {
-                option.SwaggerEndpoint(swaggerOptions.UiEndpoint,
-                                       swaggerOptions.Description);
-            });
-
-            app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; })
+               .UseSwaggerUI(option =>
+               {
+                    option.SwaggerEndpoint(swaggerOptions.UiEndpoint,
+                                            swaggerOptions.Description);
+               })
+               .UseHttpsRedirection()
+               .UseMvc();
         }
     }
 }
