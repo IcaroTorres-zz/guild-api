@@ -1,11 +1,11 @@
-using Guild.Entities;
+using Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Guild.Context
+namespace Context
 {
     public class ApiContext : DbContext
     {
@@ -30,27 +30,23 @@ namespace Guild.Context
             return base.SaveChanges();
         }
 
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             AddAudit();
             return await base.SaveChangesAsync();
         }
 
-        private void AddAudit()//IHttpContextAccessor httpContextAccessor)
+        private void AddAudit()
         {
-            //var httpContext = httpContextAccessor.HttpContext;
-            var entities = ChangeTracker.Entries().Where(x => x.Entity is Entity<int> && (x.State == EntityState.Added || x.State == EntityState.Modified));
-            //var currentUsername = (httpContext != null && httpContext.User != null) ? httpContext.User.Identity.Name : "Anonymous";
+            var entities = ChangeTracker.Entries()
+                                        .Where(x => x.Entity is Entity<int>
+                                               && (x.State == EntityState.Added || x.State == EntityState.Modified));
             foreach (var entity in entities)
             {
                 if (entity.State == EntityState.Added)
-                {
                     ((Entity<int>)entity.Entity).CreatedDate = DateTime.UtcNow;
-                    //((Entity<int>)entity.Entity).CreatedBy = currentUsername;
-                }
 
-              ((Entity<int>)entity.Entity).ModifiedDate = DateTime.UtcNow;
-                //((Entity<int>)entity.Entity).ModifiedBy = currentUsername;
+                ((Entity<int>)entity.Entity).ModifiedDate = DateTime.UtcNow;
             }
         }
     }
