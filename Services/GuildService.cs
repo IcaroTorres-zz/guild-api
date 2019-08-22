@@ -38,17 +38,21 @@ namespace Services
         {
             var guild = Get<Guild>(payload.Id);
             if (guild == null)
-                throw new ArgumentNullException(nameof(guild), $"Guild '{payload.Name}' already exist.");
+                throw new ArgumentNullException(nameof(guild), $"Guild '{payload.Name}' not found.");
 
-            var master = Get<User>(payload.MasterId) ?? new User(payload.MasterName);
-
-            if (master.Guild != null)
-                throw new InvalidOperationException($"User '{master.Name}' already in the guild '{master.Guild.Name}'.");
-
-            return Add(new Guild(payload.Name, master)
+            var master = Get<User>(payload.MasterId) ?? Find<User>(u => u.Name == payload.MasterName).SingleOrDefault();
+            if (master != null)
             {
-                Members = Find<User>(u => payload.Members.Contains(u.Id)).ToList()
-            }.AddMember(master));
+                if (master.Guild != null && master.Guild.Id != guild.Id)
+                    throw new InvalidOperationException($"User '{master.Name}' already in other guild '{master.Guild.Name}'.");
+            }
+            else master = new User(payload.MasterName);
+
+            if (payload.Members != null && payload.Members.Count > 0)
+                guild.Members = Find<User>(u => payload.Members.Contains(u.Id)).ToList();
+
+            return Update(guild.ChangeName(payload.Name)
+                               .SetMaster(master));
         }
 
         public Guild AddMember(Guid id, string memberName)
@@ -67,7 +71,7 @@ namespace Services
 
             guild.Members.Add(member);
             if (guild.Members.Count() == 1)
-                guild.ChangeMaster(member);
+                guild.SetMaster(member);
 
             return Update(guild);
         }
@@ -102,7 +106,7 @@ namespace Services
                                                     $"and cannot become GuildMaster of '{guild.Name}] guild.");
 
             if (member.Guild == null) guild.AddMember(member);
-            return Update(guild.ChangeMaster(member));
+            return Update(guild.SetMaster(member));
         }
         public IQueryable<Guild> List(int count = 20) => GetAll<Guild>().Take(count);
 

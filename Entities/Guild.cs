@@ -29,15 +29,12 @@ namespace Entities
             Name = newName ?? throw new ArgumentNullException(nameof(newName));
             return this;
         }
-
-        public Guild ChangeMaster(Guid newMasterId)
-        {
-            MasterId = newMasterId;
-            return this;
-        }
-        public Guild ChangeMaster(User newMaster)
+        public Guild SetMaster(User newMaster)
         {
             Master = newMaster ?? throw new ArgumentNullException(nameof(newMaster));
+            if (!Members.Contains(Master))
+                Members.Add(Master);
+
             return this;
         }
         public Guild RemoveMember(User member)

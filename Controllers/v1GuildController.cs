@@ -133,25 +133,39 @@ namespace Controllers
             catch (Exception e) { return RollbackAndResult500(e); }
         }
 
-        private string ErrorMessageBuilder(string Message = "") =>
-            $"Fails on {Request.Method} " +
-            $"to '{Request.Path.ToUriComponent()}'. " +
-            $"Exception found: {Message}.";
+        private object ErrorMessageBuilder(Exception e)
+        {
+            var exposedErrorName = (e is InvalidOperationException) ? "Business violation"
+                                 : (e is ArgumentException) ? "Malformed request"
+                                 : (e is ArgumentNullException) ? "Missing content"
+                                 : "Internal";
+
+            return ErrorMessageBuilder(e.Message, exposedErrorName);
+        }
+
+        private object ErrorMessageBuilder(string message, string exposedErrorName = "Malformed request")
+        {
+            return new
+            {
+                Error = exposedErrorName,
+                Message = $"Fails on {Request.Method} to '{Request.Path.ToUriComponent()}'. Exception found: {message}."
+            };
+        }
 
         private ObjectResult RollbackAndResult404(Exception e)
         {
             _service.Rollback();
-            return NotFound(ErrorMessageBuilder(e.Message));
+            return NotFound(ErrorMessageBuilder(e));
         }
         private ObjectResult RollbackAndResult409(Exception e)
         {
             _service.Rollback();
-            return Conflict(ErrorMessageBuilder(e.Message));
+            return Conflict(ErrorMessageBuilder(e));
         }
         private ObjectResult RollbackAndResult500(Exception e)
         {
             _service.Rollback();
-            return StatusCode(StatusCodes.Status500InternalServerError, ErrorMessageBuilder(e.Message));
+            return StatusCode(StatusCodes.Status500InternalServerError, ErrorMessageBuilder(e));
         }
 
         private object ResponseWithLinks(IEnumerable<Entity<Guid>> entities)
