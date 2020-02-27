@@ -1,123 +1,82 @@
 using Context;
 using DTOs;
 using Entities;
+using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Services
 {
-    public class GuildService : Service<ApiContext>, IGuildService
+    public class GuildService : BaseService, IGuildService
     {
         public GuildService(ApiContext context) : base(context) { }
-        public ApiContext Ctx => _context as ApiContext;
 
-        /// <summary>
-        /// Create a new Guild using GuildDto
-        /// </summary>
-        /// <param name="payload"></param>
-        /// <returns></returns>
-        public Guild CreateGuild(GuildDto payload)
+        public Guild CreateOrUpdate(GuildDto payload, Guid id = new Guid())
         {
-            var guild = Find<Guild>(p => p.Name.Equals(payload.Name)).FirstOrDefault();
-            if (guild != null)
-                throw new InvalidOperationException($"Guild '{payload.Name}' already exist.");
+            var master = Query<User>(u => u.Name.Equals(payload.MasterName)).SingleOrDefault() ?? new User(payload.MasterName);
 
-            var master = Get<User>(payload.MasterId) ?? new User(payload.MasterName);
+            var guild = Query<Guild>(p => p.Name.Equals(payload.Name) || p.Id.Equals(id)).FirstOrDefault() ?? Insert(new Guild(payload.Name, master));
 
-            if (master.Guild != null)
-                throw new InvalidOperationException($"User '{master.Name}' already in the guild '{master.Guild.Id}'.");
-
-            return Add(new Guild(payload.Name, master)
-            {
-                Members = Find<User>(u => payload.Members.Contains(u.Id)).ToList()
-            }.AddMember(master));
+            return guild.PromoteToGuildMaster(master);
         }
 
-        public Guild UpdateGuild(GuildDto payload)
+        public Guild Update(Guid id, JsonPatchDocument<Guild> payload)
         {
-            var guild = Get<Guild>(payload.Id);
-            if (guild == null)
-                throw new ArgumentNullException(nameof(guild), $"Guild '{payload.Name}' not found.");
+            var guild = GetWithKeys<Guild>(id) ?? throw new KeyNotFoundException($"Target guild with id '{id}' not found.");
 
-            var master = Get<User>(payload.MasterId) ?? Find<User>(u => u.Name == payload.MasterName).SingleOrDefault();
-            if (master != null)
-            {
-                if (master.Guild != null && master.Guild.Id != guild.Id)
-                    throw new InvalidOperationException($"User '{master.Name}' already in other guild '{master.Guild.Name}'.");
-            }
-            else master = new User(payload.MasterName);
+            payload.ApplyTo(guild);
 
-            if (payload.Members != null && payload.Members.Count > 0)
-                guild.Members = Find<User>(u => payload.Members.Contains(u.Id)).ToList();
-
-            return Update(guild.ChangeName(payload.Name)
-                               .SetMaster(master));
+            return guild;
         }
 
         public Guild AddMember(Guid id, string memberName)
         {
-            var guild = Get<Guild>(id);
-            if (guild == null)
-                throw new ArgumentNullException(nameof(guild), $"Target guild ith id '{id}' not found.");
+            var guild = Get(id);
 
-            var member = Find<User>(u => u.Name == memberName).FirstOrDefault() ?? new User(memberName);
+            var member = GetMember(memberName);
 
-            if (guild.Members.Contains(member))
-                throw new DuplicateWaitObjectException(nameof(member), $"Member '{member.Name}' already in target '{guild.Name}' guild.");
-
-            if (member.Guild != null)
-                member.Guild.RemoveMember(member);
-
-            guild.Members.Add(member);
-            if (guild.Members.Count() == 1)
-                guild.SetMaster(member);
-
-            return Update(guild);
+            return guild.InviteToGuild(member);
         }
+
         public Guild RemoveMember(Guid id, string memberName)
         {
-            var guild = Get<Guild>(id);
-            if (guild == null)
-                throw new ArgumentNullException(nameof(guild), $"Target guild with id '{id}' not found.");
+            var guild = Get(id);
 
-            var member = Find<User>(u => u.Name == memberName).FirstOrDefault();
-            if (member == null)
-                throw new ArgumentNullException(nameof(member), $"Target user '{memberName}' not found.");
+            var member = GetMember(memberName);
 
-            if (!guild.Members.Contains(member))
-                throw new KeyNotFoundException($"Member '{memberName}' not in target '{guild.Name}' guild.");
-
-            guild.RemoveMember(member);
-            return !guild.Members.Any() ? Remove(guild) : Update(guild);
+            return guild.KickMember(member);
         }
-        public Guild Transfer(Guid id, string masterName)
+
+        public Guild ChangeGuildMaster(Guid id, string memberName)
         {
-            var guild = Get<Guild>(id);
-            if (guild == null)
-                throw new ArgumentNullException(nameof(guild), $"Target guild ith id '{id}' not found.");
+            var guild = Get(id);
 
-            var member = Find<User>(u => u.Name == masterName).FirstOrDefault();
-            if (member == null)
-                throw new ArgumentNullException(nameof(member), $"Target user '{masterName}' not found");
+            var member = GetMember(memberName);
 
-            if (member.Guild != null && member.GuildId != id)
-                throw new InvalidOperationException($"Target user '{member.Name}' already is in a different guild '{member.Guild.Name}', " +
-                                                    $"and cannot become GuildMaster of '{guild.Name}] guild.");
-
-            if (member.Guild == null) guild.AddMember(member);
-            return Update(guild.SetMaster(member));
+            return guild.PromoteToGuildMaster(member);
         }
-        public IQueryable<Guild> List(int count = 20) => GetAll<Guild>().Take(count);
 
-        // deprecated
-        public TEntity ApplyPatchAsync<TEntity>(TEntity entityName, List<PatchDto> patchDtos) where TEntity : Entity<Guid>
+        public IQueryable<Guild> List(int count = 20)
         {
-            var nameValuePairProperties = patchDtos.ToDictionary(a => a.PropertyName, a => a.PropertyValue);
+            return GetAll<Guild>().Take(count);
+        }
 
-            var dbEntityEntry = _context.Entry(entityName);
-            dbEntityEntry.CurrentValues.SetValues(nameValuePairProperties);
-            return Update(dbEntityEntry.Entity);
+        public Guild Get(Guid id)
+        {
+            return GetWithKeys<Guild>(id) ?? throw new KeyNotFoundException($"Target guild with id '{id}' not found.");
+        }
+
+        private User GetMember(string memberName)
+        {
+            return Query<User>(u => u.Name.Equals(memberName)).SingleOrDefault() ?? throw new KeyNotFoundException($"Target user '{memberName}' not found.");
+        }
+
+        public Guild Delete(Guid id)
+        {
+            var guild = Get(id);
+
+            return Remove(guild);
         }
     }
 }

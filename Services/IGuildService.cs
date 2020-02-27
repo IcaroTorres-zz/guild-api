@@ -1,18 +1,20 @@
-using Context;
 using DTOs;
 using Entities;
+using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Linq;
 
 namespace Services
 {
-    public interface IGuildService : IService<ApiContext>
+    public interface IGuildService
     {
-        Guild CreateGuild(GuildDto payload);
-        Guild UpdateGuild(GuildDto payload);
+        Guild Get(Guid id);
+        Guild CreateOrUpdate(GuildDto payload, Guid id = new Guid());
+        Guild Update(Guid id, JsonPatchDocument<Guild> payload);
         Guild AddMember(Guid id, string memberName);
         Guild RemoveMember(Guid id, string memberName);
-        Guild Transfer(Guid id, string masterName);
+        Guild ChangeGuildMaster(Guid id, string masterName);
+        Guild Delete(Guid id);
         IQueryable<Guild> List(int count = 20);
     }
 }

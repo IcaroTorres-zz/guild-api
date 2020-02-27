@@ -16,35 +16,34 @@ namespace api
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // enable acces Current HttpContext in class within dependency injection container
-            services.AddHttpContextAccessor()
-                    // if < .NET Core 2.2 use this
-                    //services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services
+                // enable access to Current HttpContext
+                .AddHttpContextAccessor()
 
-                    // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
-                    .AddMvc()
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                    .AddJsonOptions(options => options.SerializerSettings
-                                                      .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+                // DbContext dependency registration
+                .AddEntityFrameworkInMemoryDatabase()
+                .AddDbContext<ApiContext>(options => options.UseLazyLoadingProxies().UseInMemoryDatabase($"InMemory{nameof(ApiContext)}"))
+                .AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Guild.api", Version = "v1" }); })
 
-            // your context dependency registration
-            services.AddEntityFrameworkInMemoryDatabase()
-                    .AddDbContext<ApiContext>(options => options.UseLazyLoadingProxies()
-                                                                .UseInMemoryDatabase($"InMemory{nameof(ApiContext)}"))
+                // Custom service layer dependecy registration
+                .AddScoped<DbContext, ApiContext>()
+                .AddScoped<IBaseService, BaseService>()
+                .AddScoped<IGuildService, GuildService>()
 
-                    .AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Guild.api", Version = "v1" }); })
-
-                    // your custom service layer dependecy registration
-                    .AddTransient<DbContext, ApiContext>()
-                    .AddTransient<IService<ApiContext>, Service<ApiContext>>()
-                    .AddTransient<IGuildService, GuildService>();
+                // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
+                .AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(options => 
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IService<ApiContext> service)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IBaseService service)
         {
             if (env.IsDevelopment())
             {

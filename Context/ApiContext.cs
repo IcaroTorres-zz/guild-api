@@ -39,14 +39,14 @@ namespace Context
         private void AddAudit()
         {
             var entities = ChangeTracker.Entries()
-                                        .Where(x => x.Entity is Entity<int>
+                                        .Where(x => x.Entity is BaseEntity
                                                && (x.State == EntityState.Added || x.State == EntityState.Modified));
             foreach (var entity in entities)
             {
                 if (entity.State == EntityState.Added)
-                    ((Entity<int>)entity.Entity).CreatedDate = DateTime.UtcNow;
-
-                ((Entity<int>)entity.Entity).ModifiedDate = DateTime.UtcNow;
+                {
+                    ((BaseEntity)entity.Entity).CreatedDate = DateTime.UtcNow;
+                } ((BaseEntity)entity.Entity).ModifiedDate = DateTime.UtcNow;
             }
         }
     }

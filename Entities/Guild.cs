@@ -1,57 +1,93 @@
+using JetBrains.Annotations;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Entities
 {
-    public class Guild : Entity<Guid>
+    public class Guild : BaseEntity
     {
+        private Guild() { }
+
         public Guild(string name, User master)
         {
             Name = name;
-            Master = master;
-        }
-        public Guild(string name, Guid masterId)
-        {
-            Name = name;
-            MasterId = masterId;
+            PromoteToGuildMaster(master);
         }
 
+        public Guid Id { get; private set; } = new Guid();
         public string Name { get; private set; }
         public Guid MasterId { get; private set; }
         public virtual User Master { get; private set; }
 
         [InverseProperty("Guild")]
-        public virtual ICollection<User> Members { get; set; }
+        public virtual ICollection<User> Members { get; private set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Membership> Memberships { get; private set; }
 
         public Guild ChangeName(string newName)
         {
-            Name = newName ?? throw new ArgumentNullException(nameof(newName));
+            Name = newName ?? Name;
             return this;
         }
-        public Guild SetMaster(User newMaster)
+
+        public Guild PromoteToGuildMaster([NotNull] User newMaster)
         {
-            Master = newMaster ?? throw new ArgumentNullException(nameof(newMaster));
-            if (!Members.Contains(Master))
-                Members.Add(Master);
+            InviteToGuild(newMaster);
+            Master = Members.SingleOrDefault(m => m.Equals(newMaster)) ?? Master;
 
             return this;
         }
-        public Guild RemoveMember(User member)
+
+        public Guild DemoteMaster()
         {
-            if(member.Id == MasterId && Members.Count != 1)
-                throw new InvalidOperationException($"Member '{member.Name}' is the Guildmaster of target '{Name}' guild. " +
-                                                    $"Guildmasters can only leave guilds as the last remaining member. " +
-                                                    $"(You can try PATCH 'api/guilds/{Id}' to transfer guild ownership).");
-            Members.Remove(member);
+            Master = GetOldestMemberToPromoteMaster();
+
             return this;
         }
-        public Guild AddMember(User member)
+
+        private User GetOldestMemberToPromoteMaster()
+        {
+            return Memberships.Join(Members, 
+                membership => membership.MemberId, 
+                member => member.Id, 
+                (membership, _) => membership)
+                .OrderByDescending(mb => (mb.Exit ?? DateTime.UtcNow).Subtract(mb.Entrance))
+                .FirstOrDefault(m => !m.Equals(Master))?.Member;
+        }
+
+        public Guild InviteToGuild([NotNull] User newMember)
+        {
+            if (!Members.Contains(newMember))
+            {
+                Members.Add(newMember.AcceptGuildInvitation(this));
+
+                Memberships.Add(new Membership(this, newMember));
+
+                if (Members.Count == 1)
+                {
+                    Master = newMember;
+                }
+            }
+
+            return this;
+        }
+
+        public Guild KickMember([NotNull] User member)
         {
             if (Members.Contains(member))
-                throw new DuplicateWaitObjectException(nameof(member), $"Member '{member.Name}' already in target '{Name}' guild.");
+            {
+                if (Master.Equals(member))
+                {
+                    DemoteMaster();
+                }
+                Members.Remove(member);
+                member.Membership.RegisterExit();
+            }
 
-            Members.Add(member);
             return this;
         }
     }

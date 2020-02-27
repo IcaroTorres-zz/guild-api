@@ -9,6 +9,6 @@ namespace DTOs
         public Guid MasterId { get; set; }
         public string Name { get; set; }
         public string MasterName { get; set; }
-        public HashSet<Guid> Members { get; set; }
+        public HashSet<UserDto> Members { get; set; }
     }
 }

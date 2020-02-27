@@ -1,20 +1,19 @@
-using Context;
-using Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Services;
 using System;
 
 namespace api
 {
     public static class ApiGlobalExceptionHandlerExtension
     {
-        public static IApplicationBuilder UseWebApiExceptionHandler(this IApplicationBuilder app, IService<ApiContext> service)
+        public static IApplicationBuilder UseWebApiExceptionHandler(this IApplicationBuilder app, IBaseService service)
         {
             return app.UseExceptionHandler(HandleApiException(service));
         }
 
-        public static Action<IApplicationBuilder> HandleApiException(IService<ApiContext> service)
+        public static Action<IApplicationBuilder> HandleApiException(IBaseService service)
         {
             return appBuilder =>
             {
@@ -29,9 +28,9 @@ namespace api
                 });
             };
         }
-        private static string ErrorMessageBuilder(HttpContext context, string Message = "") =>
-            $"Fails on {context.Request.Method} " +
-            $"to '{context.Request.Path.ToUriComponent()}'. " +
-            $"Exception found: {Message}.";
+        private static string ErrorMessageBuilder(HttpContext context, string Message = "")
+        {
+            return $"Fails on {context.Request.Method} to '{context.Request.Path.ToUriComponent()}'. Exception found: {Message}.";
+        }
     }
 }
