@@ -27,7 +27,6 @@
 ```
 $ git clone https://github.com/icarotorres/guild.api.git
 $ dotnet restore --project Api
-
 ```
 ### Running the project
 
