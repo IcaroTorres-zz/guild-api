@@ -60,13 +60,13 @@
               "target": "Package",
               "version": "[2.2.6, )"
             },
-            "Microsoft.EntityFrameworkCore.Inmemory": {
-              "target": "Package",
-              "version": "[2.2.1, )"
-            },
             "Microsoft.EntityFrameworkCore.Proxies": {
               "target": "Package",
               "version": "[2.2.1, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[2.2.6, )"
             },
             "Microsoft.NETCore.App": {
               "suppressParent": "All",
