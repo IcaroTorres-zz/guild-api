@@ -1,36 +1,45 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Services;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace api
 {
     public static class ApiGlobalExceptionHandlerExtension
     {
-        public static IApplicationBuilder UseWebApiExceptionHandler(this IApplicationBuilder app, IBaseService service)
+        public static IApplicationBuilder UseWebApiExceptionHandler(this IApplicationBuilder app)
         {
-            return app.UseExceptionHandler(HandleApiException(service));
+            return app.UseExceptionHandler(HandleApiException());
         }
 
-        public static Action<IApplicationBuilder> HandleApiException(IBaseService service)
+        public static Action<IApplicationBuilder> HandleApiException()
         {
-            return appBuilder =>
-            {
-                appBuilder.Run(async context =>
-                {
-                    service.Rollback();
-                    context.Response.StatusCode = 500;
-                    var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    await context.Response
-                                 .WriteAsync(ErrorMessageBuilder(context, exceptionHandlerFeature != null ? exceptionHandlerFeature.Error.Message
-                                                                                                          : "An unexpected fault happened."));
-                });
-            };
+            return appBuilder => appBuilder.Run(async context => await context.Response.WriteAsync(ErrorMessageBuilder(context)));
         }
-        private static string ErrorMessageBuilder(HttpContext context, string Message = "")
+
+        private static string ErrorMessageBuilder(HttpContext context)
         {
-            return $"Fails on {context.Request.Method} to '{context.Request.Path.ToUriComponent()}'. Exception found: {Message}.";
+            var errors = GenerateExceptionErrorMessages(context.Features.Get<IExceptionHandlerFeature>().Error);
+            return JsonConvert.SerializeObject(new
+            {
+                status = context.Response?.StatusCode ?? 500,
+                errors
+            }, Formatting.Indented);
+        }
+
+        private static List<string> GenerateExceptionErrorMessages(Exception ex)
+        {
+            if (ex is null)
+            {
+                return new List<string>();
+            }
+
+            var errors = GenerateExceptionErrorMessages(ex.InnerException);
+            errors.Add(ex.Message);
+
+            return errors;
         }
     }
 }
