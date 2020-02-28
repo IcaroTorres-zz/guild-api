@@ -23,7 +23,7 @@ namespace Services
 
         public Guild Update(Guid id, JsonPatchDocument<Guild> payload)
         {
-            var guild = GetWithKeys<Guild>(id) ?? throw new KeyNotFoundException($"Target guild with id '{id}' not found.");
+            var guild = Get(id);
 
             payload.ApplyTo(guild);
 
@@ -32,34 +32,28 @@ namespace Services
 
         public Guild AddMember(Guid id, string memberName)
         {
-            var guild = Get(id);
-
-            var member = GetMember(memberName);
+            var (guild, member) = GetGuildAndMamber(id, memberName);
 
             return guild.InviteToGuild(member);
         }
 
         public Guild RemoveMember(Guid id, string memberName)
         {
-            var guild = Get(id);
-
-            var member = GetMember(memberName);
+            var (guild, member) = GetGuildAndMamber(id, memberName);
 
             return guild.KickMember(member);
         }
 
         public Guild ChangeGuildMaster(Guid id, string memberName)
         {
-            var guild = Get(id);
-
-            var member = GetMember(memberName);
+            var (guild, member) = GetGuildAndMamber(id, memberName);
 
             return guild.PromoteToGuildMaster(member);
         }
 
-        public IQueryable<Guild> List(int count = 20)
+        public IReadOnlyList<Guild> List(int count = 20)
         {
-            return GetAll<Guild>().Take(count);
+            return GetAll<Guild>().Take(count).ToList();
         }
 
         public Guild Get(Guid id)
@@ -67,16 +61,18 @@ namespace Services
             return GetWithKeys<Guild>(id) ?? throw new KeyNotFoundException($"Target guild with id '{id}' not found.");
         }
 
-        private User GetMember(string memberName)
+        private (Guild, User) GetGuildAndMamber(Guid id, string memberName)
         {
-            return Query<User>(u => u.Name.Equals(memberName)).SingleOrDefault() ?? throw new KeyNotFoundException($"Target user '{memberName}' not found.");
+            var guild = GetWithKeys<Guild>(id) ?? throw new KeyNotFoundException($"Target guild with id '{id}' not found.");
+
+            var member = Query<User>(u => u.Name.Equals(memberName)).SingleOrDefault() ?? throw new KeyNotFoundException($"Target user '{memberName}' not found.");
+
+            return (guild, member);
         }
 
         public Guild Delete(Guid id)
         {
-            var guild = Get(id);
-
-            return Remove(guild);
+            return Remove(Get(id));
         }
     }
 }
