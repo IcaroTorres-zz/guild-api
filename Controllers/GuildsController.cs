@@ -18,7 +18,7 @@ namespace Controllers
         }
 
         [HttpGet(Name = "get-guilds")]
-        public ActionResult GetAll([FromQuery(Name = "count")] int count, [FromServices] IGuildService service)
+        public ActionResult GetAll([FromServices] IGuildService service, [FromQuery(Name = "count")] int count = 20)
         {
             return Ok(service.List(count));
         }

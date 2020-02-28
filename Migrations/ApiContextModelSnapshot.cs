@@ -27,8 +27,6 @@ namespace Api.Migrations
 
                     b.Property<bool>("Disabled");
 
-                    b.Property<Guid>("MasterId");
-
                     b.Property<string>("ModifiedBy");
 
                     b.Property<DateTime>("ModifiedDate");
@@ -36,9 +34,6 @@ namespace Api.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MasterId")
-                        .IsUnique();
 
                     b.ToTable("Guilds");
                 });
@@ -78,6 +73,8 @@ namespace Api.Migrations
 
                     b.Property<Guid>("GuildId");
 
+                    b.Property<bool>("IsGuildMaster");
+
                     b.Property<string>("ModifiedBy");
 
                     b.Property<DateTime>("ModifiedDate");
@@ -89,14 +86,6 @@ namespace Api.Migrations
                     b.HasIndex("GuildId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Entities.Guild", b =>
-                {
-                    b.HasOne("Entities.User", "Master")
-                        .WithOne()
-                        .HasForeignKey("Entities.Guild", "MasterId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Entities.Membership", b =>

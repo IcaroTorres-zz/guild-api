@@ -17,13 +17,6 @@ namespace Context
         public ApiContext(DbContextOptions<ApiContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // explicitly needed to map this one-sided navigation property on Guild Entity
-            modelBuilder.Entity<Guild>()
-              .HasOne(g => g.Master)
-              .WithOne()
-              .HasForeignKey<Guild>(g => g.MasterId);
-            // the foreignKey here is needed cause there is no navigation property on the other relation size
-
             modelBuilder.Entity<Membership>().HasKey(bc => new { bc.MemberId, bc.GuildId });
 
             modelBuilder.Entity<Membership>()

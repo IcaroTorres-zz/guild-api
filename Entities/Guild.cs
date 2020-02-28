@@ -9,7 +9,7 @@ namespace Entities
 {
     public class Guild : BaseEntity
     {
-        private Guild() { }
+        protected Guild() { }
 
         public Guild(string name, User master)
         {
@@ -19,8 +19,7 @@ namespace Entities
 
         public Guid Id { get; private set; } = new Guid();
         public string Name { get; private set; }
-        public Guid MasterId { get; private set; }
-        public virtual User Master { get; private set; }
+
 
         [InverseProperty("Guild")]
         public virtual ICollection<User> Members { get; private set; } = new List<User>();
@@ -28,35 +27,13 @@ namespace Entities
         [JsonIgnore]
         public virtual ICollection<Membership> Memberships { get; private set; } = new List<Membership>();
 
+        [NotMapped]
+        public virtual User Master => Members.SingleOrDefault(m => m.IsGuildMaster);
+
         public Guild ChangeName(string newName)
         {
             Name = newName ?? Name;
             return this;
-        }
-
-        public Guild PromoteToGuildMaster([NotNull] User newMaster)
-        {
-            InviteToGuild(newMaster);
-            Master = Members.SingleOrDefault(m => m.Equals(newMaster)) ?? Master;
-
-            return this;
-        }
-
-        public Guild DemoteMaster()
-        {
-            Master = GetOldestMemberToPromoteMaster();
-
-            return this;
-        }
-
-        private User GetOldestMemberToPromoteMaster()
-        {
-            return Memberships.Join(Members, 
-                membership => membership.MemberId, 
-                member => member.Id, 
-                (membership, _) => membership)
-                .OrderByDescending(mb => (mb.Exit ?? DateTime.UtcNow).Subtract(mb.Entrance))
-                .FirstOrDefault(m => !m.Equals(Master))?.Member;
         }
 
         public Guild InviteToGuild([NotNull] User newMember)
@@ -69,11 +46,38 @@ namespace Entities
 
                 if (Members.Count == 1)
                 {
-                    Master = newMember;
+                    newMember.PromoteToGuildMaster();
                 }
             }
 
             return this;
+        }
+
+        public Guild PromoteToGuildMaster([NotNull] User newMaster)
+        {
+            InviteToGuild(newMaster);
+            newMaster.PromoteToGuildMaster();
+
+            return this;
+        }
+
+        public Guild DemoteMaster()
+        {
+            var oldestMemberToReplaceMaster = GetOldestMemberToPromoteMaster();
+
+            oldestMemberToReplaceMaster?.PromoteToGuildMaster();
+
+            return this;
+        }
+
+        private User GetOldestMemberToPromoteMaster()
+        {
+            return Memberships.Join(Members,
+                membership => membership.MemberId,
+                member => member.Id,
+                (membership, _) => membership)
+                .OrderByDescending(ms => (ms.Exit ?? DateTime.UtcNow).Subtract(ms.Entrance))
+                .FirstOrDefault(ms => !ms.Member.IsGuildMaster)?.Member;
         }
 
         public Guild KickMember([NotNull] User member)

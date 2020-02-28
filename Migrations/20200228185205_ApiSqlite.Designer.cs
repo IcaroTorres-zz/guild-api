@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20200228154701_ApiDb")]
-    partial class ApiDb
+    [Migration("20200228185205_ApiSqlite")]
+    partial class ApiSqlite
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,8 +29,6 @@ namespace Api.Migrations
 
                     b.Property<bool>("Disabled");
 
-                    b.Property<Guid>("MasterId");
-
                     b.Property<string>("ModifiedBy");
 
                     b.Property<DateTime>("ModifiedDate");
@@ -38,9 +36,6 @@ namespace Api.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MasterId")
-                        .IsUnique();
 
                     b.ToTable("Guilds");
                 });
@@ -80,6 +75,8 @@ namespace Api.Migrations
 
                     b.Property<Guid>("GuildId");
 
+                    b.Property<bool>("IsGuildMaster");
+
                     b.Property<string>("ModifiedBy");
 
                     b.Property<DateTime>("ModifiedDate");
@@ -91,14 +88,6 @@ namespace Api.Migrations
                     b.HasIndex("GuildId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Entities.Guild", b =>
-                {
-                    b.HasOne("Entities.User", "Master")
-                        .WithOne()
-                        .HasForeignKey("Entities.Guild", "MasterId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Entities.Membership", b =>

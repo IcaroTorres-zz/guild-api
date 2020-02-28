@@ -5,7 +5,7 @@ namespace Entities
 {
     public class Membership
     {
-        private Membership() { }
+        protected Membership() { }
 
         public Membership(Guild guild, User member)
         {

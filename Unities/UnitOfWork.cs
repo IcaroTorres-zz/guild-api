@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Win32.SafeHandles;
 using System;
@@ -9,7 +10,7 @@ namespace Unities
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly DbContext Context;
+        private readonly ApiContext Context;
         private IDbContextTransaction ContextTransaction;
 
         protected bool Disposed { get; private set; } = false;
@@ -19,7 +20,7 @@ namespace Unities
         /// Construtor de Unidade de trabalho, injetada com os Contextos.
         /// </summary>
         /// <param name="context"/>
-        public UnitOfWork(DbContext context)
+        public UnitOfWork(ApiContext context)
         {
             Context = context;
         }
@@ -89,7 +90,7 @@ namespace Unities
 
         public void Save()
         {
-            try { Context.SaveChanges(); }
+            try { var changes = Context.SaveChanges(); }
             catch (Exception dbex)
             {
                 RollbackStates();
