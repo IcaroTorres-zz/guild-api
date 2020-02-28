@@ -139,6 +139,8 @@ Startup.cs
 	// ...
 ```
 
+And alter he context registration in the ConfigureServices method
+
 ```c#
 	var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
 
