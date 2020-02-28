@@ -116,8 +116,7 @@ You can do it in many ways. Following there is an example on how to do so:
 
 			// DbContext dependency registration
 			.AddEntityFrameworkSqlite()
-			.AddDbContext<YourContext>(options => options
-				.UseSqlite(yourSqlConnectionString));
+			.AddDbContext<YourContext>(options => options.UseSqlite(yourSqlConnectionString));
 			// ... other services registration
 	}
 // ...
