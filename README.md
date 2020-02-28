@@ -1,27 +1,40 @@
 ﻿# Guild.api
-Sample API Developed with 
-+ **.Net Core 2.2**;
-+ **EF Core 2**;
-+ **Microsoft.EntityFrameworkCore.Inmemory** package;
-+ **Dependency Injection**;
-+ **Repository Pattern**.
 
-# Setup
+> A simple Rest API made in .net core, with operations (_GET, POST, PUT, PATCH, DELETE_) over `Guild` URI _/api/guilds/v1_
 
-### Requirements
+## Sample API Developed with :
+
++ [x]**.Net Core 2.2**;
++ [x]**EF Core 2.2.6**;
++ [x]**Microsoft.EntityFrameworkCore.Sqlite 2.2.6** package;
++ [x]**Dependency Injection**;
++ [x]**Repository Pattern**;
++ [x]**Unit of Work**;
++ []**Hateoas**;
++ []**Distributed Cache (Redis)**.
+
+## Setup
+
+### Requirements:
+
 + [.NetCore SDK](https://dotnet.microsoft.com/download "microsoft downloads");
-+ [GIT](https://git-scm.com/downloads "git downloads").
++ [GIT](https://git-scm.com/downloads "git downloads");
++ [Redis](https://redis.io/download "redis downloads").
 
-On prompt:
+
+### Clone and Restore
+
 ```
 $ git clone https://github.com/icarotorres/guild.api.git
-$ dotnet restore
-$ dotnet run
+$ dotnet restore --project Api
+
 ```
-If you are using VS Code, configure your VS Code Debugger with _.vscode_ folder on your project root folder, pres `F5` and select `.Net Core Launch (web)` as your running target option. It will ask to create a build task, generating a file like following.
+### Running the project
+
+> If you are using VS Code, configure your VS Code Debugger with _.vscode_ folder on your project root folder, pres `F5` and select `.Net Core Launch (web)` as your running target option. It will ask to create a build task, generating a file like following.
 
 tasks.json:
-``` js
+``` json
 {
     "version": "2.0.0",
     "tasks": [
@@ -39,364 +52,85 @@ tasks.json:
 }
 ```
 
-Compile project with `dotnet build` and Publish production folder with `dotnet publish`.
+> Compile project with `dotnet build` and Publish production folder with `dotnet publish`.
 
-# Resources
-#### Disclaimer
-+ All responses are formated as JSON;
-+ [domain] Will represent the root domain URL. Example: *http://localhost:5000*.
+```
+$ redis-server
+$ dotnet run
+```
 
-## Guilds = _`[domain]/api/guilds`_
-+ Objective: **Creating a guild**.
-+ Method: **`POST`**
-+ Params: **`([FromBody] GuildDto)`**
-+ Sample request:
-**```
-$ curl -i -X POST http://localhost:5000/api/guilds \
--d '{"id": "a", "masterid": "u1"}' \
--H 'Content-type: application/json'
-```**
-> Expected output sample:
-> + Response header
+## Aditional Setup
+
+### Redis Installation (Non Windows)
+
+> Download, extract and compile Redis with:
+
 ```
-HTTP/1.1 201 Created
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-Location: api/guilds/a
+$ wget http://download.redis.io/releases/redis-5.0.7.tar.gz
+$ tar xzf redis-5.0.7.tar.gz
+$ cd redis-5.0.7
+$ make
 ```
-> + Response body
+
+> The binaries that are now compiled are available in the src directory. Run Redis with:
+
 ```
+$ src/redis-server
+```
+
+### Redis Installation (Windows)
+
+> Download a compiled windows version from [dmajkic / redis](https://github.com/dmajkic/redis/downloads "github dmajkic/redis download packages"). Set Redis on your environment variables and run `redis-server` on prompt like below:
+
+```
+$ redis-server
+```
+
+> this will start your Redis local server with default settings.
+
+### Adding Redis to your project
+
+> Configure an entry for your settings in your pppsetings.json. Following there is an example:
+
+```json
 {
-	"name":"a",
-	"masterName":"u1",
-	"master":{"name":"u1","guildName":"a","isGuildMaster":true},
-	"members":[{"name":"u1","guildName":"a","isGuildMaster":true}]
-}
-```
-
----
-
-### Guild Info.
-+ Method: `GET`
-+ URI: `[API]/guilds/:name`
-+ Controller Action: `GuildInfo`
-+ Params: `name: string`
-+ Sample request:
-```
-$ curl -i http://localhost:5000/api/guilds/a
-```
-
-> Expected output sample:
-> + Response header
-```
-HTTP/1.1 200 OK
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-```
-> + Response body
-```
-{
-	"master":{"name":"u2","guildName":"a","isGuildMaster":true},
-	"members":[
-		{"name":"u2","guildName":"a","isGuildMaster":true},
-		{"name":"u1","guildName":"a","isGuildMaster":false}
-	],
-	"name":"a",
-	"masterName":"u2"
-}
-```
-
----
-
-### List Guilds.
-+ Method: `GET`
-+ URI: `[API]/guilds/list/:count=20`
-+ Controller Action: `Guilds`
-+ Params: `count: int`
-+ Sample request:
-```
-$ curl -i http://localhost:5000/api/guilds/list/3
-```
-
-> Expected output sample:
-> + Response header
-```
-HTTP/1.1 200 OK
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-```
-> + Response body
-```
-[
-	{
-		"master":{"name":"u2","guildName":"a","isGuildMaster":true},
-		"members":[
-			{"name":"u2","guildName":"a","isGuildMaster":true},
-			{"name":"u1","guildName":"a","isGuildMaster":false}
-		],
-		"name":"a",
-		"masterName":"u2"
-	},
-	{
-		"master":{"name":"u3","guildName":"b","isGuildMaster":true},
-		"members":[{"name":"u3","guildName":"b","isGuildMaster":true}],
-		"name":"b",
-		"masterName":"u3"
-	},
-	{
-		"master":{"name":"u5","guildName":"c","isGuildMaster":true},
-		"members":[{"name":"u5","guildName":"c","isGuildMaster":true}],
-		"name":"c",
-		"masterName":"u5"
-	}
-]
-```
-
----
-### Guild Update.
-+ Method: `PUT`
-+ URI: `[API]/guilds/:name`
-+ Controller Action: `UpdateGuild`
-+ Params:
-  + `name: string`
-  + `payload: GuildForm`
-+ Sample request:
-```
-$ curl -i -X PUT http://localhost:5000/api/guilds/a \
--d '{"name": "a", "masterName": "u2", "members": ["u1", "u2"]}' \
--H 'Content-type: application/json'
-```
-> Expected output sample:
-> + Response header
-```
-HTTP/1.1 200 OK
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-```
-> + Response body
-```
-{
-  "name":"a",
-  "masterName":"u2",
-  "master":{
-    "name":"u2",
-    "guildName":"a",
-    "isGuildMaster":true
+  //...
+  "RedisCacheSettings": {
+    // other settings...
+    "ConnectionString": "localhost,port: 6379,password=your_redis_password!"
   },
-  "members":[
-    {
-      "name":"u1",
-      "guildName":"a",
-      "isGuildMaster":false
-    },
-    {
-      "name":"u2",
-      "guildName":"a",
-      "isGuildMaster":true
-    }
-  ]
-}
-```
----
-### Add member to guild.
-+ Method: `PATCH`
-+ URI: `[API]/guilds/:name`
-+ Controller Action(s): `PatchGuild > UpdateMembers`
-+ Params:
-  + `name: string`
-  + `payload: {"addedMember": string}`
-+ Sample request:
-```
-$ curl -i -X PATCH http://localhost:5000/api/guilds/a \
--d '{"addedMember": "u9"}' \
--H 'Content-type: application/json'
-```
-> Expected output sample:
-> + Response header
-```
-HTTP/1.1 200 OK
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-```
-> + Response body
-```true```
----
-
-### Remove member from guild.
-+ Method: `PATCH`
-+ URI: `[API]/guilds/:name`
-+ Controller Action(s): `PatchGuild > UpdateMembers`
-+ Params:
-  + `name: string`
-  + `payload: {"removedMember": string}`
-+ Sample request:
-```
-$ curl -i -X PATCH http://localhost:5000/api/guilds/a \
--d '{"removedMember": "u9"}' \
--H 'Content-type: application/json'
-```
-> Expected output sample:
-> + Response header
-```
-HTTP/1.1 200 OK
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-```
-> + Response body
-
-```true```
-
----
-
-### Transfer guild master ownership.
-+ Method: `PATCH`
-+ URI: `[API]/guilds/:name`
-+ Controller Action(s): `PatchGuild > Transfer`
-+ Params:
-  + `name: string`
-  + `payload: {"newMasterName": string}`
-+ Sample request:
-```
-$ curl -i -X PATCH http://localhost:5000/api/guilds/a \
--d '{"newMasterName": "u3"}' \
--H 'Content-type: application/json'
-```
-> Expected output sample:
-> + Response header
-```
-HTTP/1.1 200 OK
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-```
-> + Response body
-
-```true```
-
----
-
-### Delete Guild.
-+ Method: `DELETE`
-+ URI: `[API]/guilds/:name`
-+ Controller Action(s): `DeleteGuild`
-+ Params: `name: string`
-+ Sample request:
-```
-$ curl -i -X DELETE http://localhost:5000/api/guilds/a
-```
-> Expected output sample:
-> + Response header
-```
-HTTP/1.1 200 OK
-Date: <Response DateTime>
-Content-Type: application/json; charset=utf-8
-Server: Kestrel
-Transfer-Encoding: chunked
-```
-> + Response body
-
-```true```
-
----
-
-### Models
-#### User.cs
-```c#
-public class User
-{
-  [Key]
-  public string Name { get; set; }
-  public string GuildName { get; set; }
-  [ForeignKey("GuildName")]
-  public virtual Guild Guild { get; set; }
-  public bool IsGuildMaster { get => Guild?.MasterName?.Equals(Name) ?? false; }
+  //...
 }
 ```
 
-#### Guild.cs
+### Sqlite
+
+> To add Sqlite to the project you need to register on your dependenci injection services through the method `ConfigureServices` in the `Startup.cs`.
+You can do it in many ways. Following there is an example on how to do so:
+
 ```c#
-public class Guild
-{
-  [Key]
-  public string Name { get; set; }
-  public string MasterName { get; set; }
-  [ForeignKey("MasterName")]
-  public virtual User Master { get; set; }
-  [InverseProperty("Guild")]
-  public virtual ICollection<User> Members { get; set; }
-}
+// ...
+	public void ConfigureServices(IServiceCollection services)
+	{
+		services
+			// ... other services registratins
+
+			// DbContext dependency registration
+			.AddEntityFrameworkSqlite()
+			.AddDbContext<YourContext>(options => options
+				.UseSqlite(yourSqlConnectionString));
+			// ... other services registration
+	}
+// ...
+
 ```
 
-### DTOs
-#### UserForm.cs
-```c#
-public class UserForm
-{
-  public string Name { get; set; }
-  public string GuildName { get; set; }
-}
-```
+> Examples of ConnectionStrings for absolute and relative paths:
 
-#### GuildForm.cs
 ```c#
-public class GuildForm
-{
-  public string Name { get; set; }
-  public string MasterName { get; set; }
-  public List<string> Members { get; set; }
-}
-```
+	// example for using absolute path using some apsettings key:value congifs
+	var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
 
-### ApiContext
-```c#
-public class ApiContext : DbContext
-{
-  public DbSet<Guild> Guilds { get; set; }
-  public DbSet<User> Users { get; set; }
-  public ApiContext(DbContextOptions<ApiContext> options): base(options){}  
-  protected override void OnModelCreating(ModelBuilder modelBuilder)
-  {
-    // explicitly needed to map this one-sided navigation property on Guild Entity
-    modelBuilder.Entity<Guild>()
-      .HasOne(g => g.Master)
-      .WithOne()
-      .HasForeignKey<Guild>(g => g.MasterName);
-    // the foreignKey here is needed cause there is no navigation property on the other relation size
-   }
-}
-```
-
-### Dependency Injection Setup (Startup.cs)
-> This turns the IoC possible and the dependencies available to be injected (used on this project as Constructor type), On HomeController, Repositories and UnitOfWork.
-> The Inmemory Provider is also setup here to register our context.
-```c#
-public void ConfigureServices(IServiceCollection services)
-{
-  // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
-  services.AddMvc()
-          .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-          .AddJsonOptions(options => options.SerializerSettings
-                                            .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-  // your context dependency registration
-  services.AddEntityFrameworkInMemoryDatabase()
-          .AddDbContext<ApiContext>(options => options.UseLazyLoadingProxies()
-                                                        .UseInMemoryDatabase("ApiInMemoryDB"));
-  // your repositories and unit of work dependecy registration
-  services.AddTransient<IGuildRepository, GuildRepository>(); 
-  services.AddTransient<IUserRepository, UserRepository>();
-  services.AddTransient<IUnitOfWork, UnitOfWork>();                             
-}   
+	// example for using relative path of running application (bin/Debug/.../someName.Db)
+	var SqliteRelaivePathConnectionString = Configuration["SqliteSettings:ConnectionString"];
 ```
