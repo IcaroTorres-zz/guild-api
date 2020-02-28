@@ -11,6 +11,7 @@ namespace Context
     {
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Membership> Memberships { get; set; }
 
         public ApiContext() { }
         public ApiContext(DbContextOptions<ApiContext> options) : base(options) { }
@@ -22,6 +23,21 @@ namespace Context
               .WithOne()
               .HasForeignKey<Guild>(g => g.MasterId);
             // the foreignKey here is needed cause there is no navigation property on the other relation size
+
+            modelBuilder.Entity<Membership>().HasKey(bc => new { bc.MemberId, bc.GuildId });
+
+            modelBuilder.Entity<Membership>()
+                .HasOne(ms => ms.Guild)
+                .WithMany(g => g.Memberships)
+                .HasForeignKey(ms => ms.GuildId);
+
+            modelBuilder.Entity<Membership>()
+                .HasOne(ms => ms.Member)
+                .WithOne(m => m.Membership)
+                .HasForeignKey<Membership>(ms => ms.MemberId);
+            // the foreignkey is in the membership due to its dependency on User table
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public override int SaveChanges()
