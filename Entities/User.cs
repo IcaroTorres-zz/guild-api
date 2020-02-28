@@ -44,7 +44,7 @@ namespace Entities
 
         public User AcceptGuildInvitation([NotNull] Guild invitingGuild)
         {
-            if (!Guild.Equals(invitingGuild))
+            if (Guild != invitingGuild)
             {
                 QuitGuild();
                 Guild = invitingGuild;

@@ -11,7 +11,7 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "api/guilds/v1",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -20,7 +20,7 @@
     "api": {
       "commandName": "Project",
       "workingDirectory": "C:\\Users\\Icaro Torres\\source\\repos\\guild.api",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "api/guilds/v1",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

@@ -23,10 +23,10 @@ namespace Entities
         public virtual User Master { get; private set; }
 
         [InverseProperty("Guild")]
-        public virtual ICollection<User> Members { get; private set; }
+        public virtual ICollection<User> Members { get; private set; } = new List<User>();
 
         [JsonIgnore]
-        public virtual ICollection<Membership> Memberships { get; private set; }
+        public virtual ICollection<Membership> Memberships { get; private set; } = new List<Membership>();
 
         public Guild ChangeName(string newName)
         {
@@ -80,7 +80,7 @@ namespace Entities
         {
             if (Members.Contains(member))
             {
-                if (Master.Equals(member))
+                if (Master == member)
                 {
                     DemoteMaster();
                 }

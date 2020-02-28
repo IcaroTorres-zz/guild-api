@@ -127,22 +127,22 @@ You can do it in many ways. Following there is an example on how to do so:
 Startup.cs
 
 ```c#
-	public Startup(IConfiguration configuration, IHostingEnvironment appHost)
-    {
-        Configuration = configuration;
-        AppHost = appHost;
-    }
+public Startup(IConfiguration configuration, IHostingEnvironment appHost)
+{
+    Configuration = configuration;
+    AppHost = appHost;
+}
 
-    public IConfiguration Configuration { get; }
-    public IHostingEnvironment AppHost { get; }
+public IConfiguration Configuration { get; }
+public IHostingEnvironment AppHost { get; }
 
-	// ...
+// ...
 ```
 
 And alter he context registration in the ConfigureServices method
 
 ```c#
-	var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
+var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
 
-	services.AddDbContext<YourContext>(options => options.UseSqlite(yourSqlConnectionString));
+services.AddDbContext<YourContext>(options => options.UseSqlite(yourSqlConnectionString));
 ```
