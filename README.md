@@ -120,15 +120,27 @@ You can do it in many ways. Following there is an example on how to do so:
 			// ... other services registration
 	}
 // ...
-
 ```
 
-> Examples of ConnectionStrings for absolute and relative paths:
+> You can use `appsettings.json` to set absolute or relative paths for Sqlite. If you want to get the absolute path of your application host, you can change default `Startup` class constructor adding the `IHostingEnvironment` as parameter like hereinafter:
+
+Startup.cs
 
 ```c#
-	// example for using absolute path using some apsettings key:value congifs
+	public Startup(IConfiguration configuration, IHostingEnvironment appHost)
+    {
+        Configuration = configuration;
+        AppHost = appHost;
+    }
+
+    public IConfiguration Configuration { get; }
+    public IHostingEnvironment AppHost { get; }
+
+	// ...
+```
+
+```c#
 	var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
 
-	// example for using relative path of running application (bin/Debug/.../someName.Db)
-	var SqliteRelaivePathConnectionString = Configuration["SqliteSettings:ConnectionString"];
+	services.AddDbContext<YourContext>(options => options.UseSqlite(yourSqlConnectionString));
 ```
