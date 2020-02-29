@@ -96,6 +96,8 @@ To add Sqlite to the project you need to register on your dependenci injection s
 
 You can do it in many ways. Following there is an example on how to do so:
 
+Startup.cs
+
 ```c#
 public void ConfigureServices(IServiceCollection services)
 {
@@ -120,10 +122,11 @@ public IConfiguration Configuration { get; }
 public IHostingEnvironment AppHost { get; }
 ```
 
-And alter he context registration in the ConfigureServices method
+And alter the context registration in the `ConfigureServices` method of `Startup.cs` class. Code below is mounting sql connection using `AppHost.ContentRootPath` and `Configuration` key/value from `appsettings.json`.
 
+
+Startup.cs
 ```c#
-// mounting sql connection with AppHost and key value from **appsettings.json** using `Configuration`
 var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
 
 services.AddDbContext<YourContext>(options => options.UseSqlite(SqliteAbsolutePathConnectionString));
