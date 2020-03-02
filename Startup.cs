@@ -1,15 +1,20 @@
-﻿using Context;
-using Services;
+﻿using Abstractions.Services;
+using Abstractions.Unities;
+using Cache;
+using Context;
+using Hateoas;
+using Implementations.Entities;
+using Implementations.Services;
+using Implementations.Unities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
-using Unities;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Reflection;
+using System.Collections.Generic;
 
 namespace api
 {
@@ -33,18 +38,19 @@ namespace api
                 // DbContext dependency registration
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<ApiContext>(options => options
-                    .UseLazyLoadingProxies()
                     .UseSqlite($"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:Source"]}")
                     .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)))
+
+                // Custom service layer dependecy registration
+                .AddScoped<IBaseService, BaseService>()
+                .AddScoped<IGuildService, GuildService>()
+                .AddScoped<IUnitOfWork, UnitOfWork>()
 
                 // swagger
                 .AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Guild.api", Version = "v1" }); })
 
-                // Custom service layer dependecy registration
-                .AddScoped<DbContext, ApiContext>()
-                .AddScoped<IBaseService, BaseService>()
-                .AddScoped<IGuildService, GuildService>()
-                .AddScoped<IUnitOfWork, UnitOfWork>()
+                // Ativando o uso de cache via Redis
+                .AddRedisResponseCacheService(Configuration)
 
                 // enabling UseLazyLoadingProxies, requires AddJsonOptions to handle navigation reference looping on json serialization
                 .AddMvcCore()
@@ -54,6 +60,17 @@ namespace api
                     options.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                     options.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                     options.Formatting = Newtonsoft.Json.Formatting.Indented;
+                })
+
+                // custom hateoas resouces options for JsonHateoasFormatter
+                .AddHateoasResources(options =>
+                {
+                    options.AddLink<List<Guild>>("create-guild");
+                    options.AddLink<Guild>("get-guilds");
+                    options.AddLink<Guild>("get-guild", e => new { id = e.Id });
+                    options.AddLink<Guild>("update-guild", e => new { id = e.Id });
+                    options.AddLink<Guild>("patch-guild", e => new { id = e.Id });
+                    options.AddLink<Guild>("delete-enterprise", e => new { id = e.Id });
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -77,8 +94,7 @@ namespace api
                .UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; })
                .UseSwaggerUI(option =>
                {
-                    option.SwaggerEndpoint(swaggerOptions.UiEndpoint,
-                                            swaggerOptions.Description);
+                   option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description);
                })
                .UseHttpsRedirection()
                .UseMvc();
