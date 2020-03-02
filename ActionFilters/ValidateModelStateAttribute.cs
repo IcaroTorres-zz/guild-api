@@ -2,17 +2,20 @@
 using System;
 using System.Linq;
 
-namespace Api.ActionFilters
+namespace ActionFilters
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class ValidateModelStateAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext actionContext)
         {
-            var modelState = actionContext.ModelState;
-            if (!modelState.IsValid)
+            if (!actionContext.ModelState.IsValid)
             {
-                throw new ArgumentException(string.Join(" | ", modelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
+                var rootException = actionContext.ModelState.Values
+                    .Select(v => new FormatException(string.Join(", ", v.Errors.Select(e => e.ErrorMessage))))
+                    .Aggregate((inner, ex) => new FormatException(ex.Message, inner));
+
+                throw rootException;
             }
 
             base.OnActionExecuting(actionContext);

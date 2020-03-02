@@ -1,23 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Abstractions.Unities;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using Unities;
 
-namespace ActionFIlters
+namespace ActionFilters
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class UseUnitOfWorkAttribute : Attribute, IActionFilter
+    public class UseUnitOfWorkAttribute : ActionFilterAttribute
     {
-        public IUnitOfWork UnitOfWork { get; private set; }
+        public IUnitOfWork UnitOfWork { get; protected set; }
 
-        public void OnActionExecuting(ActionExecutingContext context)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
             UnitOfWork = context.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>();
 
             UnitOfWork.Begin();
         }
 
-        public void OnActionExecuted(ActionExecutedContext context)
+        public override void OnActionExecuted(ActionExecutedContext context)
         {
             UnitOfWork ??= context.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>();
 
