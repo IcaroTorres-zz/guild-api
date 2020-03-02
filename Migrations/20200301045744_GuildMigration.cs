@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Api.Migrations
 {
-    public partial class ApiSqlite : Migration
+    public partial class GuildMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,7 +25,7 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Members",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -40,9 +40,9 @@ namespace Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Members", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Guilds_GuildId",
+                        name: "FK_Members_Guilds_GuildId",
                         column: x => x.GuildId,
                         principalTable: "Guilds",
                         principalColumn: "Id",
@@ -53,15 +53,16 @@ namespace Api.Migrations
                 name: "Memberships",
                 columns: table => new
                 {
-                    GuildId = table.Column<Guid>(nullable: false),
-                    MemberId = table.Column<Guid>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false),
                     Entrance = table.Column<DateTime>(nullable: false),
                     Exit = table.Column<DateTime>(nullable: true),
-                    Disabled = table.Column<bool>(nullable: false)
+                    Disabled = table.Column<bool>(nullable: false),
+                    MemberId = table.Column<Guid>(nullable: false),
+                    GuildId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Memberships", x => new { x.MemberId, x.GuildId });
+                    table.PrimaryKey("PK_Memberships", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Memberships_Guilds_GuildId",
                         column: x => x.GuildId,
@@ -69,12 +70,17 @@ namespace Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Memberships_Users_MemberId",
+                        name: "FK_Memberships_Members_MemberId",
                         column: x => x.MemberId,
-                        principalTable: "Users",
+                        principalTable: "Members",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Members_GuildId",
+                table: "Members",
+                column: "GuildId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Memberships_GuildId",
@@ -84,13 +90,7 @@ namespace Api.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Memberships_MemberId",
                 table: "Memberships",
-                column: "MemberId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_GuildId",
-                table: "Users",
-                column: "GuildId");
+                column: "MemberId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -99,7 +99,7 @@ namespace Api.Migrations
                 name: "Memberships");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Members");
 
             migrationBuilder.DropTable(
                 name: "Guilds");
