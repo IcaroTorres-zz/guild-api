@@ -11,14 +11,11 @@ namespace api
     {
         public static IApplicationBuilder UseWebApiExceptionHandler(this IApplicationBuilder app)
         {
-            return app.UseExceptionHandler(HandleApiException());
+            return app.UseExceptionHandler(appBuilder =>
+            {
+                appBuilder.Run(async context => await context.Response.WriteAsync(ErrorMessageBuilder(context)));
+            });
         }
-
-        public static Action<IApplicationBuilder> HandleApiException()
-        {
-            return appBuilder => appBuilder.Run(async context => await context.Response.WriteAsync(ErrorMessageBuilder(context)));
-        }
-
         private static string ErrorMessageBuilder(HttpContext context)
         {
             var errors = GenerateExceptionErrorMessages(context.Features.Get<IExceptionHandlerFeature>().Error);
