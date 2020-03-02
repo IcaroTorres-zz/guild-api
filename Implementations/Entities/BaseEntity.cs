@@ -1,8 +1,9 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Entities
+namespace Implementations.Entities
 {
+    [Serializable]
     public abstract class BaseEntity
     {
         [JsonIgnore]
@@ -10,13 +11,10 @@ namespace Entities
         [JsonIgnore]
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
 
-        [JsonIgnore]
-        public string CreatedBy { get; set; }
-        [JsonIgnore]
-        public string ModifiedBy { get; set; }
-
         // logic control flag
         [JsonIgnore]
         public bool Disabled { get; set; } = false;
+
+        public abstract bool Validate();
     }
 }
