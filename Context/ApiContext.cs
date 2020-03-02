@@ -1,4 +1,4 @@
-using Entities;
+using Implementations.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -10,27 +10,27 @@ namespace Context
     public class ApiContext : DbContext
     {
         public DbSet<Guild> Guilds { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<Member> Members { get; set; }
         public DbSet<Membership> Memberships { get; set; }
 
         public ApiContext() { }
         public ApiContext(DbContextOptions<ApiContext> options) : base(options) { }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            modelBuilder.Entity<Membership>().HasKey(bc => new { bc.MemberId, bc.GuildId });
+            builder.Entity<Membership>().HasKey(ms => ms.Id);
 
-            modelBuilder.Entity<Membership>()
+            builder.Entity<Membership>()
                 .HasOne(ms => ms.Guild)
-                .WithMany(g => g.Memberships)
+                .WithMany()
                 .HasForeignKey(ms => ms.GuildId);
 
-            modelBuilder.Entity<Membership>()
+            builder.Entity<Membership>()
                 .HasOne(ms => ms.Member)
-                .WithOne(m => m.Membership)
-                .HasForeignKey<Membership>(ms => ms.MemberId);
+                .WithMany(m => m.Memberships)
+                .HasForeignKey(ms => ms.MemberId);
             // the foreignkey is in the membership due to its dependency on User table
 
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
         }
 
         public override int SaveChanges()
