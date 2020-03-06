@@ -13,41 +13,28 @@ namespace DataAccess.Services
 {
     public class GuildService : BaseService, IGuildService
     {
-        public GuildService(ApiContext context) : base(context) { }
+        public GuildService(ApiContext context) : base(context) {}
         public IValidationResult Create(GuildDto payload)
         {
             if (!(Query<Guild>(p => p.Name.Equals(payload.Name)).SingleOrDefault() is Guild guild))
             {
-                if (GetMember(payload.MasterId) is Member master)
-                {
-                    guild = new Guild(payload.Name, master);
-                    if (guild.IsValid)
-                    {
-                        guild = Insert(guild);
-                    }
-                    return guild.ValidationResult;
-                }
-                return new NotFoundValidationResult($"A {nameof(Member)} with given {nameof(Member.Id)} '{payload.MasterId}' do not exists.");
+                var master = GetMember(payload.MasterId) as Member;
+                guild = new Guild(payload.Name, master);
+                return Insert(guild).ValidationResult;
             }
             return new ConflictValidationResult($"A {nameof(Guild)} with given name '{payload.Name}' already exists.");          
         }
         public IValidationResult Update(GuildDto payload, Guid id)
         {
-            if (GetGuild(id) is Guild guildToUpdate)
-            {
-                if (GetMember(payload.MasterId) is Member master)
-                {
-                    guildToUpdate.Promote(master);
-                    guildToUpdate.ChangeName(payload.Name);
-                    guildToUpdate.UpdateMembers(
-                        Query<Member>(m => !m.Disabled, included: $"{nameof(Member.Memberships)},{nameof(Member.Guild)}")
-                        .Join(payload.MemberIds, m => m.Id, id => id, (member, _) => member));
+            var guildToUpdate = GetGuild(id);
+            var master = GetMember(payload.MasterId);
+            guildToUpdate.Promote(master);
+            guildToUpdate.ChangeName(payload.Name);
+            guildToUpdate.UpdateMembers(
+                Query<Member>(m => !m.Disabled, included: $"{nameof(Member.Memberships)},{nameof(Member.Guild)}")
+                .Join(payload.MemberIds, m => m.Id, id => id, (member, _) => member));
 
-                    return guildToUpdate.ValidationResult;
-                }
-                return new NotFoundValidationResult($"A {nameof(Member)} with given {nameof(Member.Id)} '{payload.MasterId}' do not exists.");
-            }
-            return new NotFoundValidationResult($"A {nameof(Guild)} with given {nameof(Guild.Id)} '{id}' do not exists.");
+            return guildToUpdate.ValidationResult;
         }
         public IReadOnlyList<IGuild> List(int count = 20)
         {
@@ -68,12 +55,7 @@ namespace DataAccess.Services
         }
         public IValidationResult Delete(Guid id)
         {
-            var guildToRemove = GetGuild(id);
-            if (guildToRemove.IsValid)
-            {
-                guildToRemove = Remove(guildToRemove);
-            }
-            return guildToRemove.ValidationResult;
+            return Remove(GetGuild(id)).ValidationResult;
         }
     }
 }

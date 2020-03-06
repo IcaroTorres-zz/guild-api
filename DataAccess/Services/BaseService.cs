@@ -36,7 +36,7 @@ namespace DataAccess.Services
                     return e;
                 });
             }
-            return entity;
+            return entity ?? new NullEntityFactory().GetNullObject<T>();
         }
 
         public virtual IQueryable<T> GetAll<T>(string included = "", bool readOnly = false) where T : class

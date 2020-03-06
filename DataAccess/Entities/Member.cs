@@ -20,9 +20,9 @@ namespace DataAccess.Entities
         {
             Name = name;
         }
-        public string Name { get; protected set; }
+        public virtual string Name { get; protected set; }
         private bool isGuildMaster = false;
-        public bool IsGuildMaster
+        public virtual bool IsGuildMaster
         {
             get => isGuildMaster;
             protected set
@@ -38,14 +38,14 @@ namespace DataAccess.Entities
                 isGuildMaster = value;
             }
         }
-        public Guid? GuildId { get; protected set; }
+        public virtual Guid? GuildId { get; protected set; }
         [JsonIgnore] public virtual Guild Guild { get; protected set; }
         [JsonIgnore] public virtual ICollection<Membership> Memberships { get; protected set; } = new List<Membership>();
-        public void ChangeName([NotNull] string newName)
+        public virtual void ChangeName([NotNull] string newName)
         {
             Name = newName;
         }
-        public IMember JoinGuild([NotNull] IInvite invite)
+        public virtual IMember JoinGuild([NotNull] IInvite invite)
         {
             if (invite is Invite receivedInvite
                 && receivedInvite.Guild is Guild invitingGuild
@@ -59,7 +59,7 @@ namespace DataAccess.Entities
             }
             return this;
         }
-        public IMember BePromoted()
+        public virtual IMember BePromoted()
         {
             if (!IsGuildMaster && Guild is Guild)
             {
@@ -68,7 +68,7 @@ namespace DataAccess.Entities
             }
             return this;
         }
-        public IMember BeDemoted()
+        public virtual IMember BeDemoted()
         {
             if (IsGuildMaster && Guild is Guild)
             {
@@ -77,7 +77,7 @@ namespace DataAccess.Entities
             }
             return this;
         }
-        public IMember LeaveGuild()
+        public virtual IMember LeaveGuild()
         {
             if (Guild is Guild)
             {

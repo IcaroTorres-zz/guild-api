@@ -8,15 +8,9 @@ namespace DataAccess.Entities
     {
         private Dictionary<Type, object> NullTypes = new Dictionary<Type, object>
         {
-            { typeof(Guild), new NullGuild() }
+            { typeof(Guild), new NullGuild() },
+            { typeof(Member), new NullMember() },
         };
-        public T GetNullObject<T>() where T : class, new()
-        {
-            if (NullTypes.TryGetValue(typeof(T), out object nullType))
-            {
-                return (T)nullType;
-            }
-            return new T();
-        }
+        public T GetNullObject<T>() where T : class => (T)NullTypes[typeof(T)];
     }
 }

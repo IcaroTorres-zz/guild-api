@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace Domain.Validations
 {
+  [Serializable]
   public abstract class ValidationResult : IValidationResult
   {
     public virtual bool IsValid => !Errors.Any();
@@ -19,11 +21,8 @@ namespace Domain.Validations
       errors.Add(new ValidationPair(statusCode, message) as IValidationPair);
       return this;
     }
-    public virtual string AsSerializedError() => JsonConvert.SerializeObject(new 
-    { 
-      Status, 
-      Errors = Errors.Select(e => e.ToString()) 
-    }, Formatting.Indented);
+    public virtual object AsSerializableError() => new { Status, Errors = Errors.Select(e => e.ToString()) };
+    public virtual string AsSerializedError() => JsonConvert.SerializeObject(AsSerializableError(), Formatting.Indented);
     public virtual IActionResult AsActionResult()
     {
       IActionResult actionResult = new OkObjectResult(Data);

@@ -1,17 +1,18 @@
+using System;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domain.Validations
 {
+    [Serializable]
     public class NotFoundValidationResult : ValidationResult
     {
         public NotFoundValidationResult(string message) : base()
         {
-            var error = new ValidationPair(HttpStatusCode.NotFound, message);
-            notFoundResult = new NotFoundObjectResult(error);
-            errors.Add(error);
+            errors.Add(new ValidationPair(HttpStatusCode.NotFound, message));
+            NotFoundResult = new NotFoundObjectResult(AsSerializableError());
         }
-        private NotFoundObjectResult notFoundResult;
-        public override IActionResult AsActionResult() => notFoundResult;
+        private NotFoundObjectResult NotFoundResult;
+        public override IActionResult AsActionResult() => NotFoundResult;
     }
 }

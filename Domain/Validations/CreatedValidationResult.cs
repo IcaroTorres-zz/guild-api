@@ -1,9 +1,11 @@
+using System;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domain.Validations
 {
+    [Serializable]
     public class CreatedValidationResult : SuccessValidationResult
     {
         public CreatedValidationResult(object createdData) : base()

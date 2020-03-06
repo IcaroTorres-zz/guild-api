@@ -2,6 +2,7 @@
 using Domain.Unities;
 using DataAccess.Context;
 using DataAccess.Entities;
+using DataAccess.Entities.NullEntities;
 using DataAccess.Services;
 using DataAccess.Unities;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +48,7 @@ namespace api
                 .AddScoped<IMemberService, MemberService>()
                 .AddScoped<IInviteService, InviteService>()
                 .AddScoped<IUnitOfWork, UnitOfWork>()
+                .AddScoped<NullEntityFactory>()
 
                 // swagger
                 .AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info { Title = "Guild.api", Version = "v1" }); })

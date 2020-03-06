@@ -14,14 +14,7 @@ namespace Application.Controllers
         [HttpGet("{id}", Name = "get-guild"), CacheResponse(30)]
         public IActionResult Get(Guid id, [FromServices] IGuildService service)
         {
-            IValidationResult result = new NotFoundValidationResult($"A {nameof(Guild)} with given {nameof(Guild.Id)} '{id}' do not exists.");
-
-            if (service.GetGuild(id) is Guild guild)
-            {
-                return guild.ValidationResult.AsActionResult();
-            }
-
-            return result.AsActionResult();
+            return service.GetGuild(id).ValidationResult.AsActionResult();
         }
 
         [HttpGet(Name = "get-guilds"), CacheResponse(30)]
@@ -33,16 +26,16 @@ namespace Application.Controllers
         [HttpPost(Name = "create-guild"), UseUnitOfWork]
         public IActionResult Create([FromBody] GuildDto payload, [FromServices] IGuildService service)
         {
-            var result = service.Create(payload);
+            return service.Create(payload).AsActionResult(Request);
 
-            if (result is CreatedValidationResult createdResult && createdResult.Data is Guild guild)
-                return Created($"{Request.Path.ToUriComponent()}{guild.Id}", guild);
+            // if (result is CreatedValidationResult createdResult && createdResult.Data is Guild guild)
+            //     return Created($"{Request.Path.ToUriComponent()}{guild.Id}", guild);
                 
-            return new ContentResult
-            {
-                Content = result.AsSerializedError(),
-                StatusCode = (int)result.Status
-            };
+            // return new ContentResult
+            // {
+            //     Content = result.AsSerializedError(),
+            //     StatusCode = (int)result.Status
+            // };
         }
 
         [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]

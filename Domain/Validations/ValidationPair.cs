@@ -1,7 +1,9 @@
+using System;
 using System.Net;
 
 namespace Domain.Validations
 {
+    [Serializable]
     public class ValidationPair : IValidationPair
     {
         public ValidationPair(HttpStatusCode status, string message)
