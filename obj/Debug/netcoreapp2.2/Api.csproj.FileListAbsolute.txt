@@ -1,14 +1,30 @@
-C:\Users\Icaro Torres\source\repos\guild.api\bin\Debug\netcoreapp2.2\Api.deps.json
-C:\Users\Icaro Torres\source\repos\guild.api\bin\Debug\netcoreapp2.2\Api.runtimeconfig.json
-C:\Users\Icaro Torres\source\repos\guild.api\bin\Debug\netcoreapp2.2\Api.runtimeconfig.dev.json
-C:\Users\Icaro Torres\source\repos\guild.api\bin\Debug\netcoreapp2.2\Api.dll
-C:\Users\Icaro Torres\source\repos\guild.api\bin\Debug\netcoreapp2.2\Api.pdb
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.csproj.CoreCompileInputs.cache
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.RazorAssemblyInfo.cache
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.RazorAssemblyInfo.cs
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.AssemblyInfoInputs.cache
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.AssemblyInfo.cs
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.RazorTargetAssemblyInfo.cache
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.dll
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.pdb
-C:\Users\Icaro Torres\source\repos\guild.api\obj\Debug\netcoreapp2.2\Api.csprojAssemblyReference.cache
+C:/Users/Icaro Torres/source/repos/guild.api/bin/Debug/netcoreapp2.2/Api.deps.json
+C:/Users/Icaro Torres/source/repos/guild.api/bin/Debug/netcoreapp2.2/Api.runtimeconfig.json
+C:/Users/Icaro Torres/source/repos/guild.api/bin/Debug/netcoreapp2.2/Api.runtimeconfig.dev.json
+C:/Users/Icaro Torres/source/repos/guild.api/bin/Debug/netcoreapp2.2/Api.dll
+C:/Users/Icaro Torres/source/repos/guild.api/bin/Debug/netcoreapp2.2/Api.pdb
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.csproj.CoreCompileInputs.cache
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.RazorAssemblyInfo.cache
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.RazorAssemblyInfo.cs
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.AssemblyInfoInputs.cache
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.AssemblyInfo.cs
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.RazorTargetAssemblyInfo.cache
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.dll
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.pdb
+C:/Users/Icaro Torres/source/repos/guild.api/obj/Debug/netcoreapp2.2/Api.csprojAssemblyReference.cache
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/appsettings.Development.json
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/appsettings.json
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/Properties/launchSettings.json
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/Api.deps.json
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/Api.runtimeconfig.json
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/Api.runtimeconfig.dev.json
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/Api.dll
+/home/icarotorres/Documentos/guild.api/bin/Debug/netcoreapp2.2/Api.pdb
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.csprojAssemblyReference.cache
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.RazorAssemblyInfo.cache
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.RazorAssemblyInfo.cs
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.AssemblyInfoInputs.cache
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.AssemblyInfo.cs
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.RazorTargetAssemblyInfo.cache
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.dll
+/home/icarotorres/Documentos/guild.api/obj/Debug/netcoreapp2.2/Api.pdb
