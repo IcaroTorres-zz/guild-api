@@ -6,25 +6,26 @@ using DataAccess.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Validations;
-using System.Net;
+using DataAccess.Validations;
 
 namespace DataAccess.Services
 {
     public class GuildService : BaseService, IGuildService
     {
         public GuildService(ApiContext context) : base(context) {}
-        public IValidationResult Create(GuildDto payload)
+        public IGuild Create(GuildDto payload)
         {
-            if (!(Query<Guild>(p => p.Name.Equals(payload.Name)).SingleOrDefault() is Guild guild))
+            if (Query<Guild>(p => p.Name.Equals(payload.Name), included: nameof(Guild.Members)).SingleOrDefault() is Guild guild)
             {
-                var master = GetMember(payload.MasterId) as Member;
-                guild = new Guild(payload.Name, master);
-                return Insert(guild).ValidationResult;
+                guild.ValidationResult = new ConflictValidationResult(nameof(Guild))
+                    .AddValidationError(nameof(Guild), $"With given name '{payload.Name}' already exists.");
+                    return guild;
             }
-            return new ConflictValidationResult($"A {nameof(Guild)} with given name '{payload.Name}' already exists.");          
+            var master = GetMember(payload.MasterId) as Member;
+            var newGuild = Insert(new Guild(payload.Name, master));
+            return newGuild;
         }
-        public IValidationResult Update(GuildDto payload, Guid id)
+        public IGuild Update(GuildDto payload, Guid id)
         {
             var guildToUpdate = GetGuild(id);
             var master = GetMember(payload.MasterId);
@@ -34,7 +35,7 @@ namespace DataAccess.Services
                 Query<Member>(m => !m.Disabled, included: $"{nameof(Member.Memberships)},{nameof(Member.Guild)}")
                 .Join(payload.MemberIds, m => m.Id, id => id, (member, _) => member));
 
-            return guildToUpdate.ValidationResult;
+            return guildToUpdate;
         }
         public IReadOnlyList<IGuild> List(int count = 20)
         {
@@ -53,9 +54,9 @@ namespace DataAccess.Services
             var collections = new[] { nameof(Member.Memberships) };
             return GetWithKeys<Member>(keys, navigations, collections);
         }
-        public IValidationResult Delete(Guid id)
+        public IGuild Delete(Guid id)
         {
-            return Remove(GetGuild(id)).ValidationResult;
+            return Remove(GetGuild(id));
         }
     }
 }

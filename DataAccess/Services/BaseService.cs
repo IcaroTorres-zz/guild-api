@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using DataAccess.Entities;
 using Domain.Validations;
+using DataAccess.Validations;
 
 namespace DataAccess.Services
 {
