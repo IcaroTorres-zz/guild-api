@@ -1,3 +1,4 @@
+using DataAccess.Validations;
 using Domain.Entities;
 using Domain.Validations;
 using JetBrains.Annotations;
@@ -5,7 +6,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace DataAccess.Entities
 {
@@ -84,7 +84,7 @@ namespace DataAccess.Entities
             }
             return member;
         }
-        public virtual IEnumerable<IMember> UpdateMembers(IEnumerable<IMember> members)
+        public virtual IEnumerable<IMember> UpdateMembers([NotNull] IEnumerable<IMember> members)
         {
             foreach (var memberToInvite in members)
             {
@@ -108,21 +108,44 @@ namespace DataAccess.Entities
         public virtual void DemoteMaster() => Members.SingleOrDefault(m => m.IsGuildMaster)?.BeDemoted();
         public override IValidationResult Validate()
         {
-            IValidationResult result = null;
-            if (string.IsNullOrWhiteSpace(Name) && Members.Any())
+            IErrorValidationResult result = null;
+            if (string.IsNullOrWhiteSpace(Name))
             {
-                result = new BadRequestValidationResult($"{Name} Can't be null or empty.");
+                result ??= new BadRequestValidationResult(nameof(Guild));
+                result.AddValidationError(nameof(Name), "Can't be null or empty.");
             }
 
-            if (!Members.Any())
+            if (Members is null || !Members.Any())
             {
-                var errorMessage = $"{nameof(Members)} Can't be null or empty list.";
-                result = (result == null)
-                    ? new BadRequestValidationResult(errorMessage)
-                    : result.AddValidationError(HttpStatusCode.BadRequest, errorMessage);
+                result ??= new BadRequestValidationResult(nameof(Guild));
+                result.AddValidationError(nameof(Members), "Can't be null or empty list.");
             }
 
-            return result ?? ValidationResult;
+            if (Members != null)
+            {
+                foreach (var error in Members.Select(m => m.ValidationResult)
+                                             .OfType<ErrorValidationResult>()
+                                             .SelectMany(m => m.Errors))
+                {
+                    result ??= new ConflictValidationResult(nameof(Guild));
+                    result.AddValidationErrors(error.Key, error.Value);
+                }
+            }
+
+            if (Invites != null)
+            {
+                foreach (var error in Invites.Select(i => i.ValidationResult)
+                                             .OfType<ErrorValidationResult>()
+                                             .SelectMany(i => i.Errors))
+                {
+                    result ??= new ConflictValidationResult(nameof(Guild));
+                    result.AddValidationErrors(error.Key, error.Value);
+                }
+            }
+
+            ValidationResult = result ?? ValidationResult;
+
+            return ValidationResult;
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿using Domain.Entities;
+﻿using DataAccess.Validations;
+using Domain.Entities;
 using Domain.Enums;
 using Domain.Validations;
 using Newtonsoft.Json;
 using System;
-using System.Linq;
-using System.Net;
 
 namespace DataAccess.Entities
 {
@@ -70,43 +69,35 @@ namespace DataAccess.Entities
         }
         public override IValidationResult Validate()
         {
-            IValidationResult result = null;
+            IErrorValidationResult result = null;
             if (Member == null)
             {
-                result = new BadRequestValidationResult($"{Member} Can't be null.");
+                result = new BadRequestValidationResult(nameof(Invite)).AddValidationError(nameof(Member), "Can't be null.");
             }
 
             if (Member.IsValid)
             {
-                if (result == null)
+                result ??= new ConflictValidationResult(nameof(Invite));
+                result.AddValidationError(nameof(Member), "Is Invalid.");
+                foreach(var error in (Member.ValidationResult as IErrorValidationResult)?.Errors)
                 {
-                    result = new ConflictValidationResult($"{nameof(Member)} is Invalid.");
-                }
-                foreach(var error in Member.ValidationResult.Errors)
-                {
-                    result.AddValidationError(error.Status, error.Message);
+                    result.AddValidationErrors(error.Key, error.Value);
                 }
             }
 
             if (Guild == null)
             {
-                var errorMessage = $"{nameof(Guild)} Can't be null.";
-
-                if (result == null)
-                    result = new ConflictValidationResult(errorMessage);
-                else
-                    result.AddValidationError(HttpStatusCode.Conflict, errorMessage);
+                result ??= new ConflictValidationResult(nameof(Invite));
+                result.AddValidationError(nameof(Guild), "Can't be null.");
             }
 
             if (Guild.IsValid)
             {
-                if (result == null)
+                result ??= new ConflictValidationResult(nameof(Invite));
+                result.AddValidationError(nameof(Guild), "Is Invalid.");
+                foreach (var error in (Guild.ValidationResult as IErrorValidationResult)?.Errors)
                 {
-                    result = new ConflictValidationResult($"{nameof(Guild)} is Invalid.");
-                }
-                foreach (var error in Guild.ValidationResult.Errors)
-                {
-                    result.AddValidationError(error.Status, error.Message);
+                    result.AddValidationErrors(error.Key, error.Value);
                 }
             }
 

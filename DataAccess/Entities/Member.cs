@@ -1,3 +1,4 @@
+using DataAccess.Validations;
 using Domain.Entities;
 using Domain.Validations;
 using JetBrains.Annotations;
@@ -90,7 +91,7 @@ namespace DataAccess.Entities
         public override IValidationResult Validate()
         {
             return string.IsNullOrWhiteSpace(Name)
-                ? new BadRequestValidationResult($"{nameof(Name)} Can't be null or empty.")
+                ? new BadRequestValidationResult(nameof(Member)).AddValidationError(nameof(Name), "Can't be null or empty.")
                 : ValidationResult;
         }
         public override bool Equals(object obj) =>  obj is Member member && member.Id == Id;
