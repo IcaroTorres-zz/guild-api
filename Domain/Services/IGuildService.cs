@@ -9,9 +9,9 @@ namespace Domain.Services
     public interface IGuildService
     {
         IGuild GetGuild(Guid id);
-        IValidationResult Create(GuildDto payload);
-        IValidationResult Update(GuildDto payload, Guid id);
-        IValidationResult Delete(Guid id);
+        IGuild Create(GuildDto payload);
+        IGuild Update(GuildDto payload, Guid id);
+        IGuild Delete(Guid id);
         IReadOnlyList<IGuild> List(int count = 20);
     }
 }
