@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DataAccess.Validations;
 using Domain.Entities;
 using Domain.Validations;
 
@@ -13,7 +14,7 @@ namespace DataAccess.Entities.NullEntities
             Memberships = new List<Membership>();
             Guild = new NullGuild();
         }
-        public override IValidationResult ValidationResult { get => new NotFoundValidationResult($"Unable to find requested {nameof(Member)}."); set { } }
+        public override IValidationResult ValidationResult { get => new NotFoundValidationResult(nameof(Member)); set { } }
         public override IValidationResult Validate() => ValidationResult;
         public override bool IsGuildMaster { get => false; protected set { } }
         public override Guid? GuildId { get => Guid.Empty; protected set { } }

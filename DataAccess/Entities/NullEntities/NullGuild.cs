@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DataAccess.Validations;
 using Domain.Entities;
 using Domain.Validations;
 
@@ -13,7 +14,7 @@ namespace DataAccess.Entities.NullEntities
             Members = new List<Member>();
             Invites = new List<Invite>();
         }
-        public override IValidationResult ValidationResult { get => new NotFoundValidationResult($"Unable to find requested {nameof(Guild)}."); set {} }
+        public override IValidationResult ValidationResult { get => new NotFoundValidationResult(nameof(Guild)); set {} }
         public override IValidationResult Validate() => ValidationResult;
         public override void ChangeName(string newName) { }
         public override IInvite Invite(IMember member) => null;
