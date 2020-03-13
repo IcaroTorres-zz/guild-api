@@ -3,12 +3,10 @@ using Application.ActionFilters;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using DataAccess.Entities;
-using Domain.Validations;
 
 namespace Application.Controllers
 {
-    [Route("api/[controller]/v1"), ApiController]
+    [Route("api/[controller]/v1"), ApiController, ResultValidation]
     public class GuildsController : ControllerBase
     {
         [HttpGet("{id}", Name = "get-guild"), CacheResponse(30)]
@@ -18,54 +16,30 @@ namespace Application.Controllers
         }
 
         [HttpGet(Name = "get-guilds"), CacheResponse(30)]
-        public IActionResult GetAll([FromServices] IGuildService service, [FromQuery(Name = "count")] int count = 20)
+        public IActionResult Get([FromServices] IGuildService service, [FromQuery(Name = "count")] int count = 20)
         {
             return Ok(service.List(count));
         }
 
         [HttpPost(Name = "create-guild"), UseUnitOfWork]
-        public IActionResult Create([FromBody] GuildDto payload, [FromServices] IGuildService service)
+        public IActionResult Post([FromBody] GuildDto payload, [FromServices] IGuildService service)
         {
-            return service.Create(payload).AsActionResult(Request);
+            var guild = service.Create(payload);
 
-            // if (result is CreatedValidationResult createdResult && createdResult.Data is Guild guild)
-            //     return Created($"{Request.Path.ToUriComponent()}{guild.Id}", guild);
-                
-            // return new ContentResult
-            // {
-            //     Content = result.AsSerializedError(),
-            //     StatusCode = (int)result.Status
-            // };
+            return Created($"{Request.Path.ToUriComponent()}{guild.Id}", guild);
         }
 
         [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]
-        public IActionResult Update(Guid id, [FromBody] GuildDto payload, [FromServices] IGuildService service)
+        public IActionResult Put(Guid id, [FromBody] GuildDto payload, [FromServices] IGuildService service)
         {
-            var result = service.Update(payload, id);
-
-            if (result is OkValidationResult)
-                return Ok(result.Data);
-
-            return new ContentResult
-            {
-                Content = result.AsSerializedError(),
-                StatusCode = (int)result.Status
-            };
+            return Ok(service.Update(payload, id));
         }
 
         [HttpDelete("{id}", Name = "delete-guild"), UseUnitOfWork]
         public IActionResult Delete(Guid id, [FromServices] IGuildService service)
         {
-            var result = service.Delete(id);
-
-            if (result is NoContentValidationResult)
-                return NoContent();
-
-            return new ContentResult
-            {
-                Content = result.AsSerializedError(),
-                StatusCode = (int)result.Status
-            };
+            service.Delete(id);
+            return NoContent();
         }
     }
 }
