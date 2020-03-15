@@ -10,8 +10,8 @@ A simple Rest API made in .net core, with operations (_GET, POST, PUT, PATCH, DE
 - [x] **Dependency Injection**;
 - [x] **Repository Pattern**;
 - [x] **Unit of Work**;
-- [ ] **Hateoas**;
-- [ ] **Distributed Cache (Redis)**.
+- [x] **Hateoas**;
+- [x] **Distributed Cache (Redis)**.
 
 ## Setup
 
