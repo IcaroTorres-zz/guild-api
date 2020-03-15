@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using DataAccess.Entities;
-using Domain.Validations;
-using DataAccess.Validations;
+using Domain.Entities;
+using DataAccess.Entities.NullEntities;
 
 namespace DataAccess.Services
 {
@@ -75,36 +75,13 @@ namespace DataAccess.Services
             return entities;
         }
 
-        public virtual T Remove<T>(T entity) where T : class
-        {
-            entity = Context.Set<T>().Remove(entity).Entity;
-            if (entity is BaseEntity baseEntity)
-            {
-                baseEntity.ValidationResult =new  NoContentValidationResult();
-            }
-            return entity;
-        }
+        public virtual T Remove<T>(T entity) where T : class => Context.Set<T>().Remove(entity).Entity;
 
-        public virtual T Remove<T>(params object[] keys) where T : class
-        {
-            var entity = Context.Set<T>().Remove(GetWithKeys<T>(keys)).Entity;
-            if (entity is BaseEntity baseEntity)
-            {
-                baseEntity.ValidationResult = new NoContentValidationResult();
-            }
-            return entity;
-        }
+        public virtual T Remove<T>(params object[] keys) where T : class => Context.Set<T>().Remove(GetWithKeys<T>(keys)).Entity;
 
         public virtual IEnumerable<T> RemoveMany<T>(IEnumerable<T> entities) where T : class
         {
             Context.Set<T>().RemoveRange(entities);
-            foreach(var entity in entities)
-            {
-                if (entity is BaseEntity baseEntity)
-                {
-                    baseEntity.ValidationResult = new NoContentValidationResult();
-                }
-            }
             return entities;
         }
 
@@ -112,13 +89,26 @@ namespace DataAccess.Services
         {
             foreach (var keys in keysList)
             {
-                var entity = Remove<T>(keys);
-                if (entity is BaseEntity baseEntity)
-                {
-                    baseEntity.ValidationResult = new NoContentValidationResult();
-                }
-                yield return entity;
+                yield return Remove<T>(keys);
             }
+        }
+
+        protected virtual IMember GetMember(Guid memberId)
+        {
+            return Query<Member>(m => m.Id == memberId)
+                .Include(m => m.Guild.Members)
+                .Include(m => m.Guild.Invites)
+                .Include(g => g.Memberships)
+                .SingleOrDefault() ?? new NullMember();
+        }
+
+        protected IGuild GetGuild(Guid id)
+        {
+            return Query<Guild>(g => g.Id == id)
+                .Include(g => g.Members)
+                    .ThenInclude(m => m.Memberships)
+                .Include(g => g.Invites)
+                .SingleOrDefault() ?? new NullGuild();
         }
     }
 }
