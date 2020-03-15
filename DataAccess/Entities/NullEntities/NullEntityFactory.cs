@@ -10,6 +10,7 @@ namespace DataAccess.Entities
         {
             { typeof(Guild), new NullGuild() },
             { typeof(Member), new NullMember() },
+            { typeof(Invite), new NullInvite() },
         };
         public T GetNullObject<T>() where T : class => (T)NullTypes[typeof(T)];
     }
