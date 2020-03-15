@@ -7,7 +7,7 @@ namespace Domain.Entities
     {
         Guid Id { get; }
         bool IsValid { get; }
-        IValidationResult ValidationResult { get; }
+        IValidationResult ValidationResult { get; set; }
         DateTime CreatedDate { get; }
         DateTime ModifiedDate { get; }
         bool Disabled { get; }
