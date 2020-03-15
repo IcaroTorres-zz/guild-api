@@ -6,6 +6,7 @@ namespace Domain.Entities
     public interface IGuild : IBaseEntity
     {
         void ChangeName([NotNull] string newName);
+        bool IsGuildMember(IMember member);
         IInvite Invite([NotNull] IMember newMember);
         IInvite CancelInvite([NotNull] IInvite invite);
         IMember AcceptMember([NotNull] IMember member);
