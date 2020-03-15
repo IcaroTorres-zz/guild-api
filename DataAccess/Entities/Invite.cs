@@ -11,17 +11,14 @@ namespace DataAccess.Entities
     public class Invite : BaseEntity, IInvite
     {
         // EF core suitable parametersless constructor hidden to be called elsewhere
-        protected Invite()
-        {
-            ValidationResult = new OkValidationResult(this);
-        }
+        protected Invite() { }
         public Invite(Guild guild, Member member) : base()
         {
             Guild = guild;
             Member = member;
         }
         private InviteStatuses status = InviteStatuses.Pending;
-        public InviteStatuses Status
+        public virtual InviteStatuses Status
         {
             get => status;
             protected set
@@ -41,7 +38,7 @@ namespace DataAccess.Entities
         public Guid MemberId { get; protected set; }
         [JsonIgnore] public virtual Member Member { get; protected set; }
         [JsonIgnore] public virtual Guild Guild { get; protected set; }
-        public IInvite BeAccepted()
+        public virtual IInvite BeAccepted()
         {
             if (Status == InviteStatuses.Pending)
             {
@@ -51,7 +48,7 @@ namespace DataAccess.Entities
             }
             return this;
         }
-        public IInvite BeDeclined()
+        public virtual IInvite BeDeclined()
         {
             if (Status == InviteStatuses.Pending)
             {
@@ -59,7 +56,7 @@ namespace DataAccess.Entities
             }
             return this;
         }
-        public IInvite BeCanceled()
+        public virtual IInvite BeCanceled()
         {
             if (Status == InviteStatuses.Pending)
             {
@@ -75,7 +72,7 @@ namespace DataAccess.Entities
                 result = new BadRequestValidationResult(nameof(Invite)).AddValidationError(nameof(Member), "Can't be null.");
             }
 
-            if (Member.IsValid)
+            if (!Member.IsValid)
             {
                 result ??= new ConflictValidationResult(nameof(Invite));
                 result.AddValidationError(nameof(Member), "Is Invalid.");
@@ -91,7 +88,7 @@ namespace DataAccess.Entities
                 result.AddValidationError(nameof(Guild), "Can't be null.");
             }
 
-            if (Guild.IsValid)
+            if (!Guild.IsValid)
             {
                 result ??= new ConflictValidationResult(nameof(Invite));
                 result.AddValidationError(nameof(Guild), "Is Invalid.");
