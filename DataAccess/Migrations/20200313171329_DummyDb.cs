@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace DataAccess.Migrations
+namespace Api.DataAccess.Migrations
 {
-    public partial class InvitesFeature : Migration
+    public partial class DummyDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -31,8 +31,8 @@ namespace DataAccess.Migrations
                     ModifiedDate = table.Column<DateTime>(nullable: false),
                     Disabled = table.Column<bool>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    GuildId = table.Column<Guid>(nullable: true),
-                    IsGuildMaster = table.Column<bool>(nullable: false)
+                    IsGuildMaster = table.Column<bool>(nullable: false),
+                    GuildId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -54,8 +54,8 @@ namespace DataAccess.Migrations
                     ModifiedDate = table.Column<DateTime>(nullable: false),
                     Disabled = table.Column<bool>(nullable: false),
                     Status = table.Column<short>(nullable: false),
-                    MemberId = table.Column<Guid>(nullable: false),
-                    GuildId = table.Column<Guid>(nullable: false)
+                    GuildId = table.Column<Guid>(nullable: false),
+                    MemberId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {

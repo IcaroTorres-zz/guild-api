@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace DataAccess.Migrations
+namespace Api.DataAccess.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20200303190730_InvitesFeature")]
-    partial class InvitesFeature
+    [Migration("20200313171329_DummyDb")]
+    partial class DummyDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,7 +18,7 @@ namespace DataAccess.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
-            modelBuilder.Entity("Implementations.Entities.Guild", b =>
+            modelBuilder.Entity("DataAccess.Entities.Guild", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -36,7 +36,7 @@ namespace DataAccess.Migrations
                     b.ToTable("Guilds");
                 });
 
-            modelBuilder.Entity("Implementations.Entities.Invite", b =>
+            modelBuilder.Entity("DataAccess.Entities.Invite", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -62,7 +62,7 @@ namespace DataAccess.Migrations
                     b.ToTable("Invite");
                 });
 
-            modelBuilder.Entity("Implementations.Entities.Member", b =>
+            modelBuilder.Entity("DataAccess.Entities.Member", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -86,7 +86,7 @@ namespace DataAccess.Migrations
                     b.ToTable("Members");
                 });
 
-            modelBuilder.Entity("Implementations.Entities.Membership", b =>
+            modelBuilder.Entity("DataAccess.Entities.Membership", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -108,35 +108,35 @@ namespace DataAccess.Migrations
                     b.ToTable("Memberships");
                 });
 
-            modelBuilder.Entity("Implementations.Entities.Invite", b =>
+            modelBuilder.Entity("DataAccess.Entities.Invite", b =>
                 {
-                    b.HasOne("Implementations.Entities.Guild", "Guild")
+                    b.HasOne("DataAccess.Entities.Guild", "Guild")
                         .WithMany("Invites")
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Implementations.Entities.Member", "Member")
+                    b.HasOne("DataAccess.Entities.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Implementations.Entities.Member", b =>
+            modelBuilder.Entity("DataAccess.Entities.Member", b =>
                 {
-                    b.HasOne("Implementations.Entities.Guild", "Guild")
+                    b.HasOne("DataAccess.Entities.Guild", "Guild")
                         .WithMany("Members")
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Implementations.Entities.Membership", b =>
+            modelBuilder.Entity("DataAccess.Entities.Membership", b =>
                 {
-                    b.HasOne("Implementations.Entities.Guild", "Guild")
+                    b.HasOne("DataAccess.Entities.Guild", "Guild")
                         .WithMany()
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Implementations.Entities.Member", "Member")
+                    b.HasOne("DataAccess.Entities.Member", "Member")
                         .WithMany("Memberships")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade);
