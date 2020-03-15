@@ -7,7 +7,7 @@ namespace Domain.Services
 {
     public interface IInviteService
     {
-        IInvite GetInvite(Guid id);
+        IInvite Get(Guid id);
         IReadOnlyList<IInvite> List(InviteDto payload);
         IInvite InviteMember(InviteDto payload);
         IInvite Accept(Guid id);
