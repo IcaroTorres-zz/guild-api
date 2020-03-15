@@ -10,6 +10,8 @@ A simple Rest API made in .net core, with operations (_GET, POST, PUT, PATCH, DE
 - [x] **Dependency Injection**;
 - [x] **Repository Pattern**;
 - [x] **Unit of Work**;
+- [x] **Rich Domain entities**;
+- [x] **Custom Domain Validations**;
 - [x] **Hateoas**;
 - [x] **Distributed Cache (Redis)**.
 
@@ -24,8 +26,9 @@ A simple Rest API made in .net core, with operations (_GET, POST, PUT, PATCH, DE
 
 ### Clone and Restore
 
-    $ git clone https://github.com/icarotorres/guild.api.git
-    $ dotnet restore --project Api
+    $ git clone https://github.com/IcaroTorres/guild-api.git
+    $ cd guild-api
+    $ dotnet restore Api.csproj
 
 ### Running the project
 
@@ -51,16 +54,18 @@ tasks.json:
 }
 ```
 
-Compile project with `dotnet build` and Publish production folder with `dotnet publish`.
+You can _Compile_ project with `dotnet build Api.csproj` and _Publish_ production folder with `dotnet publish Api.csproj`.
+
+To run, start your Redis server instance and run your project like example below:
 
     $ redis-server
-    $ dotnet run
+    $ dotnet run Api.csproj
 
 ## Aditional Setup
 
 ### Redis Installation (Non Windows)
 
-Download, extract and compile Redis with:
+Download, extract somewhere you want and compile Redis with:
 
     $ wget http://download.redis.io/releases/redis-5.0.7.tar.gz
     $ tar xzf redis-5.0.7.tar.gz
