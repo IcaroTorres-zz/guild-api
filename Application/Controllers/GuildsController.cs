@@ -6,16 +6,16 @@ using System;
 
 namespace Application.Controllers
 {
-    [Route("api/[controller]/v1"), ApiController, ResultValidation]
+    [Route("api/[controller]/v1"), ApiController]
     public class GuildsController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-guild"), CacheResponse(30)]
+        [HttpGet("{id}", Name = "get-guild"), ValidateResult,  CacheResponse(30)]
         public IActionResult Get(Guid id, [FromServices] IGuildService service)
         {
-            return service.GetGuild(id).ValidationResult.AsActionResult();
+            return Ok(service.Get(id));
         }
 
-        [HttpGet(Name = "get-guilds"), CacheResponse(30)]
+        [HttpGet(Name = "get-guilds"), ValidateResult, CacheResponse(30)]
         public IActionResult Get([FromServices] IGuildService service, [FromQuery(Name = "count")] int count = 20)
         {
             return Ok(service.List(count));
@@ -26,7 +26,7 @@ namespace Application.Controllers
         {
             var guild = service.Create(payload);
 
-            return Created($"{Request.Path.ToUriComponent()}{guild.Id}", guild);
+            return CreatedAtRoute("get-guild", new { id = guild.Id } , guild);
         }
 
         [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]
