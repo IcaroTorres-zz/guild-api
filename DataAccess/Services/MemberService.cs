@@ -47,57 +47,24 @@ namespace DataAccess.Services
             }
             return member;
         }
-
         public IMember Patch(Guid id, JsonPatchDocument<Member> payload)
         {
-            var member = GetMember(id) as Member;
+            var member = Get(id) as Member;
 
             payload.ApplyTo(member);
 
             return member;
         }
-
-        public IMember Promote(Guid id)
-        {
-            return GetMember(id).BePromoted();
-        }
-
-        public IMember Demote(Guid id)
-        {
-            return GetMember(id).BeDemoted();
-        }
-
-        public IMember LeaveGuild(Guid id)
-        {
-            return GetMember(id).LeaveGuild();
-        }
+        public IMember Promote(Guid id) => Get(id).BePromoted();
+        public IMember Demote(Guid id) => Get(id).BeDemoted();
+        public IMember LeaveGuild(Guid id) => Get(id).LeaveGuild();
         public IReadOnlyList<IMember> List(MemberFilterDto payload) => Query<Member>(m
             => m.Name.Contains(payload.Name)
             && (payload.GuildId == Guid.Empty || m.GuildId == payload.GuildId),
             included: $"{nameof(Member.Memberships)},{nameof(Member.Guild)}",
             readOnly: true).Take(payload.Count).ToList();
 
-        public IMember GetMember(Guid memberId)
-        {
-            var keys = new object[] { memberId };
-            var navigations = new[] { nameof(Member.Guild) };
-            var collections = new[] { nameof(Member.Memberships) };
-
-            return GetWithKeys<Member>(keys, navigations, collections)
-                ?? throw new KeyNotFoundException($"Target {nameof(Member)} with id '{memberId}' not found.");
-        }
-
-        private IGuild GetGuild(Guid guildId)
-        {
-            var keys = new object[] { guildId };
-            var collections = new[] { nameof(Guild.Members), nameof(Guild.Invites) };
-
-            return GetWithKeys<Guild>(keys, collections: collections);
-        }
-
-        public IMember Delete(Guid id)
-        {
-            return Remove<Member>(id);
-        }
+        public IMember Get(Guid memberId) => GetMember(memberId);
+        public IMember Delete(Guid id) => Remove<Member>(id);
     }
 }
