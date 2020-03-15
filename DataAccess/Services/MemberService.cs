@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataAccess.Validations;
 
 namespace DataAccess.Services
 {
@@ -16,24 +17,29 @@ namespace DataAccess.Services
 
         public IMember Create(MemberDto payload)
         {
-            if (!(Query<Member>(p => p.Name.Equals(payload.Name)).SingleOrDefault() is Member guild))
+            if ((Query<Member>(p => p.Name.Equals(payload.Name)).SingleOrDefault() is Member guild))
             {
-                return Insert(new Member(payload.Name));
+                guild.ValidationResult = new ConflictValidationResult(nameof(Member))
+                    .AddValidationError(nameof(Member), $"With given name '{payload.Name}' already exists.");
+                return guild;
             }
-            throw new Exception($"A {nameof(Member)} with given name '{payload.Name}' already exists.");
+            return Insert(new Member(payload.Name));
         }
-
         public IMember Update(MemberDto payload, Guid id)
         {
-            var member = GetMember(id);
+            var member = Get(id);
 
             member.ChangeName(payload.Name);
 
             if (payload.GuildId is Guid guildId && guildId != Guid.Empty)
             {
                 var guild = GetGuild(guildId);
-                member.JoinGuild(guild.Invite(member));
-                guild.AcceptMember(member);
+                
+                guild.AcceptMember(
+                    member.JoinGuild(
+                        guild.Invite(member)
+                    )
+                );
             }
             else
             {
