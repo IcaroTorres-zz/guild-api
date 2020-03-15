@@ -10,14 +10,9 @@ namespace DataAccess.Entities
     [Serializable]
     public abstract class BaseEntity : IBaseEntity
     {
-        public BaseEntity()
-        {
-            Id = Guid.NewGuid();
-            ValidationResult = new CreatedValidationResult(this);
-        }
-        public Guid Id { get; protected set; }
+        public Guid Id { get; protected set; } = Guid.NewGuid();
+        [NotMapped, JsonIgnore] public virtual IValidationResult ValidationResult { get; set; } = new SuccessValidationResult();
         [NotMapped, JsonIgnore] public virtual bool IsValid => Validate().IsValid;
-        [NotMapped, JsonIgnore] public virtual IValidationResult ValidationResult { get; set; }
         [JsonIgnore] public DateTime CreatedDate { get; protected set; } = DateTime.UtcNow;
         [JsonIgnore] public DateTime ModifiedDate { get; protected set; } = DateTime.UtcNow;
         [JsonIgnore] public bool Disabled { get; protected set; } = false;
