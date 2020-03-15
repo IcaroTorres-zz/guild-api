@@ -2,7 +2,6 @@
 using Domain.Unities;
 using DataAccess.Context;
 using DataAccess.Entities;
-using DataAccess.Entities.NullEntities;
 using DataAccess.Services;
 using DataAccess.Unities;
 using Microsoft.AspNetCore.Builder;
@@ -39,7 +38,7 @@ namespace api
                 // DbContext dependency registration
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<ApiContext>(options => options
-                    .UseSqlite($"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:Source"]}")
+                    .UseSqlite($"Data Source={AppHost.ContentRootPath}/{Configuration["SqliteSettings:Source"]}")
                     .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)))
 
                 // Custom service layer dependecy registration
