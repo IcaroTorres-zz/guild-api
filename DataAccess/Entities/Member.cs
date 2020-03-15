@@ -6,18 +6,14 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace DataAccess.Entities
 {
     [Serializable]
     public class Member : BaseEntity, IMember
     {
-        public Member()
-        {
-            ValidationResult = new OkValidationResult(this);
-        }
-        public Member([NotNull] string name) : base()
+        public Member() { }
+        public Member([NotNull] string name)
         {
             Name = name;
         }
@@ -64,7 +60,10 @@ namespace DataAccess.Entities
         {
             if (!IsGuildMaster && Guild is Guild)
             {
-                Guild.DemoteMaster();
+                if (Guild.Members.Any(m => m.IsGuildMaster))
+                {
+                    Guild.DemoteMaster();
+                }
                 isGuildMaster = true;
             }
             return this;
@@ -73,8 +72,8 @@ namespace DataAccess.Entities
         {
             if (IsGuildMaster && Guild is Guild)
             {
-                Guild.PromoteMasterSubstitute();
                 isGuildMaster = false;
+                Guild.PromoteMasterSubstitute();
             }
             return this;
         }

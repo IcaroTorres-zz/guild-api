@@ -13,16 +13,17 @@ namespace DataAccess.Entities
     public class Guild : BaseEntity, IGuild
     {
         // EF core suitable parametersless constructor hidden to be called elsewhere
-        protected Guild()
-        {
-            ValidationResult = new OkValidationResult(this);
-        }
+        protected Guild() { }
         public Guild([NotNull] string name, Member member) : base()
         {
             Name = name;
-            Members.Add(member);
-            Promote(member);
-            ValidationResult = new CreatedValidationResult(this);
+            Promote(
+                AcceptMember(
+                    member.JoinGuild(
+                        Invite(member)
+                    )
+                )
+            );
         }
         public string Name { get; protected set; }
         [JsonIgnore] public virtual ICollection<Member> Members { get; protected set; } = new List<Member>();
@@ -31,6 +32,7 @@ namespace DataAccess.Entities
         {
             Name = newName;
         }
+        public bool IsGuildMember(IMember member) => Members.Contains(member);
         public virtual IInvite Invite([NotNull] IMember member)
         {
             if (member is Member memberToInvite && !Members.Contains(memberToInvite))
@@ -66,7 +68,6 @@ namespace DataAccess.Entities
         {
             if (member is Member memberToPromote && Members.Contains(memberToPromote))
             {
-                DemoteMaster();
                 memberToPromote.BePromoted();
             }
             return member;
@@ -77,8 +78,7 @@ namespace DataAccess.Entities
             {
                 if (memberToKick.IsGuildMaster)
                 {
-                    DemoteMaster();
-                    PromoteMasterSubstitute();
+                    memberToKick.BeDemoted();
                 }
                 Members.Remove(memberToKick);
             }
@@ -88,9 +88,9 @@ namespace DataAccess.Entities
         {
             foreach (var memberToInvite in members)
             {
-                Invite(memberToInvite).BeAccepted();
+                Invite(memberToInvite)?.BeAccepted();
             }
-            foreach (var memberToKick in Members.Except(members))
+            foreach (var memberToKick in Members.Except(members).ToList())
             {
                 KickMember(memberToKick);
             }
@@ -101,7 +101,7 @@ namespace DataAccess.Entities
             Members
                 .OrderByDescending(m => m.Memberships
                     .SingleOrDefault(ms => ms.Exit == null)
-                    .GetDuration())
+                    ?.GetDuration())
                 .FirstOrDefault(m => !m.IsGuildMaster)
                 ?.BePromoted();
         }
