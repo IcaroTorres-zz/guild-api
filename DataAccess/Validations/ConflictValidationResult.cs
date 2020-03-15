@@ -14,6 +14,6 @@ namespace DataAccess.Validations
             Title = Status.ToString();
             AddValidationError(resourceName, $"{HttpStatusCode.Conflict} with entity {resourceName}.");
         }
-        public override IActionResult AsActionResult() => new ConflictObjectResult(AsSerializableError());
+        public override IActionResult AsErrorActionResult() => new ConflictObjectResult(AsSerializableError());
     }
 }

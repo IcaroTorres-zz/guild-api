@@ -14,6 +14,6 @@ namespace DataAccess.Validations
             Title = Status.ToString();
             AddValidationError(resourceName, $"Malformed request for entity {resourceName}.");
         }
-        public override IActionResult AsActionResult() => new BadRequestObjectResult(AsSerializableError());
+        public override IActionResult AsErrorActionResult() => new BadRequestObjectResult(AsSerializableError());
     }
 }

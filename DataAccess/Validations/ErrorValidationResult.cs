@@ -10,12 +10,12 @@ namespace DataAccess.Validations
     public abstract class ErrorValidationResult : IErrorValidationResult, IValidationResult
     {
         public bool IsValid => false;
-        protected HttpStatusCode Status;
-        protected string Title;
+        public HttpStatusCode Status { get; protected set; }
+        public string Title { get; protected set; }
         public IReadOnlyDictionary<string, List<string>> Errors => errors;
         private Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
-        protected object AsSerializableError() => new { Title, Status, Errors };
-        public abstract IActionResult AsActionResult();
+        public virtual object AsSerializableError() => new { Title, Status, Errors };
+        public abstract IActionResult AsErrorActionResult();
         public virtual IErrorValidationResult AddValidationError(string key, string errorMessage)
         {
             if (errors.TryGetValue(key, out List<string> errorMessages))

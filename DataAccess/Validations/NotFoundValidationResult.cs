@@ -14,6 +14,6 @@ namespace DataAccess.Validations
             Title = Status.ToString();
             AddValidationError(resourceName, $"Unable to find requested {resourceName}.");
         }
-        public override IActionResult AsActionResult() => new NotFoundObjectResult(AsSerializableError());
+        public override IActionResult AsErrorActionResult() => new NotFoundObjectResult(AsSerializableError());
     }
 }
