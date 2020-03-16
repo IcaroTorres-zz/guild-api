@@ -1,5 +1,7 @@
 ﻿using Abstractions.Service;
 using Application.Cache;
+using DataAccess.Entities;
+using DataAccess.Validations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -12,11 +14,11 @@ using System.Threading.Tasks;
 namespace Application.ActionFilters
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class CacheResponseAttribute : ActionFilterAttribute
+    public class UseCacheAttribute : ActionFilterAttribute
     {
         private readonly int _timeToLiveSeconds;
 
-        public CacheResponseAttribute(int timeToLiveSeconds)
+        public UseCacheAttribute(int timeToLiveSeconds)
         {
             _timeToLiveSeconds = timeToLiveSeconds;
         }
@@ -26,7 +28,7 @@ namespace Application.ActionFilters
             var cacheSettings = context.HttpContext.RequestServices.GetRequiredService<RedisCacheSettings>();
             if (!cacheSettings.Enabled)
             {
-                await next();
+                await ExecuteNextAsync(next);
                 return;
             }
 
@@ -40,11 +42,24 @@ namespace Application.ActionFilters
                 return;
             }
 
-            var executedContext = await next();
+            var executedContext = await ExecuteNextAsync(next);
             if (executedContext.Result is OkObjectResult okObjectResult)
             {
                 await cacheService.CacheResponseAsync(cacheKey, okObjectResult.Value, timeToLive: TimeSpan.FromSeconds(_timeToLiveSeconds));
             }
+        }
+
+        private async Task<ActionExecutedContext> ExecuteNextAsync(ActionExecutionDelegate next)
+        {
+            var executedContext = await next();
+            var okResult = executedContext.Result as OkObjectResult;
+            var createdResult = executedContext.Result as CreatedResult;
+            var entityValue =  (okResult?.Value ?? createdResult?.Value) as BaseEntity;
+            if (entityValue is BaseEntity && entityValue.Validate() is ErrorValidationResult errorInsteadOkResult)
+            {
+                executedContext.Result = errorInsteadOkResult.AsErrorActionResult();
+            }
+            return executedContext;
         }
 
         private static string GenerateCacheKeyFromRequest(HttpRequest request)

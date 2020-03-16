@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Application.ActionFilters
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class UseUnitOfWorkAttribute : ValidateResultAttribute
+    public class UseUnitOfWorkAttribute : ActionFilterAttribute
     {
         public IUnitOfWork UnitOfWork { get; protected set; }
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
