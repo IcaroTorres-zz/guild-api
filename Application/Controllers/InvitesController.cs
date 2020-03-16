@@ -9,13 +9,13 @@ namespace Application.Controllers
     [Route("api/[controller]/v1"), ApiController]
     public class InvitesController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-invite"), ValidateResult, CacheResponse(30)]
+        [HttpGet("{id}", Name = "get-invite"), CacheResponse(20)]
         public ActionResult Get(Guid id, [FromServices] IInviteService service)
         {
             return Ok(service.Get(id));
         }
 
-        [HttpGet(Name = "get-invites"), ValidateResult, CacheResponse(30)]
+        [HttpGet(Name = "get-invites"), CacheResponse(30)]
         public ActionResult GetAll([FromServices] IInviteService service, [FromQuery] InviteDto payload)
         {
             return Ok(service.List(payload));
@@ -26,7 +26,7 @@ namespace Application.Controllers
         {
             var invite = service.InviteMember(payload);
 
-            return Created($"{Request.Path.ToUriComponent()}{invite.Id}", invite);
+            return CreatedAtRoute("get-invite", new { id = invite.Id }, invite);
         }
 
         [HttpPatch("{id}/accept", Name = "accept-invite"), UseUnitOfWork]

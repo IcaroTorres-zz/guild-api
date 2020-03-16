@@ -9,13 +9,13 @@ namespace Application.Controllers
     [Route("api/[controller]/v1"), ApiController]
     public class MembersController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-member"), ValidateResult, CacheResponse(30)]
+        [HttpGet("{id}", Name = "get-member"), CacheResponse(10)]
         public ActionResult Get(Guid id, [FromServices] IMemberService service)
         {
             return Ok(service.Get(id));
         }
 
-        [HttpGet(Name = "get-members"), ValidateResult, CacheResponse(30)]
+        [HttpGet(Name = "get-members"), CacheResponse(10)]
         public ActionResult GetAll([FromServices] IMemberService service, [FromQuery] MemberFilterDto payload)
         {
             return Ok(service.List(payload));
@@ -26,7 +26,7 @@ namespace Application.Controllers
         {
             var member = service.Create(payload);
 
-            return Created($"{Request.Path.ToUriComponent()}{member.Id}", member);
+            return CreatedAtRoute("get-member", new { id = member.Id }, member);
         }
 
         [HttpPut("{id}", Name = "update-member"), UseUnitOfWork]
