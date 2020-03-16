@@ -9,13 +9,13 @@ namespace Application.Controllers
     [Route("api/[controller]/v1"), ApiController]
     public class InvitesController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-invite"), CacheResponse(20)]
+        [HttpGet("{id}", Name = "get-invite"), UseCache(20)]
         public ActionResult Get(Guid id, [FromServices] IInviteService service)
         {
             return Ok(service.Get(id));
         }
 
-        [HttpGet(Name = "get-invites"), CacheResponse(30)]
+        [HttpGet(Name = "get-invites"), UseCache(30)]
         public ActionResult GetAll([FromServices] IInviteService service, [FromQuery] InviteDto payload)
         {
             return Ok(service.List(payload));

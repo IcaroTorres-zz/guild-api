@@ -9,13 +9,13 @@ namespace Application.Controllers
     [Route("api/[controller]/v1"), ApiController]
     public class MembersController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-member"), CacheResponse(10)]
+        [HttpGet("{id}", Name = "get-member"), UseCache(10)]
         public ActionResult Get(Guid id, [FromServices] IMemberService service)
         {
             return Ok(service.Get(id));
         }
 
-        [HttpGet(Name = "get-members"), CacheResponse(10)]
+        [HttpGet(Name = "get-members"), UseCache(10)]
         public ActionResult GetAll([FromServices] IMemberService service, [FromQuery] MemberFilterDto payload)
         {
             return Ok(service.List(payload));

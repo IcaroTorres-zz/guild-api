@@ -9,13 +9,13 @@ namespace Application.Controllers
     [Route("api/[controller]/v1"), ApiController]
     public class GuildsController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-guild"), CacheResponse(10)]
+        [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
         public IActionResult Get(Guid id, [FromServices] IGuildService service)
         {
             return Ok(service.Get(id));
         }
 
-        [HttpGet(Name = "get-guilds"), CacheResponse(20)]
+        [HttpGet(Name = "get-guilds"), UseCache(20)]
         public IActionResult Get([FromServices] IGuildService service, [FromQuery(Name = "count")] int count = 20)
         {
             return Ok(service.List(count));
