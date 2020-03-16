@@ -1,8 +1,8 @@
 ﻿# Guild.api
 
-A simple Rest API made in .net core, with operations (_GET, POST, PUT, PATCH, DELETE_) over `Guild` URI _/api/guilds/v1_
+# Description
 
-## Sample API Developed with :
+A REST API of a basic environment allowing interactions between models representing guilds, members, invites and memberships, made in .Net Core including the following list of concepts during development:
 
 - [x] **.Net Core 2.2**;
 - [x] **EF Core 2.2.6**;
@@ -15,55 +15,39 @@ A simple Rest API made in .net core, with operations (_GET, POST, PUT, PATCH, DE
 - [x] **Hateoas**;
 - [x] **Distributed Cache (Redis)**.
 
-## Setup
+# Table of Contents
 
-### Requirements:
+1. **[Title](#guildapi "Title")**
+2. **[Description](#description "Description")**
+3. **[Table of Contents](#table-of-contents "Table of Contents")**
+4. **[Installation](#installation "Installation")**
 
-* [.NetCore SDK](https://dotnet.microsoft.com/download "microsoft downloads");
-* [GIT](https://git-scm.com/downloads "git downloads");
-* [Redis](https://redis.io/download "redis downloads").
+    1. **[Requirements](#requirements "Requirements")**
+    2. **[Clone and Restore](#clone-and-restore "Clone and Restore")**
+    3. **[Redis Installation (Non Windows)](#redis-installation-non-windows "Redis Installation (Non Windows)")**
+    4. **[Redis Installation (Windows)](#redis-installation-windows "Redis Installation (Windows)")**
+    5. **[Redis in the project](#redis-in-the-project "Redis in the project")**
+    6. **[Sqlite in the project](#sqlite-in-the-project "Sqlite in the project")**
 
+5. **[Usage](#usage "Usage")**
+6. **[Contributing](#contributing "Contributing")**
+7. **[Credits](#credits "Credits")**
 
-### Clone and Restore
+# Installation
+
+## Requirements:
+
+This project require installation of some other tools. You need to have **[GIT](https://git-scm.com/downloads "git downloads")** to clone this repo, install **[.Net Core SDK 2.2](https://dotnet.microsoft.com/download "microsoft downloads")** to work with .net cross-platform development environment and use `dotnet cli` commands to restore the project and get all packages and dependencies needed properly installed, including **[Package EntityFrameworkCore 2.2.6](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore/ "nuget gallery")**, **[Package SQLite 2.2.6](https://www.nuget.org/packages/System.Data.SQLite "nuget gallery")** and **[Package StackExchangeRedis 2.2.5](https://www.nuget.org/packages/Microsoft.Extensions.Caching.StackExchangeRedis "nuget gallery")**. At last but not least, you will need **[Redis](https://redis.io/download "redis downloads")** installed on your system and run it before starts the project execution.
+
+## Clone and Restore
+
+The restore command will provide installations for needed packages.
 
     $ git clone https://github.com/IcaroTorres/guild-api.git
     $ cd guild-api
     $ dotnet restore Api.csproj
 
-### Running the project
-
-If you are using VS Code, configure your VS Code Debugger with _.vscode_ folder on your project root folder, pres `F5` and select `.Net Core Launch (web)` as your running target option. It will ask to create a build task, generating a file like following.
-
-tasks.json:
-```json
-
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "build",
-        "${workspaceFolder}/guild.api.csproj"
-      ],
-      "problemMatcher": "$msCompile"
-    }
-  ]
-}
-```
-
-You can _Compile_ project with `dotnet build Api.csproj` and _Publish_ production folder with `dotnet publish Api.csproj`.
-
-To run, start your Redis server instance and run your project like example below:
-
-    $ redis-server
-    $ dotnet run Api.csproj
-
-## Aditional Setup
-
-### Redis Installation (Non Windows)
+## Redis Installation (Non Windows)
 
 Download, extract somewhere you want and compile Redis with:
 
@@ -76,7 +60,7 @@ The binaries that are now compiled are available in the src directory. Run Redis
 
     $ src/redis-server
 
-### Redis Installation (Windows)
+## Redis Installation (Windows)
 
 Download a compiled windows version from [dmajkic / redis](https://github.com/dmajkic/redis/downloads "github dmajkic/redis download packages"). Set Redis on your environment variables and run `redis-server` on prompt like below:
 
@@ -84,18 +68,20 @@ Download a compiled windows version from [dmajkic / redis](https://github.com/dm
 
 This will start your Redis local server with default settings.
 
-### Adding Redis to your project
+## Redis in the project
 
 Configure an entry for your settings in your pppsetings.json. Following there is an example:
 
 ```json
 {
   "RedisCacheSettings": {
-    "ConnectionString": "localhost,port: 6379,password=your_redis_password!"
+    "ConnectionString": "localhost,port: 6379,password=your_redis_password!",
+    "Enabled": true
   },
 }
 ```
-### Sqlite
+
+## Sqlite in the project
 
 To add Sqlite to the project you need to register on your dependenci injection services through the method `ConfigureServices` in the `Startup.cs`.
 
@@ -131,8 +117,54 @@ And alter the context registration in the `ConfigureServices` method of `Startup
 
 
 Startup.cs
+
 ```c#
 var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
 
 services.AddDbContext<YourContext>(options => options.UseSqlite(SqliteAbsolutePathConnectionString));
 ```
+
+#  Usage
+
+If you are using VS Code, configure your VS Code Debugger with _.vscode_ folder on your project root folder, pres `F5` and select `.Net Core Launch (web)` as your running target option. It will ask to create a build task, generating a file like following.
+
+tasks.json:
+
+```json
+
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/guild.api.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
+```
+
+You can **Compile** project with `dotnet build Api.csproj` and **Publish** production folder with `dotnet publish Api.csproj`.
+
+To run, start your Redis server instance and run your project like example below:
+
+> Using windows environment variable or accessing your compiled src directory.
+
+    $ redis-server
+
+> Inside the project directory.
+
+    $ dotnet run Api.csproj
+
+# Contributing
+
+Feel free to *Fork* this repo and send a *Pull Request* with your ideas and improvements, turning this proof of concept any better.
+
+# Credits
+
+This project was conceived by me, [@icarotorres](https://github.com/icarotorres "author's profile") : icaro.stuart@gmail.com, then owner of this repository.
