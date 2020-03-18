@@ -42,7 +42,6 @@ namespace api
                     .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)))
 
                 // Custom service layer dependecy registration
-                .AddScoped<IBaseService, BaseService>()
                 .AddScoped<IGuildService, GuildService>()
                 .AddScoped<IMemberService, MemberService>()
                 .AddScoped<IInviteService, InviteService>()
