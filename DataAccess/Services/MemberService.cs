@@ -50,13 +50,12 @@ namespace DataAccess.Services
         public IMember Promote(Guid id) => Get(id).BePromoted();
         public IMember Demote(Guid id) => Get(id).BeDemoted();
         public IMember LeaveGuild(Guid id) => Get(id).LeaveGuild();
-        public IReadOnlyList<IMember> List(MemberFilterDto payload) => Query<Member>(m
-            => m.Name.Contains(payload.Name)
-            && (payload.GuildId == Guid.Empty || m.GuildId == payload.GuildId),
-            included: $"{nameof(Member.Memberships)},{nameof(Member.Guild)}",
-            readOnly: true).Take(payload.Count).ToList();
-
-        public IMember Get(Guid memberId) => GetMember(memberId);
+        public IReadOnlyList<IMember> List(MemberFilterDto payload)
+            => Query<Member>(m => m.Name.Contains(payload.Name)
+                               && (payload.GuildId == Guid.Empty 
+                               || m.GuildId == payload.GuildId), 
+                            readOnly: true).Take(payload.Count).ToList();
+        public IMember Get(Guid memberId, bool readOnly = false) => GetMember(memberId, readOnly);
         public IMember Delete(Guid id) => Remove<Member>(id);
     }
 }

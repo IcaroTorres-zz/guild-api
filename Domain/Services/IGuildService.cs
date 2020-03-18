@@ -2,13 +2,12 @@ using Domain.Entities;
 using Domain.DTOs;
 using System;
 using System.Collections.Generic;
-using Domain.Validations;
 
 namespace Domain.Services
 {
     public interface IGuildService
     {
-        IGuild Get(Guid id);
+        IGuild Get(Guid id, bool readOnly = false);
         IGuild Create(GuildDto payload);
         IGuild Update(GuildDto payload, Guid id);
         IGuild Delete(Guid id);

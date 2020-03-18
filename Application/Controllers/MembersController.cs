@@ -12,7 +12,7 @@ namespace Application.Controllers
         [HttpGet("{id}", Name = "get-member"), UseCache(10)]
         public ActionResult Get(Guid id, [FromServices] IMemberService service)
         {
-            return Ok(service.Get(id));
+            return Ok(service.Get(id, readOnly: true));
         }
 
         [HttpGet(Name = "get-members"), UseCache(10)]

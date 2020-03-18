@@ -16,15 +16,14 @@ namespace DataAccess.Services
         public GuildService(ApiContext context) : base(context) {}
         public IGuild Create(GuildDto payload)
         {
-            if (Query<Guild>(p => p.Name.Equals(payload.Name), included: nameof(Guild.Members)).SingleOrDefault() is Guild guild)
+            if (Query<Guild>(p => p.Name.Equals(payload.Name), true).SingleOrDefault() is Guild guild)
             {
                 guild.ValidationResult = new ConflictValidationResult(nameof(Guild))
                     .AddValidationErrors(nameof(Guild), $"With given name '{payload.Name}' already exists.");
                     return guild;
             }
             var master = GetMember(payload.MasterId) as Member;
-            var newGuild = Insert(new Guild(payload.Name, master));
-            return newGuild;
+            return Insert(new Guild(payload.Name, master));
         }
         public IGuild Update(GuildDto payload, Guid id)
         {
@@ -51,23 +50,24 @@ namespace DataAccess.Services
             var toInviteIds = payload.MemberIds.Except(receivedAlreadyMemberIds);
             var toKickIds = currentMemberIds.Except(receivedAlreadyMemberIds);
 
-            var memberQuery = Query<Member>(m => !m.Disabled)
+            Query<Member>(m => !m.Disabled)
                 .Include(g => g.Memberships)
                 .Include(m => m.Guild.Members)
-                .Include(m => m.Guild.Invites);
+                .Include(m => m.Guild.Invites)
+                .Join(toInviteIds, m => m.Id, id => id, (member, _) => member).ToList()
+                .ForEach(memberToInvite => guildToUpdate.Invite(memberToInvite)?.BeAccepted());
 
-            memberQuery.Join(toInviteIds, m => m.Id, id => id, (member, _) => member).ToList()
-                       .ForEach(memberToInvite => Insert<Invite>(guildToUpdate.Invite(memberToInvite)?.BeAccepted() as Invite));
-            memberQuery.Join(toInviteIds, m => m.Id, id => id, (member, _) => member).ToList()
-                       .ForEach(memberToKick => memberToKick.LeaveGuild());
+            guildToUpdate.Members
+                .Join(toKickIds, m => m.Id, id => id, (member, _) => member).ToList()
+                .ForEach(memberToKick => memberToKick.LeaveGuild());
 
-            return guildToUpdate;
+            return Update<Guild>(guildToUpdate);
         }
         public IReadOnlyList<IGuild> List(int count = 20)
         {
             return GetAll<Guild>(included: nameof(Guild.Members), readOnly: true).Take(count).ToList();
         }
-        public IGuild Get(Guid id) => GetGuild(id);
+        public IGuild Get(Guid id, bool readOnly = false) => GetGuild(id, readOnly);
         public IGuild Delete(Guid id) => Remove(Get(id));
     }
 }

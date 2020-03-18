@@ -19,7 +19,10 @@ namespace DataAccess.Services
             Context = context;
         }
 
-        public virtual T GetWithKeys<T>(object[] keys, IEnumerable<string> navigations = null, IEnumerable<string> collections = null) where T : class
+        public virtual T GetWithKeys<T>(
+            object[] keys, 
+            IEnumerable<string> navigations = null, 
+            IEnumerable<string> collections = null) where T : class
         {
             var entity = Context.Set<T>().Find(keys);
 
@@ -42,61 +45,20 @@ namespace DataAccess.Services
 
         public virtual IQueryable<T> GetAll<T>(string included = "", bool readOnly = false) where T : class
         {
-            return Query<T>(e => true, readOnly, included);
+            return Query<T>(e => true, readOnly);
         }
 
-        public virtual IQueryable<T> Query<T>(Expression<Func<T, bool>> predicate = null, bool readOnly = false, string included = "") where T : class
+        public virtual IQueryable<T> Query<T>(Expression<Func<T, bool>> predicate = null, bool readOnly = false) where T : class
         {
-            var query = included
-                .Split(",", StringSplitOptions.RemoveEmptyEntries)
-                .Aggregate(Context.Set<T>() as IQueryable<T>, (set, navigation) => set.Include<T>(navigation))
-                .Where(predicate ?? (e => true));
+            var query = Context.Set<T>().Where(predicate ?? (e => true));
 
             return readOnly ? query.AsNoTracking() : query;
         }
 
-        public virtual IEnumerable<T> AddOrUpdate<T>(params T[] items) where T : class
-        {
-            foreach(var item in items.Where(e => (e is BaseEntity entity && entity.IsValid) || !(e is BaseEntity)))
-            {
-                var itemId = item.GetType().GetProperty("Id").GetValue(item);
-                var dbItem = Context.Set<T>().Find(itemId);
-                if (dbItem != null)
-                {
-                    Context.Entry(dbItem).CurrentValues.SetValues(item);
-                    Context.Set<T>().Update(item);
-                }
-                else Insert(item);
-                
-                yield return item;
-
-                // var state = Context.Entry(item).State;
-                // yield return (state == EntityState.Modified)
-                //     ? Context.Set<T>().Update(item).Entity
-                //     : Insert(item);
-            }
-
-            // var itemsToAdd = validItems.Where(item => Context.Entry(item).State == EntityState.Added);
-            // Context.Set<T>().AddRange(itemsToAdd);
-
-            // var itemsToUpdate = validItems.Where(item => Context.Entry(item).State == EntityState.Modified);
-            // Context.Set<T>().UpdateRange(itemsToUpdate);
-        }
-
-        public virtual T[] Update<T>(params T[] items) where T : class
-        {
-            Context.Set<T>().UpdateRange(items.Where(i => (i is BaseEntity entity && entity.IsValid) || !(i is BaseEntity)));
-
-            return items;
-        }
-
         public virtual T Insert<T>(T entity) where T : class
         {
-            if (entity is BaseEntity baseEntity && !baseEntity.IsValid)
-            {
-                return entity;
-            }
-            return Context.Set<T>().Add(entity).Entity;
+            return (entity is BaseEntity baseEntity && !baseEntity.IsValid)
+                ? entity : Context.Set<T>().Add(entity).Entity;
         }
 
         public virtual IEnumerable<T> InsertMany<T>(IEnumerable<T> entities) where T : class
@@ -106,6 +68,23 @@ namespace DataAccess.Services
                 return entities;
             }
             Context.Set<T>().AddRange(entities);
+
+            return entities;
+        }
+
+        public virtual T Update<T>(T entity) where T : class
+        {
+            return (entity is BaseEntity baseEntity && !baseEntity.IsValid)
+                ? entity : Context.Set<T>().Update(entity).Entity;
+        }
+
+        public virtual IEnumerable<T> UpdateMany<T>(IEnumerable<T> entities) where T : class
+        {
+            if (entities.Any(entity => entity is BaseEntity baseEntity && !baseEntity.IsValid))
+            {
+                return entities;
+            }
+            Context.Set<T>().UpdateRange(entities);
 
             return entities;
         }
@@ -128,21 +107,23 @@ namespace DataAccess.Services
             }
         }
 
-        protected virtual IMember GetMember(Guid memberId)
+        protected virtual IMember GetMember(Guid memberId, bool readOnly = false)
         {
-            return Query<Member>(m => m.Id == memberId)
+            var query = Query<Member>(m => m.Id == memberId)
                 .Include(m => m.Memberships)
                 .Include(m => m.Guild.Members)
-                .Include(m => m.Guild.Invites)
-                .SingleOrDefault() ?? new NullMember();
+                .Include(m => m.Guild.Invites);
+            
+            return (readOnly ? query.AsNoTracking() : query).SingleOrDefault() ?? new NullMember();
         }
 
-        protected IGuild GetGuild(Guid id)
+        protected IGuild GetGuild(Guid id, bool readOnly = false)
         {
-            return Query<Guild>(g => g.Id == id)
+            var query = Query<Guild>(g => g.Id == id)
                 .Include(g => g.Members).ThenInclude(m => m.Memberships)
-                .Include(g => g.Invites).ThenInclude(i => i.Member)
-                .SingleOrDefault() ?? new NullGuild();
+                .Include(g => g.Invites).ThenInclude(i => i.Member);
+
+            return (readOnly ? query.AsNoTracking() : query).SingleOrDefault() ?? new NullGuild();
         }
     }
 }

@@ -24,17 +24,17 @@ namespace Application.ActionFilters
                 {
                     executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
                     executedContext.Result = errorResult.AsErrorActionResult();
+                    UnitOfWork.RollbackTransaction();
                 }
+                else UnitOfWork.Commit();
             }
-
-            if (executedContext.Exception == null && executedContext.HttpContext.Response.StatusCode < 400)
+            else if (executedContext.Exception == null && executedContext.HttpContext.Response.StatusCode < 400)
             {
                 UnitOfWork.Commit();
             }
             else
             {
                 UnitOfWork.RollbackTransaction();
-                throw executedContext.Exception;
             }
         }
     }

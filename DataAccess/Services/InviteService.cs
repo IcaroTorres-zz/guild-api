@@ -16,12 +16,13 @@ namespace DataAccess.Services
     {
         public InviteService(ApiContext context) : base(context) { }
 
-        public IInvite Get(Guid id)
+        public IInvite Get(Guid id, bool readOnly = false)
         {
-            return Query<Invite>(i => i.Id == id)
+            var query = Query<Invite>(i => i.Id == id)
                 .Include(i => i.Member.Memberships)
-                .Include(i => i.Guild.Members)
-                .SingleOrDefault() ?? new NullInvite();
+                .Include(i => i.Guild.Members);
+
+            return (readOnly ? query.AsNoTracking() : query).SingleOrDefault() ?? new NullInvite();
         }
         public IReadOnlyList<IInvite> List(InviteDto payload) => Query<Invite>(
             i => (payload.MemberId == Guid.Empty || i.MemberId == payload.MemberId)

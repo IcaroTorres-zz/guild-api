@@ -9,7 +9,7 @@ namespace Domain.Services
 {
     public interface IMemberService
     {
-        IMember Get(Guid id);
+        IMember Get(Guid id, bool readOnly = false);
         IMember Create(MemberDto payload);
         IMember Update(MemberDto payload, Guid id);
         IMember Patch(Guid id, JsonPatchDocument<Member> payload);
