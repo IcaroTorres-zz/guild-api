@@ -11,7 +11,6 @@ namespace Domain.Validations
         IReadOnlyDictionary<string, List<string>> Errors { get; }
         object AsSerializableError();
         IActionResult AsErrorActionResult();
-        IErrorValidationResult AddValidationError(string key, string errorMessage);
-        IErrorValidationResult AddValidationErrors(string key, List<string> newErrorMessages);
+        IErrorValidationResult AddValidationErrors(string key, params string[] newMessages);
     }
 }

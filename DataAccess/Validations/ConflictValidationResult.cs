@@ -8,11 +8,11 @@ namespace DataAccess.Validations
     [Serializable]
     public class ConflictValidationResult : ErrorValidationResult, IErrorValidationResult, IValidationResult
     {
-        public ConflictValidationResult(string resourceName)
+        public ConflictValidationResult(string resourcePath) : base(resourcePath)
         {
             Status = HttpStatusCode.Conflict;
             Title = Status.ToString();
-            AddValidationError(resourceName, $"{HttpStatusCode.Conflict} with entity {resourceName}.");
+            AddValidationErrors(string.Empty, $"{HttpStatusCode.Conflict} with entity {ResourcePath}.");
         }
         public override IActionResult AsErrorActionResult() => new ConflictObjectResult(AsSerializableError());
     }

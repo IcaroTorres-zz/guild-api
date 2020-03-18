@@ -9,6 +9,11 @@ namespace DataAccess.Validations
     [Serializable]
     public abstract class ErrorValidationResult : IErrorValidationResult, IValidationResult
     {
+        public ErrorValidationResult(string resourcePath)
+        {
+            ResourcePath = resourcePath;
+        }
+        protected string ResourcePath { get; set; }
         public bool IsValid => false;
         public HttpStatusCode Status { get; protected set; }
         public string Title { get; protected set; }
@@ -16,28 +21,19 @@ namespace DataAccess.Validations
         private Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
         public virtual object AsSerializableError() => new { Title, Status, Errors };
         public abstract IActionResult AsErrorActionResult();
-        public virtual IErrorValidationResult AddValidationError(string key, string errorMessage)
+        public virtual IErrorValidationResult AddValidationErrors(string keyPath, params string[] newMessages)
         {
-            if (errors.TryGetValue(key, out List<string> errorMessages))
+            var formattedKey = string.IsNullOrWhiteSpace(keyPath) ? ResourcePath : $"{ResourcePath}.{keyPath}";
+
+            if (errors.TryGetValue(formattedKey, out List<string> previousMessages))
             {
-                errorMessages.Add(errorMessage);
+                previousMessages.AddRange(newMessages);
             }
             else
             {
-                errors.Add(key, new List<string>{ errorMessage });
+                errors.Add(formattedKey, new List<string>(newMessages));
             }
-            return this;
-        }
-        public virtual IErrorValidationResult AddValidationErrors(string key, List<string> newErrorMessages)
-        {
-            if (errors.TryGetValue(key, out List<string> errorMessages))
-            {
-                errorMessages.AddRange(newErrorMessages);
-            }
-            else
-            {
-                errors.Add(key, newErrorMessages);
-            }
+            
             return this;
         }
     }

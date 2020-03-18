@@ -8,11 +8,11 @@ namespace DataAccess.Validations
     [Serializable]
     public class BadRequestValidationResult : ErrorValidationResult, IErrorValidationResult, IValidationResult
     {
-        public BadRequestValidationResult(string resourceName)
+        public BadRequestValidationResult(string resourcePath) : base(resourcePath)
         {
             Status = HttpStatusCode.BadRequest;
             Title = Status.ToString();
-            AddValidationError(resourceName, $"Malformed request for entity {resourceName}.");
+            AddValidationErrors(string.Empty, $"Malformed request for entity {ResourcePath}.");
         }
         public override IActionResult AsErrorActionResult() => new BadRequestObjectResult(AsSerializableError());
     }
