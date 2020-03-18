@@ -51,9 +51,13 @@ namespace DataAccess.Entities
         }
         public virtual IMember BePromoted()
         {
-            if (!IsGuildMaster && Guild is Guild)
+            if (Guild is Guild)
             {
-                Guild.DemoteMaster();
+                Guild.Members
+                     .Where(m => m.IsGuildMaster && m.Id != Id)
+                     .ToList()
+                     .ForEach(m => m.isGuildMaster = false);
+
                 isGuildMaster = true;
             }
             return this;
@@ -62,8 +66,23 @@ namespace DataAccess.Entities
         {
             if (IsGuildMaster && Guild is Guild)
             {
-                isGuildMaster = false;
-                Guild.PromoteSubstituteFor(this);
+                if (Guild.Members?.Count > 1)
+                {
+                    isGuildMaster = false;
+                    Guild.PromoteSubstituteFor(this);
+                }
+                else
+                {
+                    var memberTypeName = nameof(Member);
+                    var guildTypeName = nameof(Guild);
+                    var conflictKey = $"{guildTypeName}.{nameof(Guild.Members)}";
+                    var conflictMessages = new string [2]
+                    {
+                        $"Can not {nameof(BeDemoted)} due to be the last {memberTypeName} left in {guildTypeName}.",
+                        $"Consider leaving the {guildTypeName}."
+                    };
+                    ValidationResult = new ConflictValidationResult(memberTypeName).AddValidationErrors(conflictKey, conflictMessages);
+                }
             }
             return this;
         }
