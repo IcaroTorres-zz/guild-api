@@ -82,14 +82,12 @@ namespace DataAccess.Entities
         public virtual void PromoteSubstituteFor(IMember previousMaster)
         {
             Members
-                .Where(m => !m.Equals(previousMaster))
                 .OrderByDescending(m => m.Memberships
                     .SingleOrDefault(ms => ms.Exit == null)
                     ?.GetDuration())
-                .FirstOrDefault(m => !m.IsGuildMaster)
+                .FirstOrDefault(m => m.Id != previousMaster.Id && !m.IsGuildMaster)
                 ?.BePromoted();
         }
-        public virtual void DemoteMaster() => Members.SingleOrDefault(m => m.IsGuildMaster)?.BeDemoted();
         public override IValidationResult Validate()
         {
             IErrorValidationResult result = null;
