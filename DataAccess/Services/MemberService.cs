@@ -20,7 +20,7 @@ namespace DataAccess.Services
             if ((Query<Member>(p => p.Name.Equals(payload.Name)).SingleOrDefault() is Member guild))
             {
                 guild.ValidationResult = new ConflictValidationResult(nameof(Member))
-                    .AddValidationErrors(nameof(Member), $"With given name '{payload.Name}' already exists.");
+                    .AddValidationErrors(nameof(Member.Name), $"With given name '{payload.Name}' already exists.");
                 return guild;
             }
             return Insert(new Member(payload.Name));
