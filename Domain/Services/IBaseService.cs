@@ -15,6 +15,7 @@ namespace Domain.Services
         T Remove<T>(T entity) where T : class;
         T Remove<T>(params object[] keys) where T : class;
         IEnumerable<T> RemoveMany<T>(IEnumerable<T> entities) where T : class;
+        IEnumerable<T>  AddOrUpdate<T>(params T[] collection) where T : class;
         IEnumerable<T> RemoveMany<T>(IEnumerable<object[]> keysList) where T : class;
     }
 }

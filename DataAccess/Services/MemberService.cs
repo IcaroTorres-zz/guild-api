@@ -20,7 +20,7 @@ namespace DataAccess.Services
             if ((Query<Member>(p => p.Name.Equals(payload.Name)).SingleOrDefault() is Member guild))
             {
                 guild.ValidationResult = new ConflictValidationResult(nameof(Member))
-                    .AddValidationError(nameof(Member), $"With given name '{payload.Name}' already exists.");
+                    .AddValidationErrors(nameof(Member), $"With given name '{payload.Name}' already exists.");
                 return guild;
             }
             return Insert(new Member(payload.Name));
@@ -28,18 +28,10 @@ namespace DataAccess.Services
         public IMember Update(MemberDto payload, Guid id)
         {
             var member = Get(id);
-
             member.ChangeName(payload.Name);
-
             if (payload.GuildId is Guid guildId && guildId != Guid.Empty)
             {
-                var guild = GetGuild(guildId);
-                
-                guild.AcceptMember(
-                    member.JoinGuild(
-                        guild.Invite(member)
-                    )
-                );
+                GetGuild(guildId).Invite(member).BeAccepted();
             }
             else
             {

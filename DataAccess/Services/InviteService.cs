@@ -19,16 +19,14 @@ namespace DataAccess.Services
         public IInvite Get(Guid id)
         {
             return Query<Invite>(i => i.Id == id)
-                .Include(i => i.Guild.Invites)
+                .Include(i => i.Member.Memberships)
                 .Include(i => i.Guild.Members)
-                .Include(i => i.Member.Memberships).SingleOrDefault() ?? new NullInvite();
+                .SingleOrDefault() ?? new NullInvite();
         }
-
         public IReadOnlyList<IInvite> List(InviteDto payload) => Query<Invite>(
             i => (payload.MemberId == Guid.Empty || i.MemberId == payload.MemberId)
               && (payload.GuildId == Guid.Empty || i.GuildId == payload.GuildId), 
               readOnly: true).Take(payload.Count).ToList();
-
         public IInvite InviteMember(InviteDto payload)
         {
             var guild = GetGuild(payload.GuildId);
@@ -40,10 +38,9 @@ namespace DataAccess.Services
 
             var badInvite = new NullInvite();
             (badInvite.ValidationResult as BadRequestValidationResult)
-                .AddValidationError(nameof(Invite),$"{nameof(Member)} is invalid or already in inviting {nameof(Guild)}.");
+                .AddValidationErrors(nameof(Invite),$"{nameof(Member)} is invalid or already in inviting {nameof(Guild)}.");
             return badInvite;
         }
-
         public IInvite Accept(Guid id) => Get(id).BeAccepted();
         public IInvite Decline(Guid id) => Get(id).BeDeclined();
         public IInvite Cancel(Guid id) => Get(id).BeCanceled();

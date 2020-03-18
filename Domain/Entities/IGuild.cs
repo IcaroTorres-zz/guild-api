@@ -12,6 +12,5 @@ namespace Domain.Entities
         IMember AcceptMember([NotNull] IMember member);
         IMember Promote([NotNull] IMember newMaster);
         IMember KickMember([NotNull] IMember member);
-        IEnumerable<IMember> UpdateMembers([NotNull] IEnumerable<IMember> members);
     }
 }

@@ -19,7 +19,7 @@ namespace DataAccess.Services
             if (Query<Guild>(p => p.Name.Equals(payload.Name), included: nameof(Guild.Members)).SingleOrDefault() is Guild guild)
             {
                 guild.ValidationResult = new ConflictValidationResult(nameof(Guild))
-                    .AddValidationError(nameof(Guild), $"With given name '{payload.Name}' already exists.");
+                    .AddValidationErrors(nameof(Guild), $"With given name '{payload.Name}' already exists.");
                     return guild;
             }
             var master = GetMember(payload.MasterId) as Member;
@@ -28,26 +28,38 @@ namespace DataAccess.Services
         }
         public IGuild Update(GuildDto payload, Guid id)
         {
-            var guildToUpdate = Get(id);
+            var guildToUpdate = Get(id) as Guild;
             var master = GetMember(payload.MasterId);
+
             if (!guildToUpdate.IsGuildMember(master))
             {
                 var guildConflict = new ConflictValidationResult(nameof(Guild))
-                    .AddValidationError(nameof(Guild.Members), $"Cannot {nameof(Guild.Promote)} a non {nameof(Member)}.");
+                    .AddValidationErrors(nameof(Guild.Members), $"Cannot {nameof(Guild.Promote)} a non {nameof(Member)}.");
 
                 var memberConflict = new ConflictValidationResult(nameof(Member))
-                    .AddValidationError(nameof(Member.Guild), $"Cannot {nameof(Member.BePromoted)} due to not being member of target {nameof(Member.Guild)}.");
+                    .AddValidationErrors(nameof(Member.Guild), $"Cannot {nameof(Member.BePromoted)} due to not being member of target {nameof(Member.Guild)}.");
 
                 guildToUpdate.ValidationResult = guildConflict;
                 master.ValidationResult = memberConflict;
             }
+            
             guildToUpdate.Promote(master);
             guildToUpdate.ChangeName(payload.Name);
-            guildToUpdate.UpdateMembers(Query<Member>(m => !m.Disabled)
-                .Include(m => m.Guild.Members)
-                .Include(m => m.Guild.Invites)
+            
+            var currentMemberIds = guildToUpdate.Members.Select(m => m.Id);
+            var receivedAlreadyMemberIds = payload.MemberIds.Intersect(currentMemberIds);
+            var toInviteIds = payload.MemberIds.Except(receivedAlreadyMemberIds);
+            var toKickIds = currentMemberIds.Except(receivedAlreadyMemberIds);
+
+            var memberQuery = Query<Member>(m => !m.Disabled)
                 .Include(g => g.Memberships)
-                .Join(payload.MemberIds, m => m.Id, id => id, (member, _) => member));
+                .Include(m => m.Guild.Members)
+                .Include(m => m.Guild.Invites);
+
+            memberQuery.Join(toInviteIds, m => m.Id, id => id, (member, _) => member).ToList()
+                       .ForEach(memberToInvite => Insert<Invite>(guildToUpdate.Invite(memberToInvite)?.BeAccepted() as Invite));
+            memberQuery.Join(toInviteIds, m => m.Id, id => id, (member, _) => member).ToList()
+                       .ForEach(memberToKick => memberToKick.LeaveGuild());
 
             return guildToUpdate;
         }

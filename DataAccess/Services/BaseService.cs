@@ -11,7 +11,7 @@ using DataAccess.Entities.NullEntities;
 
 namespace DataAccess.Services
 {
-    public class BaseService : IBaseService
+    public abstract class BaseService : IBaseService
     {
         private readonly ApiContext Context;
         public BaseService(ApiContext context)
@@ -55,6 +55,41 @@ namespace DataAccess.Services
             return readOnly ? query.AsNoTracking() : query;
         }
 
+        public virtual IEnumerable<T> AddOrUpdate<T>(params T[] items) where T : class
+        {
+            foreach(var item in items.Where(e => (e is BaseEntity entity && entity.IsValid) || !(e is BaseEntity)))
+            {
+                var itemId = item.GetType().GetProperty("Id").GetValue(item);
+                var dbItem = Context.Set<T>().Find(itemId);
+                if (dbItem != null)
+                {
+                    Context.Entry(dbItem).CurrentValues.SetValues(item);
+                    Context.Set<T>().Update(item);
+                }
+                else Insert(item);
+                
+                yield return item;
+
+                // var state = Context.Entry(item).State;
+                // yield return (state == EntityState.Modified)
+                //     ? Context.Set<T>().Update(item).Entity
+                //     : Insert(item);
+            }
+
+            // var itemsToAdd = validItems.Where(item => Context.Entry(item).State == EntityState.Added);
+            // Context.Set<T>().AddRange(itemsToAdd);
+
+            // var itemsToUpdate = validItems.Where(item => Context.Entry(item).State == EntityState.Modified);
+            // Context.Set<T>().UpdateRange(itemsToUpdate);
+        }
+
+        public virtual T[] Update<T>(params T[] items) where T : class
+        {
+            Context.Set<T>().UpdateRange(items.Where(i => (i is BaseEntity entity && entity.IsValid) || !(i is BaseEntity)));
+
+            return items;
+        }
+
         public virtual T Insert<T>(T entity) where T : class
         {
             if (entity is BaseEntity baseEntity && !baseEntity.IsValid)
@@ -96,18 +131,17 @@ namespace DataAccess.Services
         protected virtual IMember GetMember(Guid memberId)
         {
             return Query<Member>(m => m.Id == memberId)
+                .Include(m => m.Memberships)
                 .Include(m => m.Guild.Members)
                 .Include(m => m.Guild.Invites)
-                .Include(g => g.Memberships)
                 .SingleOrDefault() ?? new NullMember();
         }
 
         protected IGuild GetGuild(Guid id)
         {
             return Query<Guild>(g => g.Id == id)
-                .Include(g => g.Members)
-                    .ThenInclude(m => m.Memberships)
-                .Include(g => g.Invites)
+                .Include(g => g.Members).ThenInclude(m => m.Memberships)
+                .Include(g => g.Invites).ThenInclude(i => i.Member)
                 .SingleOrDefault() ?? new NullGuild();
         }
     }
