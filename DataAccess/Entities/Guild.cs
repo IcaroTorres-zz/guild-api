@@ -14,16 +14,11 @@ namespace DataAccess.Entities
     {
         // EF core suitable parametersless constructor hidden to be called elsewhere
         protected Guild() { }
-        public Guild([NotNull] string name, Member member) : base()
+        public Guild([NotNull] string name, Member member)
         {
             Name = name;
-            Promote(
-                AcceptMember(
-                    member.JoinGuild(
-                        Invite(member)
-                    )
-                )
-            );
+            Invite(member).BeAccepted();
+            Promote(member);
         }
         public string Name { get; protected set; }
         [JsonIgnore] public virtual ICollection<Member> Members { get; protected set; } = new List<Member>();
@@ -84,21 +79,10 @@ namespace DataAccess.Entities
             }
             return member;
         }
-        public virtual IEnumerable<IMember> UpdateMembers([NotNull] IEnumerable<IMember> members)
-        {
-            foreach (var memberToInvite in members)
-            {
-                Invite(memberToInvite)?.BeAccepted();
-            }
-            foreach (var memberToKick in Members.Except(members).ToList())
-            {
-                KickMember(memberToKick);
-            }
-            return Members;
-        }
-        public virtual void PromoteMasterSubstitute()
+        public virtual void PromoteSubstituteFor(IMember previousMaster)
         {
             Members
+                .Where(m => !m.Equals(previousMaster))
                 .OrderByDescending(m => m.Memberships
                     .SingleOrDefault(ms => ms.Exit == null)
                     ?.GetDuration())
@@ -112,13 +96,13 @@ namespace DataAccess.Entities
             if (string.IsNullOrWhiteSpace(Name))
             {
                 result ??= new BadRequestValidationResult(nameof(Guild));
-                result.AddValidationError(nameof(Name), "Can't be null or empty.");
+                result.AddValidationErrors(nameof(Name), "Can't be null or empty.");
             }
 
             if (Members is null || !Members.Any())
             {
                 result ??= new BadRequestValidationResult(nameof(Guild));
-                result.AddValidationError(nameof(Members), "Can't be null or empty list.");
+                result.AddValidationErrors(nameof(Members), "Can't be null or empty list.");
             }
 
             if (Members != null)
@@ -128,7 +112,7 @@ namespace DataAccess.Entities
                                              .SelectMany(m => m.Errors))
                 {
                     result ??= new ConflictValidationResult(nameof(Guild));
-                    result.AddValidationErrors(error.Key, error.Value);
+                    result.AddValidationErrors(error.Key, error.Value.ToArray());
                 }
             }
 
@@ -139,7 +123,7 @@ namespace DataAccess.Entities
                                              .SelectMany(i => i.Errors))
                 {
                     result ??= new ConflictValidationResult(nameof(Guild));
-                    result.AddValidationErrors(error.Key, error.Value);
+                    result.AddValidationErrors(error.Key, error.Value.ToArray());
                 }
             }
 

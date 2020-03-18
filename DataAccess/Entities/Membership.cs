@@ -1,10 +1,12 @@
 ﻿using Domain.Entities;
+using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities
 {
     [Serializable]
-    public class Membership : IMembership
+    public class Membership : BaseEntity, IMembership
     {
         protected Membership() { }
 
@@ -12,11 +14,15 @@ namespace DataAccess.Entities
         {
             Id = Guid.NewGuid();
             Guild = guild;
+            GuildId = guild.Id;
             Member = member;
+            MemberId = member.Id;
         }
-        public Guid Id { get; protected set; }
         public DateTime Entrance { get; protected set; } = DateTime.UtcNow;
         public DateTime? Exit { get; protected set; }
+
+        [JsonIgnore, NotMapped] public override DateTime CreatedDate { get => Entrance; protected set {} }
+        [JsonIgnore, NotMapped] public override DateTime ModifiedDate { get => Exit.Value; protected set {} }
 
         public virtual Member Member { get; protected set; }
         public Guid MemberId { get; protected set; }

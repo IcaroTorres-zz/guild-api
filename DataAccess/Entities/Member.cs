@@ -24,15 +24,8 @@ namespace DataAccess.Entities
             get => isGuildMaster;
             protected set
             {
-                if (!IsGuildMaster && value && Guild is Guild)
-                {
-                    Guild.DemoteMaster();
-                }
-                else if (IsGuildMaster && !value && Guild is Guild)
-                {
-                    Guild.PromoteMasterSubstitute();
-                }
-                isGuildMaster = value;
+                if (value) BePromoted();
+                else BeDemoted();
             }
         }
         public virtual Guid? GuildId { get; protected set; }
@@ -47,7 +40,7 @@ namespace DataAccess.Entities
             if (invite is Invite receivedInvite
                 && receivedInvite.Guild is Guild invitingGuild
                 && invitingGuild != Guild
-                && receivedInvite.Status == Domain.Enums.InviteStatuses.Pending)
+                && receivedInvite.Status == Domain.Enums.InviteStatuses.Accepted)
             {
                 LeaveGuild();
                 Guild = invitingGuild;
@@ -60,10 +53,7 @@ namespace DataAccess.Entities
         {
             if (!IsGuildMaster && Guild is Guild)
             {
-                if (Guild.Members.Any(m => m.IsGuildMaster))
-                {
-                    Guild.DemoteMaster();
-                }
+                Guild.DemoteMaster();
                 isGuildMaster = true;
             }
             return this;
@@ -73,7 +63,7 @@ namespace DataAccess.Entities
             if (IsGuildMaster && Guild is Guild)
             {
                 isGuildMaster = false;
-                Guild.PromoteMasterSubstitute();
+                Guild.PromoteSubstituteFor(this);
             }
             return this;
         }
@@ -90,7 +80,7 @@ namespace DataAccess.Entities
         public override IValidationResult Validate()
         {
             return string.IsNullOrWhiteSpace(Name)
-                ? new BadRequestValidationResult(nameof(Member)).AddValidationError(nameof(Name), "Can't be null or empty.")
+                ? new BadRequestValidationResult(nameof(Member)).AddValidationErrors(nameof(Name), "Can't be null or empty.")
                 : ValidationResult;
         }
         public override bool Equals(object obj) =>  obj is Member member && member.Id == Id;

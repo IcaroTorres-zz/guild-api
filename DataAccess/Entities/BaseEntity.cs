@@ -13,8 +13,8 @@ namespace DataAccess.Entities
         public Guid Id { get; protected set; } = Guid.NewGuid();
         [NotMapped, JsonIgnore] public virtual IValidationResult ValidationResult { get; set; } = new SuccessValidationResult();
         [NotMapped, JsonIgnore] public virtual bool IsValid => Validate().IsValid;
-        [JsonIgnore] public DateTime CreatedDate { get; protected set; } = DateTime.UtcNow;
-        [JsonIgnore] public DateTime ModifiedDate { get; protected set; } = DateTime.UtcNow;
+        [JsonIgnore] public virtual DateTime CreatedDate { get; protected set; } = DateTime.UtcNow;
+        [JsonIgnore] public virtual DateTime ModifiedDate { get; protected set; } = DateTime.UtcNow;
         [JsonIgnore] public bool Disabled { get; protected set; } = false;
         public virtual IValidationResult Validate() => ValidationResult;
         public DateTime RegisterCreation()

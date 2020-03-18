@@ -12,10 +12,12 @@ namespace DataAccess.Entities
     {
         // EF core suitable parametersless constructor hidden to be called elsewhere
         protected Invite() { }
-        public Invite(Guild guild, Member member) : base()
+        public Invite(Guild guild, Member member)
         {
             Guild = guild;
+            GuildId = guild.Id;
             Member = member;
+            MemberId = member.Id;
         }
         private InviteStatuses status = InviteStatuses.Pending;
         public virtual InviteStatuses Status
@@ -27,8 +29,7 @@ namespace DataAccess.Entities
                 {
                     if (Status == InviteStatuses.Pending && value == InviteStatuses.Accepted)
                     {
-                        Member.JoinGuild(this);
-                        Guild.AcceptMember(Member);
+                        BeAccepted();
                     }
                     status = value;
                 }
@@ -42,9 +43,9 @@ namespace DataAccess.Entities
         {
             if (Status == InviteStatuses.Pending)
             {
+                status = InviteStatuses.Accepted;
                 Member.JoinGuild(this);
                 Guild.AcceptMember(Member);
-                status = InviteStatuses.Accepted;
             }
             return this;
         }
@@ -69,32 +70,32 @@ namespace DataAccess.Entities
             IErrorValidationResult result = null;
             if (Member == null)
             {
-                result = new BadRequestValidationResult(nameof(Invite)).AddValidationError(nameof(Member), "Can't be null.");
+                result = new BadRequestValidationResult(nameof(Invite)).AddValidationErrors(nameof(Member), "Can't be null.");
             }
 
             if (!Member.IsValid)
             {
                 result ??= new ConflictValidationResult(nameof(Invite));
-                result.AddValidationError(nameof(Member), "Is Invalid.");
+                result.AddValidationErrors(nameof(Member), "Is Invalid.");
                 foreach(var error in (Member.ValidationResult as IErrorValidationResult)?.Errors)
                 {
-                    result.AddValidationErrors(error.Key, error.Value);
+                    result.AddValidationErrors(error.Key, error.Value.ToArray());
                 }
             }
 
             if (Guild == null)
             {
                 result ??= new ConflictValidationResult(nameof(Invite));
-                result.AddValidationError(nameof(Guild), "Can't be null.");
+                result.AddValidationErrors(nameof(Guild), "Can't be null.");
             }
 
             if (!Guild.IsValid)
             {
                 result ??= new ConflictValidationResult(nameof(Invite));
-                result.AddValidationError(nameof(Guild), "Is Invalid.");
+                result.AddValidationErrors(nameof(Guild), "Is Invalid.");
                 foreach (var error in (Guild.ValidationResult as IErrorValidationResult)?.Errors)
                 {
-                    result.AddValidationErrors(error.Key, error.Value);
+                    result.AddValidationErrors(error.Key, error.Value.ToArray());
                 }
             }
 
