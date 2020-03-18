@@ -14,6 +14,7 @@
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
+            "enableStepFiltering": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
                 "enabled": false,
