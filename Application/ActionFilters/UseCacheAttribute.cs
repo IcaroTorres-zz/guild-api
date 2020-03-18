@@ -52,12 +52,14 @@ namespace Application.ActionFilters
         private async Task<ActionExecutedContext> ExecuteNextAsync(ActionExecutionDelegate next)
         {
             var executedContext = await next();
-            var okResult = executedContext.Result as OkObjectResult;
-            var createdResult = executedContext.Result as CreatedResult;
-            var entityValue =  (okResult?.Value ?? createdResult?.Value) as BaseEntity;
-            if (entityValue is BaseEntity && entityValue.Validate() is ErrorValidationResult errorInsteadOkResult)
+            if (executedContext.Result is OkObjectResult || executedContext.Result is CreatedAtRouteResult)
             {
-                executedContext.Result = errorInsteadOkResult.AsErrorActionResult();
+                var executedValue = executedContext.Result.GetType().GetProperty("Value").GetValue(executedContext.Result);
+                if (executedValue is BaseEntity entityValue && entityValue.Validate() is ErrorValidationResult errorResult)
+                {
+                    executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
+                    executedContext.Result = errorResult.AsErrorActionResult();
+                }
             }
             return executedContext;
         }

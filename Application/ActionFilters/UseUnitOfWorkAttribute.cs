@@ -16,25 +16,25 @@ namespace Application.ActionFilters
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             UnitOfWork = context.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>().Begin();
-            
             var executedContext = await next();
-            var okResult = executedContext.Result as OkObjectResult;
-            var createdResult = executedContext.Result as CreatedResult;
-            var entityValue =  (okResult?.Value ?? createdResult?.Value) as BaseEntity;
-
-            if (entityValue is BaseEntity && entityValue.Validate() is ErrorValidationResult errorResult)
+            if (executedContext.Result is OkObjectResult || executedContext.Result is CreatedAtRouteResult)
             {
-                executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
-                executedContext.Result = errorResult.AsErrorActionResult();
+                var executedValue = executedContext.Result.GetType().GetProperty("Value").GetValue(executedContext.Result);
+                if (executedValue is BaseEntity entityValue && entityValue.Validate() is ErrorValidationResult errorResult)
+                {
+                    executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
+                    executedContext.Result = errorResult.AsErrorActionResult();
+                }
             }
 
-            if (executedContext.Exception == null && (executedContext.HttpContext.Response.StatusCode < 400))
+            if (executedContext.Exception == null && executedContext.HttpContext.Response.StatusCode < 400)
             {
                 UnitOfWork.Commit();
             }
             else
             {
                 UnitOfWork.RollbackTransaction();
+                throw executedContext.Exception;
             }
         }
     }
