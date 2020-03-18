@@ -11,6 +11,7 @@ namespace DataAccess.Context
     {
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<Invite> Invites { get; set; }
         public DbSet<Membership> Memberships { get; set; }
 
         public ApiContext() { }
