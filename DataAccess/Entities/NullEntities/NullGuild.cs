@@ -23,6 +23,5 @@ namespace DataAccess.Entities.NullEntities
         public override IMember Promote(IMember member) => member;
         public override IMember KickMember(IMember member) => member;
         public override void PromoteSubstituteFor(IMember previousMaster) { }
-        public override void DemoteMaster() { }
     }
 }
