@@ -57,7 +57,7 @@ namespace Api.DataAccess.Migrations
 
                     b.HasIndex("MemberId");
 
-                    b.ToTable("Invite");
+                    b.ToTable("Invites");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Member", b =>
@@ -88,6 +88,8 @@ namespace Api.DataAccess.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Disabled");
 
                     b.Property<DateTime>("Entrance");
 
