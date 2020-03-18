@@ -6,7 +6,6 @@ using Microsoft.Win32.SafeHandles;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using DataAccess.Entities;
 
 namespace DataAccess.Unities
 {
@@ -93,14 +92,7 @@ namespace DataAccess.Unities
         public void Save()
         {
             try { 
-                Context.ChangeTracker
-                    .Entries()
-                    .Where(e => e.State != EntityState.Added
-                             && ((e.Entity is BaseEntity entity && !entity.IsValid)
-                             || (e.Entity is Invite invite && !invite.IsValid)))
-                    .ToList()
-                    .ForEach(x => x.Reload());
-                Context.SaveChanges(); 
+                var changes = Context.SaveChanges(); 
             }
             catch (Exception dbex)
             {
