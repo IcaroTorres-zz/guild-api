@@ -8,7 +8,6 @@ namespace Domain.Entities
         void ChangeName([NotNull] string newName);
         bool IsGuildMember(IMember member);
         IInvite Invite([NotNull] IMember newMember);
-        IInvite CancelInvite([NotNull] IInvite invite);
         IMember AcceptMember([NotNull] IMember member);
         IMember Promote([NotNull] IMember newMaster);
         IMember KickMember([NotNull] IMember member);

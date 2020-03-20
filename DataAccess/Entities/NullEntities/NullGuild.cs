@@ -18,7 +18,6 @@ namespace DataAccess.Entities.NullEntities
         public override IValidationResult Validate() => ValidationResult;
         public override void ChangeName(string newName) { }
         public override IInvite Invite(IMember member) => null;
-        public override IInvite CancelInvite(IInvite invite) => invite;
         public override IMember AcceptMember(IMember member) => member;
         public override IMember Promote(IMember member) => member;
         public override IMember KickMember(IMember member) => member;

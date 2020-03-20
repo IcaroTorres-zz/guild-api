@@ -39,14 +39,6 @@ namespace DataAccess.Entities
 
             return null;
         }
-        public virtual IInvite CancelInvite([NotNull] IInvite invite)
-        {
-            if (invite is Invite inviteToCancel && Invites.Contains(inviteToCancel))
-            {
-                inviteToCancel.BeCanceled();
-            }
-            return invite;
-        }
         public virtual IMember AcceptMember([NotNull] IMember member)
         {
             if (member is Member memberToInvite && !Members.Contains(memberToInvite))
