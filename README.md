@@ -62,7 +62,9 @@ The binaries that are now compiled are available in the src directory. Run Redis
 
 ## Redis Installation (Windows)
 
-Download a compiled windows version from [dmajkic / redis](https://github.com/dmajkic/redis/downloads "github dmajkic/redis download packages"). Set Redis on your environment variables and run `redis-server` on prompt like below:
+ - You can download it directly from **[Redis](https://redis.io/download "redis downloads")** oficiall downloads page, compile with **[Make](http://gnuwin32.sourceforge.net/packages/make.htm "Make page")** for Windows similarly to linux instalation;
+ - Acquire it using **[Chocolatey](https://chocolatey.org/install "Chocolatey")** and installing Redis-64 package with `choco install redis-64` in powershell;
+ - Get a compiled Windows version from [dmajkic / redis](https://github.com/dmajkic/redis/downloads "github dmajkic/redis download packages") and set Redis on your environment variables, and use following command to run a basic configuration of redis on prompt like below:
 
     $ redis-server
 
