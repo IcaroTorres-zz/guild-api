@@ -1,12 +1,14 @@
-﻿using Abstractions.Service;
-using Application.Cache;
+﻿using Application.Cache;
 using DataAccess.Entities;
-using DataAccess.Validations;
+using Domain.Models;
+using Domain.Validations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +47,17 @@ namespace Application.ActionFilters
             var executedContext = await ExecuteNextAsync(next);
             if (executedContext.Result is OkObjectResult okObjectResult)
             {
+                var valueType = okObjectResult.Value.GetType();
+                if (valueType.GetInterfaces().Contains(typeof(IEnumerable)) && valueType.GetGenericArguments().Any())
+                {
+                    okObjectResult.Value = (okObjectResult.Value as IEnumerable<object>)
+                        .Select(item => item
+                        .GetType()
+                        .GetProperty(nameof(DomainModel<Guild>.Entity))
+                        .GetValue(item))
+                        .ToList();
+                }
+
                 await cacheService.CacheResponseAsync(cacheKey, okObjectResult.Value, timeToLive: TimeSpan.FromSeconds(_timeToLiveSeconds));
             }
         }
@@ -52,11 +65,23 @@ namespace Application.ActionFilters
         private async Task<ActionExecutedContext> ExecuteNextAsync(ActionExecutionDelegate next)
         {
             var executedContext = await next();
-            var executedValue = executedContext.Result.GetType().GetProperty("Value")?.GetValue(executedContext.Result);
-            if (executedValue is BaseEntity entityValue && entityValue.Validate() is ErrorValidationResult errorResult)
+            var valueProperty =  executedContext.Result.GetType().GetProperty("Value");
+            var value = valueProperty?.GetValue(executedContext.Result);
+            var validationMethod = value?.GetType().GetMethod(nameof(DomainModel<Guild>.Validate));
+            var validation = validationMethod?.Invoke(value, null);
+            
+            if (validation is IValidationResult)
             {
-                executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
-                executedContext.Result = errorResult.AsErrorActionResult();
+                if (validation is ErrorValidationResult errorResult)
+                {
+                    executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
+                    executedContext.Result = errorResult.AsErrorActionResult();
+                }
+                else
+                {
+                    var entityValue = value.GetType().GetProperty(nameof(DomainModel<Guild>.Entity))?.GetValue(value);
+                    executedContext.Result.GetType().GetProperty("Value")?.SetValue(executedContext.Result, entityValue);
+                }
             }
             return executedContext;
         }

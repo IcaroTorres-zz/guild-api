@@ -1,4 +1,4 @@
-﻿using Domain.Services;
+﻿using Services;
 using Application.ActionFilters;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +26,7 @@ namespace Application.Controllers
         {
             var member = service.Create(payload);
 
-            return CreatedAtRoute("get-member", new { id = member.Id }, member);
+            return CreatedAtRoute("get-member", new { id = member.Entity.Id }, member);
         }
 
         [HttpPut("{id}", Name = "update-member"), UseUnitOfWork]

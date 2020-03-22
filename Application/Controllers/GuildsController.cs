@@ -1,4 +1,4 @@
-﻿using Domain.Services;
+﻿using Services;
 using Application.ActionFilters;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +26,7 @@ namespace Application.Controllers
         {
             var guild = service.Create(payload);
 
-            return CreatedAtRoute("get-guild", new { id = guild.Id } , guild);
+            return CreatedAtRoute("get-guild", new { id = guild.Entity.Id } , guild);
         }
 
         [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]

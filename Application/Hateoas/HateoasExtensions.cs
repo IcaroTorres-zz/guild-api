@@ -1,0 +1,59 @@
+﻿using DataAccess.Entities;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+
+namespace Application.Hateoas
+{
+    public static class HateoasExtensions
+    {
+        private static IMvcCoreBuilder AddHateoasResources(this IMvcCoreBuilder builder, Action<HateoasOptions> options = null)
+        {
+            if (options != null)
+            {
+                builder.Services.Configure(options);
+            }
+            builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            builder.AddMvcOptions(o => o.OutputFormatters.Add(new JsonHateoasFormatter()));
+            return builder;
+        }
+
+        public static IMvcCoreBuilder EnableHateoasOutput(this IMvcCoreBuilder builder)
+        {
+            return builder.AddHateoasResources(options => options
+                .AddLink<List<Guild>>("get-guilds")
+                .AddLink<List<Guild>>("create-guild")
+
+                .AddLink<Guild>("get-guild", e => new { id = e.Id })
+                .AddLink<Guild>("get-members", e => new { guildId = e.Id })
+                .AddLink<Guild>("update-guild", e => new { id = e.Id })
+                .AddLink<Guild>("patch-guild", e => new { id = e.Id })
+                .AddLink<Guild>("delete-guild", e => new { id = e.Id })
+
+                .AddLink<List<Member>>("get-members")
+                .AddLink<List<Member>>("create-member")
+                .AddLink<List<Member>>("invite-member")
+
+                .AddLink<Member>("get-member", e => new { id = e.Id })
+                .AddLink<Member>("get-guild", e => new { id = e.GuildId })
+                .AddLink<Member>("update-member", e => new { id = e.Id })
+                .AddLink<Member>("patch-member", e => new { id = e.Id })
+                .AddLink<Member>("promote-member", e => new { id = e.Id })
+                .AddLink<Member>("demote-member", e => new { id = e.Id })
+                .AddLink<Member>("leave-guild", e => new { id = e.Id })
+                .AddLink<Member>("delete-member", e => new { id = e.Id })
+
+                .AddLink<List<Invite>>("get-invites")
+                .AddLink<List<Invite>>("invite-member")
+
+                .AddLink<Invite>("get-invite", e => new { id = e.Id })
+                .AddLink<Invite>("accept-invite", e => new { id = e.Id })
+                .AddLink<Invite>("decline-invite", e => new { id = e.Id })
+                .AddLink<Invite>("cancel-invite", e => new { id = e.Id })
+                .AddLink<Invite>("delete-invite", e => new { id = e.Id })
+                .AddLink<Invite>("get-guild", e => new { id = e.GuildId })
+                .AddLink<Invite>("get-member", e => new { id = e.MemberId }));
+        }
+    }
+}

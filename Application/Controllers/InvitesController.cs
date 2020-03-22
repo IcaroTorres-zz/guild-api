@@ -1,4 +1,4 @@
-﻿using Domain.Services;
+﻿using Services;
 using Application.ActionFilters;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +26,7 @@ namespace Application.Controllers
         {
             var invite = service.InviteMember(payload);
 
-            return CreatedAtRoute("get-invite", new { id = invite.Id }, invite);
+            return CreatedAtRoute("get-invite", new { id = invite.Entity.Id }, invite);
         }
 
         [HttpPatch("{id}/accept", Name = "accept-invite"), UseUnitOfWork]
