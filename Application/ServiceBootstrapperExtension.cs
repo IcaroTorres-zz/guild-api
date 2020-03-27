@@ -1,12 +1,12 @@
 using DataAccess.Context;
-using Services;
 using DataAccess.Unities;
+using Domain.Models.NullEntities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Domain.Models.NullEntities;
+using Services;
 
 namespace Application.Extensions
 {
@@ -14,12 +14,12 @@ namespace Application.Extensions
     {
         public static IServiceCollection BootstrapServicesRegistration(this IServiceCollection services, IHostingEnvironment appHost, IConfiguration configuration)
         {
-            // DbContext dependency registration
             return services
+                // DbContext dependency registration
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<ApiContext>(options => options
-                    .UseSqlite($"Data Source={appHost.ContentRootPath}/{configuration["SqliteSettings:Source"]}")
-                    .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)))
+                    .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                    .UseSqlite($"Data Source={appHost.ContentRootPath}/{configuration["SqliteSettings:Source"]}"))
 
                 // Custom service layer dependecy registration
                 .AddScoped<IGuildService, GuildService>()

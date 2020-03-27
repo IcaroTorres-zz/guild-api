@@ -111,7 +111,7 @@ namespace Application.Hateoas
 
             foreach (var linkRequirement in options.RequiredLinks.Where(r => r.ResourceType == targetResourceType))
             {
-                var route = actionDescriptorProvider.ActionDescriptors.Items.FirstOrDefault(i => i.AttributeRouteInfo.Name == linkRequirement.Name);
+                var route = actionDescriptorProvider.ActionDescriptors.Items.FirstOrDefault(x => x.AttributeRouteInfo.Name == linkRequirement.Name);
                 if (route != null)
                 {
                     var method = route.ActionConstraints.OfType<HttpMethodActionConstraint>().First().HttpMethods.First();
