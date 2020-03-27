@@ -1,11 +1,11 @@
-﻿using Domain.Validations;
+﻿using DataAccess.Entities;
 using DataAccess.Unities;
+using Domain.Models;
+using Domain.Validations;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using Domain.Models;
-using DataAccess.Entities;
 
 namespace Application.ActionFilters
 {
@@ -17,23 +17,18 @@ namespace Application.ActionFilters
             using var unitOfWork = context.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>().Begin();
 
             var executedContext = await next();
-            var valueProperty =  executedContext.Result.GetType().GetProperty("Value");
+            var valueProperty = executedContext.Result.GetType().GetProperty("Value");
             var value = valueProperty?.GetValue(executedContext.Result);
-            var validationMethod = value?.GetType().GetMethod(nameof(DomainModel<Guild>.Validate));
-            var validation = validationMethod?.Invoke(value, null);
-            
-            if (validation is IValidationResult)
+            var validation = value?.GetType().GetProperty(nameof(DomainModel<Guild>.ValidationResult))?.GetValue(value);
+
+            if (validation is IApiValidationResult apiValidation)
             {
-                if (validation is ErrorValidationResult errorResult)
+                if (apiValidation.IsValid)
                 {
-                    executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
-                    executedContext.Result = errorResult.AsErrorActionResult();
-                }
-                else
-                {
-                    var entityValue = value.GetType().GetProperty(nameof(DomainModel<Guild>.Entity))?.GetValue(value);
+                    var entityValue = value?.GetType().GetProperty(nameof(DomainModel<Guild>.Entity))?.GetValue(value);
                     executedContext.Result.GetType().GetProperty("Value")?.SetValue(executedContext.Result, entityValue);
                 }
+                else executedContext.Result = apiValidation.AsErrorActionResult();
             }
 
             if (executedContext.Exception != null || executedContext.HttpContext.Response.StatusCode >= 400)

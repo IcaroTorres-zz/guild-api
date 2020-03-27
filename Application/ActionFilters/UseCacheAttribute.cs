@@ -51,10 +51,10 @@ namespace Application.ActionFilters
                 if (valueType.GetInterfaces().Contains(typeof(IEnumerable)) && valueType.GetGenericArguments().Any())
                 {
                     okObjectResult.Value = (okObjectResult.Value as IEnumerable<object>)
-                        .Select(item => item
+                        .Select(x => x
                         .GetType()
                         .GetProperty(nameof(DomainModel<Guild>.Entity))
-                        .GetValue(item))
+                        ?.GetValue(x) ?? x)
                         .ToList();
                 }
 
@@ -65,22 +65,22 @@ namespace Application.ActionFilters
         private async Task<ActionExecutedContext> ExecuteNextAsync(ActionExecutionDelegate next)
         {
             var executedContext = await next();
-            var valueProperty =  executedContext.Result.GetType().GetProperty("Value");
+            var valueProperty = executedContext.Result.GetType().GetProperty("Value");
             var value = valueProperty?.GetValue(executedContext.Result);
-            var validationMethod = value?.GetType().GetMethod(nameof(DomainModel<Guild>.Validate));
-            var validation = validationMethod?.Invoke(value, null);
-            
-            if (validation is IValidationResult)
+            var validation = value?.GetType().GetProperty(nameof(DomainModel<Guild>.ValidationResult))?.GetValue(value);
+            //var validation = validationMethod?.Invoke(value, null);
+
+            if (validation is IApiValidationResult apiValidation)
             {
-                if (validation is ErrorValidationResult errorResult)
+                if (apiValidation.IsValid)
                 {
-                    executedContext.HttpContext.Response.StatusCode = (int) errorResult.Status;
-                    executedContext.Result = errorResult.AsErrorActionResult();
+                    var entityValue = value?.GetType().GetProperty(nameof(DomainModel<Guild>.Entity))?.GetValue(value);
+                    executedContext.Result.GetType().GetProperty("Value")?.SetValue(executedContext.Result, entityValue);
                 }
                 else
                 {
-                    var entityValue = value.GetType().GetProperty(nameof(DomainModel<Guild>.Entity))?.GetValue(value);
-                    executedContext.Result.GetType().GetProperty("Value")?.SetValue(executedContext.Result, entityValue);
+                    //executedContext.HttpContext.Response.StatusCode = (int)errorResult.Status;
+                    executedContext.Result = apiValidation.AsErrorActionResult();
                 }
             }
             return executedContext;
