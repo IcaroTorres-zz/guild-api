@@ -1,6 +1,4 @@
-﻿using Domain.Validations;
-using System;
-using DataAccess.Entities;
+﻿using DataAccess.Entities;
 
 namespace Domain.Models.NullEntities
 {
@@ -10,7 +8,5 @@ namespace Domain.Models.NullEntities
         public override InviteModel BeAccepted() => this;
         public override InviteModel BeDeclined() => this;
         public override InviteModel BeCanceled() => this;
-        public override IValidationResult ValidationResult { get => new BadRequestValidationResult(nameof(Invite)); set {} }
-        public override IValidationResult Validate() => ValidationResult;
     }
 }
