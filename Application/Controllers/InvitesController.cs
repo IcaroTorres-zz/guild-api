@@ -1,12 +1,12 @@
-﻿using Services;
-using Application.ActionFilters;
+﻿using Application.ActionFilters;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Services;
 using System;
 
 namespace Application.Controllers
 {
-    [Route("api/[controller]/v1"), ApiController]
+    [ApiController, Route("api/[controller]/v1")]
     public class InvitesController : ControllerBase
     {
         [HttpGet("{id}", Name = "get-invite"), UseCache(20)]

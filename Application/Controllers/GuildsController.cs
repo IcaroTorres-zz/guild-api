@@ -1,12 +1,12 @@
-﻿using Services;
-using Application.ActionFilters;
+﻿using Application.ActionFilters;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Services;
 using System;
 
 namespace Application.Controllers
 {
-    [Route("api/[controller]/v1"), ApiController]
+    [ApiController, Route("api/[controller]/v1")]
     public class GuildsController : ControllerBase
     {
         [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
@@ -26,7 +26,7 @@ namespace Application.Controllers
         {
             var guild = service.Create(payload);
 
-            return CreatedAtRoute("get-guild", new { id = guild.Entity.Id } , guild);
+            return CreatedAtRoute("get-guild", new { id = guild.Entity.Id }, guild);
         }
 
         [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]
