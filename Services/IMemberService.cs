@@ -1,9 +1,9 @@
-using Domain.DTOs;
 using DataAccess.Entities;
+using Domain.DTOs;
+using Domain.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
-using Domain.Models;
 
 namespace Services
 {
