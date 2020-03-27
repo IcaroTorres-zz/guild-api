@@ -1,4 +1,5 @@
 using DataAccess.Entities;
+using DataAccess.Maps;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -13,8 +14,11 @@ namespace DataAccess.Context
         public ApiContext(DbContextOptions<ApiContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.HasDefaultSchema("dbo");
-            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            builder.HasDefaultSchema("dbo")
+                .ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly())
+                .SeedEntities()
+                .EnableGuidToStringConversion();
+
             base.OnModelCreating(builder);
         }
     }
