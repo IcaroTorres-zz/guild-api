@@ -1,16 +1,27 @@
 using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 
-namespace Data.Maps
+namespace DataAccess.Maps
 {
     public class GuildMap : IEntityTypeConfiguration<Guild>
     {
         public void Configure(EntityTypeBuilder<Guild> builder)
         {
-            builder.HasMany(g => g.Members).WithOne(m => m.Guild).HasForeignKey(m => m.GuildId).OnDelete(DeleteBehavior.Restrict);
-            builder.Property(g => g.CreatedDate).ValueGeneratedOnAdd().HasDefaultValueSql("GETUTCDATE()");
-            builder.Property(g => g.ModifiedDate).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
+            builder.HasKey(x => x.Id);
+            builder.HasIndex(u => u.Name)
+                .IsUnique();
+            builder.HasMany(x => x.Members)
+                .WithOne(x => x.Guild)
+                .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Property(x => x.CreatedDate)
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            builder.Property(x => x.ModifiedDate)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         }
     }
 }
