@@ -12,6 +12,7 @@ namespace DataAccess.Unities
     {
         private readonly ApiContext Context;
         private IDbContextTransaction ContextTransaction;
+        private int Changes = 0;
 
         protected bool Disposed { get; set; } = false;
         protected SafeHandle Handle { get; } = new SafeFileHandle(IntPtr.Zero, true);
@@ -70,28 +71,31 @@ namespace DataAccess.Unities
         /// <summary>
         /// Try committing all changes in transaction and perform Rollback if fail
         /// </summary>
-        public void Commit()
+        public int Commit()
         {
             try
             {
                 Save();
-
-                if (ContextTransaction != null)
+                if (Changes > 0)
                 {
-                    ContextTransaction.GetDbTransaction().Commit();
+                    ContextTransaction?.GetDbTransaction().Commit();
                 }
+                return Changes;
             }
             catch (Exception dbex)
             {
                 RollbackTransaction();
-                throw dbex;
+                throw new DbUpdateException("Data constraint violation. Register is invalid or Already exists.", dbex);
             }
         }
 
-        public void Save()
+        public int Save()
         {
-            try { 
-                var changes = Context.SaveChanges(); 
+            try
+            {
+                var newCanges = Context.SaveChanges();
+                Changes += newCanges;
+                return newCanges;
             }
             catch (Exception dbex)
             {

@@ -12,9 +12,12 @@ namespace DataAccess.Unities
         /// <summary>
         /// Try committing all changes in transaction and perform Rollback if fail
         /// </summary>
-        void Commit();
+        int Commit();
 
-        void Save();
+        /// <summary>
+        /// Try saving a state of transaction and Rollback that changes if fail
+        /// </summary>
+        int Save();
 
         /// <summary>
         /// Discard all unsaved changes, dispatched when Commit fails and used when some part of a transaction fails
