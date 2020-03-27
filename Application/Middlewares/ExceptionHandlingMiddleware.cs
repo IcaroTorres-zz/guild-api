@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 
 namespace Application.Middlewares
 {
@@ -23,6 +24,10 @@ namespace Application.Middlewares
             {
                 await next(context);
             }
+            catch (DbUpdateException ex)
+            {
+                await HandleExceptionAsync(context, ex);
+            }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, ex);
@@ -31,13 +36,20 @@ namespace Application.Middlewares
 
         private static Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
-            var status = (int) HttpStatusCode.InternalServerError;
-            var errors = GenerateExceptionErrorMessages(ex);
-            var result = JsonConvert.SerializeObject(new { status, errors }, Formatting.Indented);
+            return WriteResponseAsync(context, (int)HttpStatusCode.InternalServerError, GenerateExceptionErrorMessages(ex));
+        }
 
+        private static Task HandleExceptionAsync(HttpContext context, DbUpdateException ex)
+        {
+            return WriteResponseAsync(context, (int)HttpStatusCode.Conflict, new[] { ex.Message });
+        }
+
+        private static Task WriteResponseAsync(HttpContext context, int status, IEnumerable<object> errors)
+        {
+            var stringResult = JsonConvert.SerializeObject(new { status, errors }, Formatting.Indented);
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int) status;
-            return context.Response.WriteAsync(result);
+            context.Response.StatusCode = status;
+            return context.Response.WriteAsync(stringResult);
         }
 
         private static List<string> GenerateExceptionErrorMessages(Exception ex)
