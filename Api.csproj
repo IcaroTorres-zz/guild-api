@@ -5,6 +5,10 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <LangVersion>8.0</LangVersion>
     <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+    <Nullable>enable</Nullable>
+    <Authors>Icaro Torres</Authors>
+    <Product>Guild-Api</Product>
+    <RepositoryUrl>https://github.com/icarotorres/guild-api.git</RepositoryUrl>
   </PropertyGroup>
   
   <ItemGroup>
@@ -13,6 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="8.6.2" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
@@ -28,5 +34,4 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-
 </Project>

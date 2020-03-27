@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Application.Cache;
+using Application.Extensions;
+using Application.Hateoas;
+using Application.Middlewares;
+using Application.Swagger;
+using Domain.Models;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
-using Application.Extensions;
-using Application.Swagger;
-using Application.Middlewares;
-using Application.Cache;
-using Application.Hateoas;
 
 namespace api
 {
@@ -40,6 +42,19 @@ namespace api
 
                 // enabling Mvc framework services and resources
                 .AddMvcCore()
+                
+                // Default framework order
+                .AddFormatterMappings()
+                .AddCacheTagHelper()
+                .AddDataAnnotations()
+                
+                // enabling validations
+                .AddFluentValidation(fv =>
+                {
+                    fv.ImplicitlyValidateChildProperties = true;
+                    fv.RegisterValidatorsFromAssemblyContaining<GuildModel>();
+                })
+
                 .AddApiExplorer()
                 .AddJsonFormatters(options =>
                 {
