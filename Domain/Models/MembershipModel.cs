@@ -1,4 +1,6 @@
 ﻿using DataAccess.Entities;
+using Domain.Validations;
+using FluentValidation;
 using System;
 
 namespace Domain.Models
@@ -9,13 +11,32 @@ namespace Domain.Models
         public MembershipModel(GuildModel guild, MemberModel member) : base(new Membership())
         {
             Entity.Guild = guild.Entity;
+            Entity.GuildId = guild.Entity.Id;
             Entity.Member = member.Entity;
+            Entity.MemberId = member.Entity.Id;
         }
         public MembershipModel RegisterExit()
         {
-            Entity.Exit = DateTime.UtcNow;
+            Entity.Until = DateTime.UtcNow;
             return this;
         }
-        public TimeSpan GetDuration() => (Entity.Exit ?? DateTime.UtcNow).Subtract(Entity.Entrance);
+        public TimeSpan GetDuration()
+        {
+            return (Entity.Until ?? DateTime.UtcNow).Subtract(Entity.Since);
+        }
+        public override IApiValidationResult Validate()
+        {
+            RuleFor(x => x.Since).NotEmpty();
+
+            RuleFor(x => x.MemberId).NotEmpty().NotEqual(Guid.Empty);
+
+            RuleFor(x => x.GuildId).NotEmpty().NotEqual(Guid.Empty);
+
+            RuleFor(x => x.Member.Id).Equal(x => x.MemberId).Unless(x => x.Member == null);
+
+            RuleFor(x => x.Guild.Id).Equal(x => x.GuildId).Unless(x => x.Guild == null);
+
+            return base.Validate();
+        }
     }
 }

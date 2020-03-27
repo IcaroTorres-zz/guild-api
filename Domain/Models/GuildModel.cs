@@ -1,9 +1,9 @@
 using DataAccess.Entities;
+using Domain.Models.NullEntities;
 using Domain.Validations;
+using FluentValidation;
 using JetBrains.Annotations;
-using System;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace Domain.Models
 {
@@ -20,17 +20,21 @@ namespace Domain.Models
         {
             Entity.Name = newName;
         }
-        public bool IsGuildMember(MemberModel member) => Entity.Members.Contains(member.Entity);
+        public bool IsGuildMember(MemberModel member)
+        {
+            return Entity.Members.Contains(member.Entity);
+        }
+
         public virtual InviteModel Invite([NotNull] MemberModel member)
         {
             if (member is MemberModel && member.Entity is Member memberToInvite && !Entity.Members.Contains(memberToInvite))
             {
-                var newInvite = new Invite { MemberId = memberToInvite.Id, GuildId = Entity.Id };
-                Entity.Invites.Add(newInvite);
-                return new InviteModel(newInvite);
+                var inviteModel = new InviteModel(this, member);
+                Entity.Invites.Add(inviteModel.Entity);
+                return inviteModel;
             }
 
-            return null;
+            return new NullInvite();
         }
         public virtual MemberModel AcceptMember([NotNull] MemberModel member)
         {
@@ -50,14 +54,13 @@ namespace Domain.Models
         }
         public virtual MemberModel Promote([NotNull] MemberModel member)
         {
-            switch (member)
+            return member switch
             {
-                case MemberModel memberToPromote when Entity.Members.Contains(memberToPromote.Entity):
-                    return memberToPromote.BePromoted();
-                default:
-                    return member;
-            }
+                MemberModel memberToPromote when Entity.Members.Contains(memberToPromote.Entity) => memberToPromote.BePromoted(),
+                _ => member,
+            };
         }
+
         public virtual MemberModel KickMember([NotNull] MemberModel member)
         {
             if (member is MemberModel memberToKick && Entity.Members.Contains(memberToKick.Entity))
@@ -70,46 +73,26 @@ namespace Domain.Models
             }
             return member;
         }
-        public override IValidationResult Validate()
+        public override IApiValidationResult Validate()
         {
-            IErrorValidationResult result = null;
-            if (string.IsNullOrWhiteSpace(Entity.Name))
-            {
-                result ??= new BadRequestValidationResult(nameof(Guild));
-                result.AddValidationErrors(nameof(Entity.Name), "Can't be null or empty.");
-            }
+            RuleFor(x => x.Name).NotEmpty();
+            
+            RuleFor(x => x.Members)
+                .Must(x => x.Any(m => m.IsGuildMaster))
+                .ForEach(memberRule => memberRule
+                    .NotEmpty()
+                    .Must(x => !x.Disabled)
+                    .Must(x => x.GuildId == Entity.Id)
+                    .Must(x => x.Guild.Invites.Any(i => i.MemberId == x.Id)))
+                .Unless(x => !x.Members?.Any() ?? true);
 
-            if (Entity.Members is null || !Entity.Members.Any())
-            {
-                result ??= new BadRequestValidationResult(nameof(Guild));
-                result.AddValidationErrors(nameof(Entity.Members), "Can't be null or empty list.");
-            }
+            RuleForEach(x => x.Invites)
+                .NotEmpty()
+                .Must(x => !x.Disabled)
+                .Must(x => x.GuildId == Entity.Id)
+                .Unless(x => x.Invites == null);
 
-            if (Entity.Members != null)
-            {
-                foreach (var error in Entity.Members.Select(m => new MemberModel(m).ValidationResult)
-                                                    .OfType<ErrorValidationResult>()
-                                                    .SelectMany(m => m.Errors))
-                {
-                    result ??= new ConflictValidationResult(nameof(Guild));
-                    result.AddValidationErrors(error.Key, error.Value.ToArray());
-                }
-            }
-
-            if (Entity.Invites != null)
-            {
-                foreach (var error in Entity.Invites.Select(i => new InviteModel(i).ValidationResult)
-                                                    .OfType<ErrorValidationResult>()
-                                                    .SelectMany(i => i.Errors))
-                {
-                    result ??= new ConflictValidationResult(nameof(Guild));
-                    result.AddValidationErrors(error.Key, error.Value.ToArray());
-                }
-            }
-
-            ValidationResult = result ?? ValidationResult;
-
-            return ValidationResult;
+            return base.Validate();
         }
     }
 }

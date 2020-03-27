@@ -1,8 +1,10 @@
+using DataAccess.Entities;
 using Domain.Validations;
+using FluentValidation;
 using JetBrains.Annotations;
 using System;
 using System.Linq;
-using DataAccess.Entities;
+using System.Net;
 
 namespace Domain.Models
 {
@@ -19,13 +21,16 @@ namespace Domain.Models
             if (invite is InviteModel receivedInvite
                 && receivedInvite.Entity.Guild is Guild invitingGuild
                 && invitingGuild != Entity.Guild
-                && receivedInvite.Entity.Status == Domain.Enums.InviteStatuses.Accepted)
+                && receivedInvite.Entity.Status == InviteStatuses.Accepted)
             {
                 LeaveGuild();
                 Entity.Guild = invitingGuild;
+                Entity.GuildId = invitingGuild.Id;
                 Entity.Memberships.Add(new Membership
-                { 
-                    GuildId = invitingGuild.Id,
+                {
+                    Guild = Entity.Guild,
+                    GuildId = Entity.GuildId.Value,
+                    Member = Entity,
                     MemberId = Entity.Id
                 });
             }
@@ -36,9 +41,9 @@ namespace Domain.Models
             if (Entity.Guild is Guild)
             {
                 Entity.Guild.Members
-                     .Where(m => m.IsGuildMaster && m.Id != Entity.Id)
+                     .Where(x => x.IsGuildMaster && x.Id != Entity.Id)
                      .ToList()
-                     .ForEach(m => m.IsGuildMaster = false);
+                     .ForEach(x => x.IsGuildMaster = false);
 
                 Entity.IsGuildMaster = true;
             }
@@ -53,25 +58,13 @@ namespace Domain.Models
                     Entity.IsGuildMaster = false;
 
                     var newMaster = Entity.Guild.Members
-                        .OrderByDescending(m => new MembershipModel(m.Memberships
-                            .SingleOrDefault(ms => ms.Exit == null))
+                        .OrderByDescending(x => new MembershipModel(x.Memberships
+                            .SingleOrDefault(x => x.Until == null))
                             ?.GetDuration())
-                        .FirstOrDefault(m => m.Id != Entity.Id && !m.IsGuildMaster);
+                        .FirstOrDefault(x => x.Id != Entity.Id && !x.IsGuildMaster);
 
                     if (newMaster is Member)
                         new MemberModel(newMaster).BePromoted();
-                }
-                else
-                {
-                    var memberTypeName = nameof(Member);
-                    var guildTypeName = nameof(Guild);
-                    var conflictKey = $"{guildTypeName}.{nameof(Guild.Members)}";
-                    var conflictMessages = new string [2]
-                    {
-                        $"Can not {nameof(BeDemoted)} due to be the last {memberTypeName} left in {guildTypeName}.",
-                        $"Consider leaving the {guildTypeName}."
-                    };
-                    ValidationResult = new ConflictValidationResult(memberTypeName).AddValidationErrors(conflictKey, conflictMessages);
                 }
             }
             return this;
@@ -81,10 +74,10 @@ namespace Domain.Models
             if (Entity.Guild is Guild)
             {
                 var membership = Entity.Memberships
-                    .OrderBy(ms => ms.Entrance)
+                    .OrderBy(x => x.Since)
                     .LastOrDefault();
 
-                if (membership is Membership)    
+                if (membership is Membership)
                     new MembershipModel(membership).RegisterExit();
 
                 new GuildModel(Entity.Guild).KickMember(this);
@@ -92,11 +85,33 @@ namespace Domain.Models
             }
             return this;
         }
-        public override IValidationResult Validate()
+        public override IApiValidationResult Validate()
         {
-            return string.IsNullOrWhiteSpace(Entity.Name)
-                ? new BadRequestValidationResult(nameof(Member)).AddValidationErrors(nameof(Entity.Name), "Can't be null or empty.")
-                : ValidationResult;
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+
+            RuleFor(x => x.GuildId)
+                .NotEmpty()
+                .NotEqual(Guid.Empty)
+                .Unless(x => x.Guild == null)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+
+            RuleFor(x => x.Guild.Id)
+                .Equal(x => x.GuildId.Value)
+                .Unless(x => x.Guild == null)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+
+            RuleFor(x => x.Memberships)
+                .Must(x => x.Any(ms
+                    => ms.MemberId == Entity.Id
+                    && ms.GuildId == Entity.GuildId
+                    && ms.Until == null
+                    && !ms.Disabled))
+                .Unless(x => !x.Memberships?.Any() ?? true)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+
+            return base.Validate();
         }
     }
 }

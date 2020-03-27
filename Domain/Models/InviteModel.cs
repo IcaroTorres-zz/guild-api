@@ -1,7 +1,9 @@
-﻿using Domain.Validations;
-using Domain.Enums;
+﻿using DataAccess.Entities;
+using Domain.Validations;
+using FluentValidation;
 using System;
-using DataAccess.Entities;
+using System.Linq;
+using System.Net;
 
 namespace Domain.Models
 {
@@ -11,15 +13,17 @@ namespace Domain.Models
         public InviteModel(GuildModel guild, MemberModel member) : base(new Invite())
         {
             Entity.Guild = guild.Entity;
+            Entity.GuildId = guild.Entity.Id;
             Entity.Member = member.Entity;
+            Entity.MemberId = member.Entity.Id;
         }
         public virtual InviteModel BeAccepted()
         {
             if (Entity.Status == InviteStatuses.Pending)
             {
                 Entity.Status = InviteStatuses.Accepted;
-                var guildModel = new GuildModel(Entity.Guild);
                 var memberModel = new MemberModel(Entity.Member);
+                var guildModel = new GuildModel(Entity.Guild);
                 guildModel.AcceptMember(memberModel.JoinGuild(this));
             }
             return this;
@@ -40,43 +44,38 @@ namespace Domain.Models
             }
             return this;
         }
-        public override IValidationResult Validate()
+        public override IApiValidationResult Validate()
         {
-            IErrorValidationResult result = null;
-            if (Entity.Member == null)
-            {
-                result = new BadRequestValidationResult(nameof(Invite)).AddValidationErrors(nameof(Member), "Can't be null.");
-            }
+            RuleFor(x => x.MemberId)
+                .NotEmpty()
+                .NotEqual(Guid.Empty)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
 
-            var memberModel = new MemberModel(Entity.Member);
-            if (!memberModel.IsValid)
-            {
-                result ??= new ConflictValidationResult(nameof(Invite));
-                result.AddValidationErrors(nameof(Member), "Is Invalid.");
-                foreach(var error in (memberModel.ValidationResult as IErrorValidationResult)?.Errors)
-                {
-                    result.AddValidationErrors(error.Key, error.Value.ToArray());
-                }
-            }
+            RuleFor(x => x.GuildId)
+                .NotEmpty()
+                .NotEqual(Guid.Empty)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
 
-            if (Entity.Guild == null)
-            {
-                result ??= new ConflictValidationResult(nameof(Invite));
-                result.AddValidationErrors(nameof(Guild), "Can't be null.");
-            }
+            RuleFor(x => x.Member.Id)
+                .Equal(x => x.MemberId)
+                .Unless(x => x.Member == null)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
 
-            var guildModel = new GuildModel(Entity.Guild);
-            if (!guildModel.IsValid)
-            {
-                result ??= new ConflictValidationResult(nameof(Invite));
-                result.AddValidationErrors(nameof(Guild), "Is Invalid.");
-                foreach (var error in (guildModel.ValidationResult as IErrorValidationResult)?.Errors)
-                {
-                    result.AddValidationErrors(error.Key, error.Value.ToArray());
-                }
-            }
+            RuleFor(x => x.Guild.Id)
+                .Equal(x => x.GuildId)
+                .Unless(x => x.Guild == null)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
 
-            return result ?? ValidationResult;
+            RuleFor(x => x.Status)
+                .IsInEnum<Invite, InviteStatuses>()
+                .WithErrorCode(((int)HttpStatusCode.BadRequest).ToString());
+
+            RuleFor(x => x.Member.Memberships)
+                .Must(x => x.Any(ms => ms.MemberId == Entity.MemberId && ms.GuildId == Entity.GuildId))
+                .When(x => x.Status == InviteStatuses.Accepted && x.Member != null && x.Member.Memberships != null)
+                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+
+            return base.Validate();
         }
     }
 }
