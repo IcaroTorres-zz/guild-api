@@ -1,12 +1,13 @@
+using Business.Services;
 using DataAccess.Context;
 using DataAccess.Unities;
-using Domain.Models.NullEntities;
+using Domain.Services;
+using Domain.Unities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Services;
 
 namespace Application.Extensions
 {
@@ -25,8 +26,7 @@ namespace Application.Extensions
                 .AddScoped<IGuildService, GuildService>()
                 .AddScoped<IMemberService, MemberService>()
                 .AddScoped<IInviteService, InviteService>()
-                .AddScoped<IUnitOfWork, UnitOfWork>()
-                .AddScoped<NullEntityFactory>();
+                .AddScoped<IUnitOfWork, UnitOfWork>();
         }
     }
 }

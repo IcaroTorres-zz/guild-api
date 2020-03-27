@@ -1,11 +1,11 @@
-using DataAccess.Entities;
 using Domain.DTOs;
+using Domain.Entities;
 using Domain.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
 
-namespace Services
+namespace Domain.Services
 {
     public interface IMemberService
     {

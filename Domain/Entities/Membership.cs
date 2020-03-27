@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DataAccess.Entities
+namespace Domain.Entities
 {
     [Serializable]
     public class Membership : EntityModel<Membership>

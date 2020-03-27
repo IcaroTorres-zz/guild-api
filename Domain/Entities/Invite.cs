@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace DataAccess.Entities
+namespace Domain.Entities
 {
     [Serializable]
     public class Invite : EntityModel<Invite>

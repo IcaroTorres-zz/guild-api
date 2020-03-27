@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace api
+namespace Application
 {
     public class Startup
     {
@@ -42,12 +42,12 @@ namespace api
 
                 // enabling Mvc framework services and resources
                 .AddMvcCore()
-                
+
                 // Default framework order
                 .AddFormatterMappings()
                 .AddCacheTagHelper()
                 .AddDataAnnotations()
-                
+
                 // enabling validations
                 .AddFluentValidation(fv =>
                 {

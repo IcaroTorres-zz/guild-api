@@ -1,5 +1,5 @@
 ﻿using Application.Cache;
-using DataAccess.Entities;
+using Domain.Entities;
 using Domain.Models;
 using Domain.Validations;
 using Microsoft.AspNetCore.Http;
@@ -68,7 +68,6 @@ namespace Application.ActionFilters
             var valueProperty = executedContext.Result.GetType().GetProperty("Value");
             var value = valueProperty?.GetValue(executedContext.Result);
             var validation = value?.GetType().GetProperty(nameof(DomainModel<Guild>.ValidationResult))?.GetValue(value);
-            //var validation = validationMethod?.Invoke(value, null);
 
             if (validation is IApiValidationResult apiValidation)
             {
@@ -79,7 +78,7 @@ namespace Application.ActionFilters
                 }
                 else
                 {
-                    //executedContext.HttpContext.Response.StatusCode = (int)errorResult.Status;
+                    executedContext.HttpContext.Response.StatusCode = apiValidation.Status;
                     executedContext.Result = apiValidation.AsErrorActionResult();
                 }
             }

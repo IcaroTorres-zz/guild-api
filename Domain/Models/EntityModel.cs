@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace DataAccess.Entities
+namespace Domain.Entities
 {
     [Serializable]
     public abstract class EntityModel<T> where T : EntityModel<T>
@@ -20,7 +20,14 @@ namespace DataAccess.Entities
         {
             return (a is null && b is null) || !(a is null || b is null) || a.Equals(b);
         }
-        public static bool operator !=(EntityModel<T> a, EntityModel<T> b) => !(a == b);
-        public override int GetHashCode() => Id.GetHashCode();
+        public static bool operator !=(EntityModel<T> a, EntityModel<T> b)
+        {
+            return !(a == b);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }

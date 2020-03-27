@@ -1,10 +1,10 @@
-using DataAccess.Entities;
+using Domain.Entities;
 using Domain.Models;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Services
+namespace Domain.Services
 {
     public interface IService
     {

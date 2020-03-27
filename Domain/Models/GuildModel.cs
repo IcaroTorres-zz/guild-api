@@ -1,4 +1,4 @@
-using DataAccess.Entities;
+using Domain.Entities;
 using Domain.Models.NullEntities;
 using Domain.Validations;
 using FluentValidation;
@@ -76,7 +76,7 @@ namespace Domain.Models
         public override IApiValidationResult Validate()
         {
             RuleFor(x => x.Name).NotEmpty();
-            
+
             RuleFor(x => x.Members)
                 .Must(x => x.Any(m => m.IsGuildMaster))
                 .ForEach(memberRule => memberRule
@@ -84,7 +84,7 @@ namespace Domain.Models
                     .Must(x => !x.Disabled)
                     .Must(x => x.GuildId == Entity.Id)
                     .Must(x => x.Guild.Invites.Any(i => i.MemberId == x.Id)))
-                .Unless(x => !x.Members?.Any() ?? true);
+                .When(x => x.Members.Any());
 
             RuleForEach(x => x.Invites)
                 .NotEmpty()

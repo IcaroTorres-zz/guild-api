@@ -1,6 +1,6 @@
-﻿using DataAccess.Entities;
-using DataAccess.Unities;
+﻿using Domain.Entities;
 using Domain.Models;
+using Domain.Unities;
 using Domain.Validations;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +28,11 @@ namespace Application.ActionFilters
                     var entityValue = value?.GetType().GetProperty(nameof(DomainModel<Guild>.Entity))?.GetValue(value);
                     executedContext.Result.GetType().GetProperty("Value")?.SetValue(executedContext.Result, entityValue);
                 }
-                else executedContext.Result = apiValidation.AsErrorActionResult();
+                else
+                {
+                    executedContext.HttpContext.Response.StatusCode = apiValidation.Status;
+                    executedContext.Result = apiValidation.AsErrorActionResult();
+                }
             }
 
             if (executedContext.Exception != null || executedContext.HttpContext.Response.StatusCode >= 400)

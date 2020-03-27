@@ -19,7 +19,7 @@ namespace Api.DataAccess.Migrations
                 .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
-            modelBuilder.Entity("DataAccess.Entities.Guild", b =>
+            modelBuilder.Entity("Domain.Entities.Guild", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -62,7 +62,7 @@ namespace Api.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Invite", b =>
+            modelBuilder.Entity("Domain.Entities.Invite", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -206,7 +206,7 @@ namespace Api.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Member", b =>
+            modelBuilder.Entity("Domain.Entities.Member", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -308,7 +308,7 @@ namespace Api.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Membership", b =>
+            modelBuilder.Entity("Domain.Entities.Membership", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -442,35 +442,35 @@ namespace Api.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Invite", b =>
+            modelBuilder.Entity("Domain.Entities.Invite", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Guild", "Guild")
+                    b.HasOne("Domain.Entities.Guild", "Guild")
                         .WithMany("Invites")
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("DataAccess.Entities.Member", "Member")
+                    b.HasOne("Domain.Entities.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Member", b =>
+            modelBuilder.Entity("Domain.Entities.Member", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Guild", "Guild")
+                    b.HasOne("Domain.Entities.Guild", "Guild")
                         .WithMany("Members")
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Membership", b =>
+            modelBuilder.Entity("Domain.Entities.Membership", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Guild", "Guild")
+                    b.HasOne("Domain.Entities.Guild", "Guild")
                         .WithMany()
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("DataAccess.Entities.Member", "Member")
+                    b.HasOne("Domain.Entities.Member", "Member")
                         .WithMany("Memberships")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict);

@@ -1,4 +1,4 @@
-﻿using DataAccess.Entities;
+﻿using Domain.Entities;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System;

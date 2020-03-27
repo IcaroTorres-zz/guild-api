@@ -1,10 +1,9 @@
-using DataAccess.Entities;
+using Domain.Entities;
 using Domain.Validations;
 using FluentValidation;
 using JetBrains.Annotations;
 using System;
 using System.Linq;
-using System.Net;
 
 namespace Domain.Models
 {
@@ -58,9 +57,7 @@ namespace Domain.Models
                     Entity.IsGuildMaster = false;
 
                     var newMaster = Entity.Guild.Members
-                        .OrderByDescending(x => new MembershipModel(x.Memberships
-                            .SingleOrDefault(x => x.Until == null))
-                            ?.GetDuration())
+                        .OrderByDescending(x => new MembershipModel(x.Memberships.SingleOrDefault(x => x.Until == null))?.GetDuration())
                         .FirstOrDefault(x => x.Id != Entity.Id && !x.IsGuildMaster);
 
                     if (newMaster is Member)
@@ -87,20 +84,16 @@ namespace Domain.Models
         }
         public override IApiValidationResult Validate()
         {
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+            RuleFor(x => x.Name).NotEmpty();
 
             RuleFor(x => x.GuildId)
                 .NotEmpty()
                 .NotEqual(Guid.Empty)
-                .Unless(x => x.Guild == null)
-                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+                .Unless(x => x.Guild == null);
 
             RuleFor(x => x.Guild.Id)
                 .Equal(x => x.GuildId.Value)
-                .Unless(x => x.Guild == null)
-                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+                .Unless(x => x.Guild == null);
 
             RuleFor(x => x.Memberships)
                 .Must(x => x.Any(ms
@@ -108,8 +101,7 @@ namespace Domain.Models
                     && ms.GuildId == Entity.GuildId
                     && ms.Until == null
                     && !ms.Disabled))
-                .Unless(x => !x.Memberships?.Any() ?? true)
-                .WithErrorCode(((int)HttpStatusCode.Conflict).ToString());
+                .When(x => x.Memberships.Any() && Entity.GuildId != null);
 
             return base.Validate();
         }

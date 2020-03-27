@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace DataAccess.Entities
+namespace Domain.Entities
 {
     [Serializable]
     public class Guild : EntityModel<Guild>

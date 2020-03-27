@@ -1,4 +1,4 @@
-using DataAccess.Entities;
+using Domain.Entities;
 using Domain.Validations;
 using FluentValidation;
 using System;
@@ -27,8 +27,15 @@ namespace Domain.Models
             return (a is null && b is null) || !(a is null || b is null) || a.Equals(b);
         }
 
-        public static bool operator !=(DomainModel<T> a, DomainModel<T> b) => !(a == b);
-        public override int GetHashCode() => Entity.Id.GetHashCode();
+        public static bool operator !=(DomainModel<T> a, DomainModel<T> b)
+        {
+            return !(a == b);
+        }
+
+        public override int GetHashCode()
+        {
+            return Entity.Id.GetHashCode();
+        }
 
         public virtual IApiValidationResult ValidationResult => Validate();
         public virtual IApiValidationResult Validate()
@@ -44,10 +51,36 @@ namespace Domain.Models
 
             return new ApiValidationResult(Validate(Entity));
         }
+
+
         public virtual bool IsValid => Validate().IsValid;
+    }
+    public class Invalidator<T> : AbstractValidator<T> where T : EntityModel<T>
+    {
+        public virtual T Entity { get; }
+        public Invalidator(T entity)
+        {
+            Entity = entity;
 
+            var resourceName = typeof(T).Name;
+            RuleFor(x => x)
+                .Must(x => x is null)
+                .When(x => x.Id != Guid.Empty)
+                .WithErrorCode("404")
+                .WithName(resourceName)
+                .WithSeverity(Severity.Warning)
+                .WithMessage($"{resourceName} not found.");
 
-        //[JsonIgnore] public virtual IValidationResult ValidationResult { get; set; } = new SuccessValidationResult();
-        //public virtual IValidationResult Validate() => ValidationResult;
+            RuleFor(x => x)
+                .Must(x => x.Id != Guid.Empty)
+                .WithErrorCode("409")
+                .WithName(resourceName)
+                .WithSeverity(Severity.Warning)
+                .WithMessage($"{resourceName} is invalid for this request.");
+        }
+        public virtual IApiValidationResult Validate()
+        {
+            return new ApiValidationResult(Validate(Entity));
+        }
     }
 }

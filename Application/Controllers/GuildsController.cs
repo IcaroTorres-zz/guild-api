@@ -1,7 +1,7 @@
 ﻿using Application.ActionFilters;
 using Domain.DTOs;
+using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
-using Services;
 using System;
 
 namespace Application.Controllers

@@ -1,7 +1,8 @@
 using Application.ActionFilters;
-using DataAccess.Entities;
+using Business.Services;
+using Domain.Entities;
+using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
-using Services;
 
 namespace Application.Controllers
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DataAccess.Unities
+namespace Domain.Unities
 {
     public interface IUnitOfWork : IDisposable
     {

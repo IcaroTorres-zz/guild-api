@@ -1,15 +1,15 @@
 using DataAccess.Context;
-using DataAccess.Entities;
 using Domain.DTOs;
+using Domain.Entities;
 using Domain.Models;
 using Domain.Models.NullEntities;
-using Domain.Validations;
+using Domain.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Services
+namespace Business.Services
 {
     public class MemberService : BaseService, IMemberService
     {
@@ -17,14 +17,6 @@ namespace Services
 
         public MemberModel Create(MemberDto payload)
         {
-            //if ((Query<Member>(p => p.Name.Equals(payload.Name)).SingleOrDefault() is Member member))
-            //{
-            //    return new MemberModel(member)
-            //    {
-            //        ValidationResult = new ConflictValidationResult(nameof(Member))
-            //        .AddValidationErrors(nameof(Member.Name), $"With given name '{payload.Name}' already exists.")
-            //    };
-            //}
             var memberModel = new MemberModel(payload.Name);
             memberModel.Entity = Insert(memberModel);
 
@@ -37,7 +29,7 @@ namespace Services
             if (payload.GuildId is Guid guildId && guildId != Guid.Empty)
             {
                 var guildEntity = GetByKeys<Guild>((object)guildId);
-                var guildModel = guildEntity is Guild ? new GuildModel(guildEntity) : new NullGuild();
+                var guildModel = ModelFactory.ConstructWith<GuildModel, Guild>(guildEntity);
                 guildModel.Invite(memberModel).BeAccepted();
             }
             else
@@ -50,18 +42,25 @@ namespace Services
         }
         public MemberModel Patch(Guid id, JsonPatchDocument<Member> payload)
         {
-            if (GetByKeys<Member>((object)id) is Member memberEntity)
-            {
-                payload.ApplyTo(memberEntity);
-
-                return new MemberModel(memberEntity);
-            }
-
-            return new NullMember();
+            var memberModel = Get(id);
+            payload.ApplyTo(memberModel.Entity);
+            return memberModel;
         }
-        public MemberModel Promote(Guid id) => Get(id).BePromoted();
-        public MemberModel Demote(Guid id) => Get(id).BeDemoted();
-        public MemberModel LeaveGuild(Guid id) => Get(id).LeaveGuild();
+        public MemberModel Promote(Guid id)
+        {
+            return Get(id).BePromoted();
+        }
+
+        public MemberModel Demote(Guid id)
+        {
+            return Get(id).BeDemoted();
+        }
+
+        public MemberModel LeaveGuild(Guid id)
+        {
+            return Get(id).LeaveGuild();
+        }
+
         public IReadOnlyList<MemberModel> List(MemberFilterDto payload)
         {
             return Query<Member>(x => x.Name.Contains(payload.Name) && (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId), readOnly: true)
@@ -71,8 +70,7 @@ namespace Services
         }
         public MemberModel Get(Guid memberId, bool readOnly = false)
         {
-            return GetByKeys<Member>((object)memberId) is Member memberEntity
-                ? new MemberModel(memberEntity) : new NullMember();
+            return ModelFactory.ConstructWith<MemberModel, Member>(GetByKeys<Member>((object)memberId));
         }
 
         public MemberModel Delete(Guid id)

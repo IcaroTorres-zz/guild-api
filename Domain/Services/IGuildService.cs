@@ -3,7 +3,7 @@ using Domain.Models;
 using System;
 using System.Collections.Generic;
 
-namespace Services
+namespace Domain.Services
 {
     public interface IGuildService
     {

@@ -1,53 +1,32 @@
 using DataAccess.Context;
-using DataAccess.Entities;
 using Domain.DTOs;
+using Domain.Entities;
 using Domain.Models;
 using Domain.Models.NullEntities;
-using Domain.Validations;
+using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Services
+namespace Business.Services
 {
     public class GuildService : BaseService, IGuildService
     {
         public GuildService(ApiContext context) : base(context) { }
         public GuildModel Create(GuildDto payload)
         {
-            //if (Query<Guild>(p => p.Name.Equals(payload.Name), true).SingleOrDefault() is Guild guild)
-            //{
-            //    return new GuildModel(guild)
-            //    {
-            //        ValidationResult = new ConflictValidationResult(nameof(Guild))
-            //        .AddValidationErrors(nameof(Guild), $"With given name '{payload.Name}' already exists.")
-            //    };
-            //}
             var masterEntity = GetByKeys<Member>((object)payload.MasterId);
-            var masterModel = masterEntity is Member ? new MemberModel(masterEntity) : new NullMember();
+            var masterModel = ModelFactory.ConstructWith<MemberModel, Member>(masterEntity);
             var newGuildModel = new GuildModel(payload.Name, masterModel);
             newGuildModel.Entity = Insert(newGuildModel);
-
             return newGuildModel;
         }
         public GuildModel Update(GuildDto payload, Guid id)
         {
             var guildModelToUpdate = Get(id);
             var masterEntity = GetByKeys<Member>((object)payload.MasterId);
-            var masterModel = masterEntity is Member ?new MemberModel(masterEntity) : new NullMember();
-
-            //if (!guildModelToUpdate.IsGuildMember(masterModel))
-            //{
-            //    var guildConflict = new ConflictValidationResult(nameof(Guild))
-            //        .AddValidationErrors(nameof(Guild.Members), $"Cannot {nameof(GuildModel.Promote)} a non {nameof(Member)}.");
-
-            //    var memberConflict = new ConflictValidationResult(nameof(Member))
-            //        .AddValidationErrors(nameof(Member.Guild), $"Cannot {nameof(MemberModel.BePromoted)} due to not being member of target {nameof(Member.Guild)}.");
-
-            //    guildModelToUpdate.ValidationResult = guildConflict;
-            //    masterModel.ValidationResult = memberConflict;
-            //}
+            var masterModel = ModelFactory.ConstructWith<MemberModel, Member>(masterEntity);
 
             var currentMemberIds = guildModelToUpdate.Entity.Members.Select(x => x.Id);
             var receivedAlreadyMemberIds = payload.MemberIds.Intersect(currentMemberIds);
@@ -71,15 +50,17 @@ namespace Services
 
             return guildModelToUpdate;
         }
-        public IReadOnlyList<GuildModel> List(int count = 20) => GetAll<Guild>(readOnly: true)
-            .Take(count)
-            .Select(ge => new GuildModel(ge))
-            .ToList();
+        public IReadOnlyList<GuildModel> List(int count = 20)
+        {
+            return GetAll<Guild>(readOnly: true)
+                .Take(count)
+                .Select(ge => new GuildModel(ge))
+                .ToList();
+        }
 
         public GuildModel Get(Guid id, bool readOnly = false)
         {
-            var guildEntity = GetByKeys<Guild>((object)id);
-            return guildEntity is Guild ? new GuildModel(guildEntity) : new NullGuild();
+            return ModelFactory.ConstructWith<GuildModel, Guild>(GetByKeys<Guild>((object)id));
         }
 
         public GuildModel Delete(Guid id)

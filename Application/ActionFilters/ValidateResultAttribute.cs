@@ -1,4 +1,4 @@
-﻿using DataAccess.Entities;
+﻿using Domain.Entities;
 using Domain.Models;
 using Domain.Validations;
 using Microsoft.AspNetCore.Mvc.Filters;

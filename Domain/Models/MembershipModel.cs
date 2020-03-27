@@ -1,4 +1,4 @@
-﻿using DataAccess.Entities;
+﻿using Domain.Entities;
 using Domain.Validations;
 using FluentValidation;
 using System;
@@ -15,12 +15,12 @@ namespace Domain.Models
             Entity.Member = member.Entity;
             Entity.MemberId = member.Entity.Id;
         }
-        public MembershipModel RegisterExit()
+        public virtual MembershipModel RegisterExit()
         {
             Entity.Until = DateTime.UtcNow;
             return this;
         }
-        public TimeSpan GetDuration()
+        public virtual TimeSpan GetDuration()
         {
             return (Entity.Until ?? DateTime.UtcNow).Subtract(Entity.Since);
         }

@@ -1,5 +1,5 @@
-using DataAccess.Entities;
 using DataAccess.Maps;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
