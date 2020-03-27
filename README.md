@@ -65,14 +65,14 @@ The binaries that are now compiled are available in the src directory. Run Redis
  - You can download it directly from **[Redis](https://redis.io/download "redis downloads")** oficiall downloads page, compile with **[Make](http://gnuwin32.sourceforge.net/packages/make.htm "Make page")** for Windows similarly to linux instalation;
  - Acquire it using **[Chocolatey](https://chocolatey.org/install "Chocolatey")** and installing Redis-64 package with `choco install redis-64` in powershell;
  - Get a compiled Windows version from [dmajkic / redis](https://github.com/dmajkic/redis/downloads "github dmajkic/redis download packages") and set Redis on your environment variables, and use following command to run a basic configuration of redis on prompt like below:
-
-    $ redis-server
+ 
+ 		$ redis-server
 
 This will start your Redis local server with default settings.
 
 ## Redis in the project
 
-Configure an entry for your settings in your pppsetings.json. Following there is an example:
+Configure an entry for your settings in your appsetings.json. Following there is an example:
 
 ```json
 {
@@ -143,7 +143,7 @@ tasks.json:
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/guild.api.csproj"
+        "${workspaceFolder}/Api.csproj"
       ],
       "problemMatcher": "$msCompile"
     }
