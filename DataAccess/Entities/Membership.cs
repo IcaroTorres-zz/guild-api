@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Newtonsoft.Json;
 
 namespace DataAccess.Entities
 {
     [Serializable]
     public class Membership : EntityModel<Membership>
     {
-        public virtual DateTime Entrance { get; set; } = DateTime.UtcNow;
-        public virtual DateTime? Exit { get; set; }
+        public virtual DateTime Since { get; set; } = DateTime.UtcNow;
+        public virtual DateTime? Until { get; set; }
         public Guid MemberId { get; set; }
         public Guid GuildId { get; set; }
         [JsonIgnore] public virtual Guild Guild { get; set; }
