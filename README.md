@@ -7,11 +7,13 @@ A REST API of a basic environment allowing interactions between models represent
 - [x] **.Net Core 2.2**;
 - [x] **EF Core 2.2.6**;
 - [x] **Microsoft.EntityFrameworkCore.Sqlite 2.2.6** package;
-- [x] **Dependency Injection**;
+- [x] **DDD**;
 - [x] **Repository Pattern**;
-- [x] **Unit of Work**;
-- [x] **Rich Domain entities**;
-- [x] **Custom Domain Validations**;
+- [x] **Unit of Work Pattern**;
+- [x] **NullObject Pattern**;
+- [x] **Entities for persistence**;
+- [x] **Rich Domain models**;
+- [x] **Fluent Validations**;
 - [x] **Hateoas**;
 - [x] **Distributed Cache (Redis)**.
 
