@@ -1,8 +1,8 @@
-using DataAccess.Context;
 using Domain.DTOs;
 using Domain.Entities;
 using Domain.Models;
 using Domain.Models.NullEntities;
+using Domain.Repositories;
 using Domain.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
@@ -11,14 +11,21 @@ using System.Linq;
 
 namespace Business.Services
 {
-    public class MemberService : BaseService, IMemberService
+    public class MemberService : IMemberService
     {
-        public MemberService(ApiContext context) : base(context) { }
+        private readonly IMemberRepository MemberRepository;
+        private readonly IGuildRepository GuildRepository;
+
+        public MemberService(IMemberRepository members, IGuildRepository guilds)
+        {
+            MemberRepository = members;
+            GuildRepository = guilds;
+        }
 
         public MemberModel Create(MemberDto payload)
         {
             var memberModel = new MemberModel(payload.Name);
-            memberModel.Entity = Insert(memberModel);
+            memberModel.Entity = MemberRepository.Insert(memberModel);
 
             return memberModel;
         }
@@ -28,7 +35,7 @@ namespace Business.Services
             memberModel.ChangeName(payload.Name);
             if (payload.GuildId is Guid guildId && guildId != Guid.Empty)
             {
-                var guildEntity = GetByKeys<Guild>((object)guildId);
+                var guildEntity = GuildRepository.Get(guildId);
                 var guildModel = ModelFactory.ConstructWith<GuildModel, Guild>(guildEntity);
                 guildModel.Invite(memberModel).BeAccepted();
             }
@@ -36,7 +43,7 @@ namespace Business.Services
             {
                 memberModel.LeaveGuild();
             }
-            memberModel.Entity = Update(memberModel);
+            memberModel.Entity = MemberRepository.Update(memberModel);
 
             return memberModel;
         }
@@ -46,37 +53,29 @@ namespace Business.Services
             payload.ApplyTo(memberModel.Entity);
             return memberModel;
         }
-        public MemberModel Promote(Guid id)
-        {
-            return Get(id).BePromoted();
-        }
+        public MemberModel Promote(Guid id) => Get(id).BePromoted();
 
-        public MemberModel Demote(Guid id)
-        {
-            return Get(id).BeDemoted();
-        }
+        public MemberModel Demote(Guid id) => Get(id).BeDemoted();
 
-        public MemberModel LeaveGuild(Guid id)
-        {
-            return Get(id).LeaveGuild();
-        }
+        public MemberModel LeaveGuild(Guid id) => Get(id).LeaveGuild();
 
         public IReadOnlyList<MemberModel> List(MemberFilterDto payload)
         {
-            return Query<Member>(x => x.Name.Contains(payload.Name) && (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId), readOnly: true)
+            return MemberRepository.Query(x => x.Name.Contains(payload.Name)
+                && (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId),
+                readOnly: true)
                 .Take(payload.Count)
                 .Select(x => new MemberModel(x))
                 .ToList();
         }
         public MemberModel Get(Guid memberId, bool readOnly = false)
         {
-            return ModelFactory.ConstructWith<MemberModel, Member>(GetByKeys<Member>((object)memberId));
+            return ModelFactory.ConstructWith<MemberModel, Member>(MemberRepository.Get(memberId));
         }
-
         public MemberModel Delete(Guid id)
         {
             var memberModel = Get(id);
-            memberModel.Entity = Remove(memberModel);
+            memberModel.Entity = MemberRepository.Remove(memberModel);
             return memberModel;
         }
     }

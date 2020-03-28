@@ -1,8 +1,8 @@
-using DataAccess.Context;
 using Domain.DTOs;
 using Domain.Entities;
 using Domain.Models;
 using Domain.Models.NullEntities;
+using Domain.Repositories;
 using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,21 +11,30 @@ using System.Linq;
 
 namespace Business.Services
 {
-    public class GuildService : BaseService, IGuildService
+    public class GuildService : IGuildService
     {
-        public GuildService(ApiContext context) : base(context) { }
+        private readonly IGuildRepository GuildRepository;
+        private readonly IMemberRepository MemberRepository;
+
+        public GuildService(IGuildRepository guilds,
+            IMemberRepository members,
+            IInviteRepository invites)
+        {
+            GuildRepository = guilds;
+            MemberRepository = members;
+        }
         public GuildModel Create(GuildDto payload)
         {
-            var masterEntity = GetByKeys<Member>((object)payload.MasterId);
+            var masterEntity = MemberRepository.Get(payload.MasterId);
             var masterModel = ModelFactory.ConstructWith<MemberModel, Member>(masterEntity);
             var newGuildModel = new GuildModel(payload.Name, masterModel);
-            newGuildModel.Entity = Insert(newGuildModel);
+            newGuildModel.Entity = GuildRepository.Insert(newGuildModel);
             return newGuildModel;
         }
         public GuildModel Update(GuildDto payload, Guid id)
         {
             var guildModelToUpdate = Get(id);
-            var masterEntity = GetByKeys<Member>((object)payload.MasterId);
+            var masterEntity = MemberRepository.Get(payload.MasterId);
             var masterModel = ModelFactory.ConstructWith<MemberModel, Member>(masterEntity);
 
             var currentMemberIds = guildModelToUpdate.Entity.Members.Select(x => x.Id);
@@ -33,7 +42,7 @@ namespace Business.Services
             var toInviteIds = payload.MemberIds.Except(receivedAlreadyMemberIds);
             var toKickIds = currentMemberIds.Except(receivedAlreadyMemberIds);
 
-            Query<Member>(x => !x.Disabled)
+            MemberRepository.Query(x => !x.Disabled)
                 .Include(x => x.Memberships)
                 .Include(x => x.Guild.Members)
                 .Include(x => x.Guild.Invites)
@@ -44,15 +53,15 @@ namespace Business.Services
                 .Join(toKickIds, x => x.Id, id => id, (member, _) => new MemberModel(member)).ToList()
                 .ForEach(memberToKick => memberToKick.LeaveGuild());
 
-            guildModelToUpdate.Promote(masterModel);
             guildModelToUpdate.ChangeName(payload.Name);
-            guildModelToUpdate.Entity = Update(guildModelToUpdate);
+            guildModelToUpdate.Promote(masterModel);
+            guildModelToUpdate.Entity = GuildRepository.Update(guildModelToUpdate);
 
             return guildModelToUpdate;
         }
         public IReadOnlyList<GuildModel> List(int count = 20)
         {
-            return GetAll<Guild>(readOnly: true)
+            return GuildRepository.GetAll(readOnly: true)
                 .Take(count)
                 .Select(ge => new GuildModel(ge))
                 .ToList();
@@ -60,13 +69,13 @@ namespace Business.Services
 
         public GuildModel Get(Guid id, bool readOnly = false)
         {
-            return ModelFactory.ConstructWith<GuildModel, Guild>(GetByKeys<Guild>((object)id));
+            return ModelFactory.ConstructWith<GuildModel, Guild>(GuildRepository.Get(id));
         }
 
         public GuildModel Delete(Guid id)
         {
             var guildModel = Get(id);
-            guildModel.Entity = Remove(guildModel);
+            guildModel.Entity = GuildRepository.Remove(guildModel);
             return guildModel;
         }
     }

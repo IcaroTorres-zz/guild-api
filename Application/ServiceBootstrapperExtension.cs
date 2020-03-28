@@ -1,6 +1,9 @@
 using Business.Services;
 using DataAccess.Context;
+using DataAccess.Repositories;
 using DataAccess.Unities;
+using Domain.Entities;
+using Domain.Repositories;
 using Domain.Services;
 using Domain.Unities;
 using Microsoft.AspNetCore.Hosting;
@@ -22,11 +25,19 @@ namespace Application.Extensions
                     .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                     .UseSqlite($"Data Source={appHost.ContentRootPath}/{configuration["SqliteSettings:Source"]}"))
 
+                // Data access layer dependencies
+                .AddScoped<IRepository<Guild>, Repository<Guild>>()
+                .AddScoped<IRepository<Member>, Repository<Member>>()
+                .AddScoped<IRepository<Invite>, Repository<Invite>>()
+                .AddScoped<IGuildRepository, GuildRepository>()
+                .AddScoped<IMemberRepository, MemberRepository>()
+                .AddScoped<IInviteRepository, InviteRepository>()
+                .AddScoped<IUnitOfWork, UnitOfWork>()
+
                 // Custom service layer dependecy registration
                 .AddScoped<IGuildService, GuildService>()
                 .AddScoped<IMemberService, MemberService>()
-                .AddScoped<IInviteService, InviteService>()
-                .AddScoped<IUnitOfWork, UnitOfWork>();
+                .AddScoped<IInviteService, InviteService>();
         }
     }
 }

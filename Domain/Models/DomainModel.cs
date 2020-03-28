@@ -51,10 +51,9 @@ namespace Domain.Models
 
             return new ApiValidationResult(Validate(Entity));
         }
-
-
         public virtual bool IsValid => Validate().IsValid;
     }
+    
     public class Invalidator<T> : AbstractValidator<T> where T : EntityModel<T>
     {
         public virtual T Entity { get; }

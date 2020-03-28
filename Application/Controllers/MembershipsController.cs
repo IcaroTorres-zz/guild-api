@@ -1,7 +1,6 @@
 using Application.ActionFilters;
-using Business.Services;
 using Domain.Entities;
-using Domain.Services;
+using Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Controllers
@@ -10,9 +9,9 @@ namespace Application.Controllers
     public class MembershipsController : ControllerBase
     {
         [HttpGet(Name = "get-memberships"), UseCache(10)]
-        public ActionResult Get([FromServices] IMemberService service)
+        public ActionResult Get([FromServices] IRepository<Membership> repository)
         {
-            return Ok((service as MemberService).GetAll<Membership>(readOnly: true));
+            return Ok(repository.GetAll(readOnly: true));
         }
     }
 }
