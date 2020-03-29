@@ -1,10 +1,11 @@
 using Domain.Entities;
+using Domain.Models.NullEntities;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Models.NullEntities
+namespace Domain.Models
 {
-    public static class ModelFactory
+    public class ModelFactory
     {
         private static readonly Dictionary<Type, object> NullTypes = new Dictionary<Type, object>
         {
@@ -17,5 +18,9 @@ namespace Domain.Models.NullEntities
         {
             return (TResult)(entity is T ? Activator.CreateInstance(typeof(TResult), entity) : NullTypes[typeof(T)]);
         }
+        public GuildModel Create(Guild guild) => guild is Guild ? new GuildModel(guild) : new NullGuild();
+        public MemberModel Create(Member member) => member is Member ? new MemberModel(member) : new NullMember();
+        public InviteModel Create(Invite invite) => invite is Invite ? new InviteModel(invite) : new NullInvite();
+        public MembershipModel Create(Membership membership) => membership is Membership ? new MembershipModel(membership) : new NullMembership();
     }
 }

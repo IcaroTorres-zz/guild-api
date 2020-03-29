@@ -1,8 +1,6 @@
 using Domain.Entities;
-using Domain.Validations;
 using FluentValidation;
 using JetBrains.Annotations;
-using System;
 using System.Linq;
 
 namespace Domain.Models
@@ -81,29 +79,6 @@ namespace Domain.Models
                 Entity.Guild = null;
             }
             return this;
-        }
-        public override IApiValidationResult Validate()
-        {
-            RuleFor(x => x.Name).NotEmpty();
-
-            RuleFor(x => x.GuildId)
-                .NotEmpty()
-                .NotEqual(Guid.Empty)
-                .Unless(x => x.Guild == null);
-
-            RuleFor(x => x.Guild.Id)
-                .Equal(x => x.GuildId.Value)
-                .Unless(x => x.Guild == null);
-
-            RuleFor(x => x.Memberships)
-                .Must(x => x.Any(ms
-                    => ms.MemberId == Entity.Id
-                    && ms.GuildId == Entity.GuildId
-                    && ms.Until == null
-                    && !ms.Disabled))
-                .When(x => x.Memberships.Any() && Entity.GuildId != null);
-
-            return base.Validate();
         }
     }
 }

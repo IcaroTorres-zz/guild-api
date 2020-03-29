@@ -1,32 +1,14 @@
 ﻿using Domain.Entities;
-using Domain.Validations;
+using System;
 
 namespace Domain.Models.NullEntities
 {
     public class NullInvite : InviteModel
     {
-        public NullInvite() : base(new Invite()) { }
+        public NullInvite() : base(new Invite { Id = Guid.Empty }) { }
         public override bool IsValid => false;
-        public override InviteModel BeAccepted()
-        {
-            return this;
-        }
-
-        public override InviteModel BeDeclined()
-        {
-            return this;
-        }
-
-        public override InviteModel BeCanceled()
-        {
-            return this;
-        }
-
-        public override IApiValidationResult Validate()
-        {
-            var validator = new Invalidator<Invite>(Entity);
-            RuleFor(x => x).SetValidator(validator);
-            return validator.Validate();
-        }
+        public override InviteModel BeAccepted() => this;
+        public override InviteModel BeDeclined() => this;
+        public override InviteModel BeCanceled() => this;
     }
 }

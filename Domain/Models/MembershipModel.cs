@@ -1,6 +1,4 @@
 ﻿using Domain.Entities;
-using Domain.Validations;
-using FluentValidation;
 using System;
 
 namespace Domain.Models
@@ -23,20 +21,6 @@ namespace Domain.Models
         public virtual TimeSpan GetDuration()
         {
             return (Entity.Until ?? DateTime.UtcNow).Subtract(Entity.Since);
-        }
-        public override IApiValidationResult Validate()
-        {
-            RuleFor(x => x.Since).NotEmpty();
-
-            RuleFor(x => x.MemberId).NotEmpty().NotEqual(Guid.Empty);
-
-            RuleFor(x => x.GuildId).NotEmpty().NotEqual(Guid.Empty);
-
-            RuleFor(x => x.Member.Id).Equal(x => x.MemberId).Unless(x => x.Member == null);
-
-            RuleFor(x => x.Guild.Id).Equal(x => x.GuildId).Unless(x => x.Guild == null);
-
-            return base.Validate();
         }
     }
 }

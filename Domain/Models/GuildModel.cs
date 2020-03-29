@@ -3,7 +3,6 @@ using Domain.Models.NullEntities;
 using Domain.Validations;
 using FluentValidation;
 using JetBrains.Annotations;
-using System.Linq;
 
 namespace Domain.Models
 {
@@ -72,27 +71,6 @@ namespace Domain.Models
                 Entity.Members.Remove(memberToKick.Entity);
             }
             return member;
-        }
-        public override IApiValidationResult Validate()
-        {
-            RuleFor(x => x.Name).NotEmpty();
-
-            RuleFor(x => x.Members)
-                .Must(x => x.Any(m => m.IsGuildMaster))
-                .ForEach(memberRule => memberRule
-                    .NotEmpty()
-                    .Must(x => !x.Disabled)
-                    .Must(x => x.GuildId == Entity.Id)
-                    .Must(x => x.Guild.Invites.Any(i => i.MemberId == x.Id)))
-                .When(x => x.Members.Any());
-
-            RuleForEach(x => x.Invites)
-                .NotEmpty()
-                .Must(x => !x.Disabled)
-                .Must(x => x.GuildId == Entity.Id)
-                .Unless(x => x.Invites == null);
-
-            return base.Validate();
         }
     }
 }
