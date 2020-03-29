@@ -1,9 +1,9 @@
-﻿using Application.Cache;
+﻿using Business.Validators;
+using Application.Cache;
 using Application.Extensions;
 using Application.Hateoas;
 using Application.Middlewares;
 using Application.Swagger;
-using Domain.Models;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -52,7 +52,7 @@ namespace Application
                 .AddFluentValidation(fv =>
                 {
                     fv.ImplicitlyValidateChildProperties = true;
-                    fv.RegisterValidatorsFromAssemblyContaining<GuildModel>();
+                    fv.RegisterValidatorsFromAssemblyContaining<GuildValidator>();
                 })
 
                 .AddApiExplorer()
