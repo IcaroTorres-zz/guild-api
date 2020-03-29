@@ -11,8 +11,9 @@ namespace Domain.Repositories
         Guild Get(Guid id, bool readOnly = false);
         IQueryable<Guild> GetAll(bool readOnly = false);
         IQueryable<Guild> Query(Expression<Func<Guild, bool>> predicate = null, bool readOnly = false);
-        Guild Insert(GuildModel domainModel);
-        Guild Update(GuildModel domainModel);
-        Guild Remove(GuildModel domainModel);
+        Guild Insert(DomainModel<Guild> domainModel);
+        Guild Update(DomainModel<Guild> domainModel);
+        Guild Remove(DomainModel<Guild> domainModel);
+        bool Exists(Expression<Func<Guild, bool>> predicate);
     }
 }

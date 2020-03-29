@@ -10,7 +10,7 @@ namespace Domain.Repositories
     {
         Invite Get(Guid id, bool readOnly = false);
         IQueryable<Invite> Query(Expression<Func<Invite, bool>> predicate = null, bool readOnly = false);
-        Invite Insert(InviteModel domainModel);
-        Invite Remove(InviteModel domainModel);
+        Invite Insert(DomainModel<Invite> domainModel);
+        Invite Remove(DomainModel<Invite> domainModel);
     }
 }

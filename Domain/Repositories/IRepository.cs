@@ -14,6 +14,6 @@ namespace Domain.Repositories
         T Insert(DomainModel<T> domainModel);
         T Update(DomainModel<T> domainModel);
         T Remove(DomainModel<T> domainModel);
-        T Remove(params object[] keys);
+        bool Exists(Expression<Func<T, bool>> predicate);
     }
 }

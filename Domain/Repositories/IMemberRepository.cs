@@ -10,8 +10,8 @@ namespace Domain.Repositories
     {
         Member Get(Guid id, bool readOnly = false);
         IQueryable<Member> Query(Expression<Func<Member, bool>> predicate = null, bool readOnly = false);
-        Member Insert(MemberModel domainModel);
-        Member Update(MemberModel domainModel);
-        Member Remove(MemberModel domainModel);
+        Member Insert(DomainModel<Member> domainModel);
+        Member Update(DomainModel<Member> domainModel);
+        Member Remove(DomainModel<Member> domainModel);
     }
 }

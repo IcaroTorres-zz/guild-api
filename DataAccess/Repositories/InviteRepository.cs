@@ -27,7 +27,7 @@ namespace DataAccess.Repositories
         {
             return BaseRepository.Query(predicate, readOnly);
         }
-        public virtual Invite Insert(InviteModel domainModel) => BaseRepository.Insert(domainModel);
-        public virtual Invite Remove(InviteModel domainModel) => BaseRepository.Remove(domainModel);
+        public virtual Invite Insert(DomainModel<Invite> domainModel) => BaseRepository.Insert(domainModel);
+        public virtual Invite Remove(DomainModel<Invite> domainModel) => BaseRepository.Remove(domainModel);
     }
 }

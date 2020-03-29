@@ -28,8 +28,9 @@ namespace DataAccess.Repositories
         {
             return BaseRepository.Query(predicate, readOnly);
         }
-        public virtual Guild Insert(GuildModel domainModel) => BaseRepository.Insert(domainModel);
-        public virtual Guild Update(GuildModel domainModel) => BaseRepository.Update(domainModel);
-        public virtual Guild Remove(GuildModel domainModel) => BaseRepository.Remove(domainModel);
+        public virtual Guild Insert(DomainModel<Guild> domainModel) => BaseRepository.Insert(domainModel);
+        public virtual Guild Update(DomainModel<Guild> domainModel) => BaseRepository.Update(domainModel);
+        public virtual Guild Remove(DomainModel<Guild> domainModel) => BaseRepository.Remove(domainModel);
+        public bool Exists(Expression<Func<Guild, bool>> predicate) => BaseRepository.Exists(predicate);
     }
 }
