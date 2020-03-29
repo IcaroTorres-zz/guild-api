@@ -6,7 +6,7 @@ namespace Domain.Entities
     [Serializable]
     public abstract class EntityModel<T> where T : EntityModel<T>
     {
-        [JsonRequired] public Guid Id { get; protected set; } = Guid.NewGuid();
+        [JsonRequired] public Guid Id { get; internal protected set; } = Guid.NewGuid();
         [JsonIgnore] public virtual DateTime CreatedDate { get; protected set; } = DateTime.UtcNow;
         [JsonIgnore] public virtual DateTime ModifiedDate { get; protected set; } = DateTime.UtcNow;
         [JsonIgnore] public bool Disabled { get; protected set; } = false;
@@ -20,14 +20,8 @@ namespace Domain.Entities
         {
             return (a is null && b is null) || !(a is null || b is null) || a.Equals(b);
         }
-        public static bool operator !=(EntityModel<T> a, EntityModel<T> b)
-        {
-            return !(a == b);
-        }
+        public static bool operator !=(EntityModel<T> a, EntityModel<T> b) => !(a == b);
 
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(Id);
     }
 }

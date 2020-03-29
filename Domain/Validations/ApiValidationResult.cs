@@ -31,19 +31,13 @@ namespace Domain.Validations
                 vl.ErrorCode, out int code) ? code : (int)HttpStatusCode.Conflict).Max())
             .FirstOrDefault();
 
-        public virtual object AsSerializableError()
-        {
-            return new { Title, Status, Errors };
-        }
+        public virtual object AsSerializableError() => new { Title, Status, Errors };
 
-        public virtual IActionResult AsErrorActionResult()
+        public virtual IActionResult AsErrorActionResult() => new ContentResult
         {
-            return new ContentResult
-            {
-                ContentType = "application/json",
-                Content = JsonConvert.SerializeObject(AsSerializableError()),
-                StatusCode = Status
-            };
-        }
+            ContentType = "application/json",
+            Content = JsonConvert.SerializeObject(AsSerializableError()),
+            StatusCode = Status
+        };
     }
 }
