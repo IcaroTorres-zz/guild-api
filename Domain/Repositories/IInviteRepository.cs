@@ -12,5 +12,6 @@ namespace Domain.Repositories
         IQueryable<Invite> Query(Expression<Func<Invite, bool>> predicate = null, bool readOnly = false);
         Invite Insert(DomainModel<Invite> domainModel);
         Invite Remove(DomainModel<Invite> domainModel);
+        bool Exists(Expression<Func<Invite, bool>> predicate);
     }
 }
