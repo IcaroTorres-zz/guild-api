@@ -1,10 +1,9 @@
 using Domain.DTOs;
 using Domain.Entities;
 using Domain.Models;
-using Domain.Models.NullEntities;
 using Domain.Repositories;
 using Domain.Services;
-using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,69 +12,77 @@ namespace Business.Services
 {
     public class GuildService : IGuildService
     {
-        private readonly IGuildRepository GuildRepository;
-        private readonly IMemberRepository MemberRepository;
+        private readonly IGuildRepository _guildRepository;
+        private readonly IMemberRepository _memberRepository;
+        private readonly ModelFactory _modelFactory;
+        private readonly IValidator<Guild> _guildValidator;
 
         public GuildService(IGuildRepository guilds,
             IMemberRepository members,
-            IInviteRepository invites)
+            ModelFactory factory,
+            IValidator<Guild> validator)
         {
-            GuildRepository = guilds;
-            MemberRepository = members;
-        }
-        public GuildModel Create(GuildDto payload)
-        {
-            var masterEntity = MemberRepository.Get(payload.MasterId);
-            var masterModel = ModelFactory.ConstructWith<MemberModel, Member>(masterEntity);
-            var newGuildModel = new GuildModel(payload.Name, masterModel);
-            newGuildModel.Entity = GuildRepository.Insert(newGuildModel);
-            return newGuildModel;
-        }
-        public GuildModel Update(GuildDto payload, Guid id)
-        {
-            var guildModelToUpdate = Get(id);
-            var masterEntity = MemberRepository.Get(payload.MasterId);
-            var masterModel = ModelFactory.ConstructWith<MemberModel, Member>(masterEntity);
-
-            var currentMemberIds = guildModelToUpdate.Entity.Members.Select(x => x.Id);
-            var receivedAlreadyMemberIds = payload.MemberIds.Intersect(currentMemberIds);
-            var toInviteIds = payload.MemberIds.Except(receivedAlreadyMemberIds);
-            var toKickIds = currentMemberIds.Except(receivedAlreadyMemberIds);
-
-            MemberRepository.Query(x => !x.Disabled)
-                .Include(x => x.Memberships)
-                .Include(x => x.Guild.Members)
-                .Include(x => x.Guild.Invites)
-                .Join(toInviteIds, x => x.Id, id => id, (member, _) => new MemberModel(member)).ToList()
-                .ForEach(memberToInvite => guildModelToUpdate.Invite(memberToInvite)?.BeAccepted());
-
-            guildModelToUpdate.Entity.Members
-                .Join(toKickIds, x => x.Id, id => id, (member, _) => new MemberModel(member)).ToList()
-                .ForEach(memberToKick => memberToKick.LeaveGuild());
-
-            guildModelToUpdate.ChangeName(payload.Name);
-            guildModelToUpdate.Promote(masterModel);
-            guildModelToUpdate.Entity = GuildRepository.Update(guildModelToUpdate);
-
-            return guildModelToUpdate;
-        }
-        public IReadOnlyList<GuildModel> List(int count = 20)
-        {
-            return GuildRepository.GetAll(readOnly: true)
-                .Take(count)
-                .Select(ge => new GuildModel(ge))
-                .ToList();
+            _guildRepository = guilds;
+            _memberRepository = members;
+            _modelFactory = factory;
+            _guildValidator = validator;
         }
 
         public GuildModel Get(Guid id, bool readOnly = false)
         {
-            return ModelFactory.ConstructWith<GuildModel, Guild>(GuildRepository.Get(id));
+            return (GuildModel) _modelFactory
+                .Create(_guildRepository.Get(id))
+                .ApplyValidator(_guildValidator);
+        }
+
+        public GuildModel Create(GuildDto payload)
+        {
+            var masterEntity = _memberRepository.Get(payload.MasterId);
+            var masterModel = _modelFactory.Create(masterEntity);
+            var guildModel = new GuildModel(payload.Name, masterModel);
+            guildModel.Entity = _guildRepository.Insert(guildModel.ApplyValidator(_guildValidator));
+            return guildModel;
+        }
+
+        public GuildModel Update(GuildDto payload, Guid id)
+        {
+            var guildModelToUpdate = Get(id);
+            var masterEntity = _memberRepository.Get(payload.MasterId);
+            var masterModel = _modelFactory.Create(masterEntity);
+
+            var currentMemberIds = guildModelToUpdate.Entity.Members.Select(x => x.Id);
+            var receivedAlreadyMemberIds = payload.MemberIds.Intersect(currentMemberIds);
+            var idsToInvite = payload.MemberIds.Except(receivedAlreadyMemberIds);
+            var idsToKick = currentMemberIds.Except(receivedAlreadyMemberIds);
+
+            _memberRepository.Query(x => !x.Disabled)
+                .Join(idsToInvite, x => x.Id, id => id, (member, _) => _modelFactory.Create(member)).ToList()
+                .ForEach(memberModelToInvite => guildModelToUpdate.Invite(memberModelToInvite)?.BeAccepted());
+
+            guildModelToUpdate.Entity.Members
+                .Join(idsToKick, x => x.Id, id => id, (member, _) => _modelFactory.Create(member)).ToList()
+                .ForEach(memberModelToKick => memberModelToKick.LeaveGuild());
+
+            guildModelToUpdate.ChangeName(payload.Name);
+            guildModelToUpdate.Promote(masterModel);
+            guildModelToUpdate.Entity = _guildRepository.Update(
+                guildModelToUpdate.ApplyValidator(_guildValidator));
+
+            return guildModelToUpdate;
+        }
+
+        public IReadOnlyList<GuildModel> List(int count = 20)
+        {
+            return _guildRepository.GetAll(readOnly: true)
+                .Take(count)
+                .Select(ge => _modelFactory.Create(ge))
+                .ToList();
         }
 
         public GuildModel Delete(Guid id)
         {
             var guildModel = Get(id);
-            guildModel.Entity = GuildRepository.Remove(guildModel);
+            guildModel.Entity = _guildRepository.Remove(guildModel);
             return guildModel;
         }
     }

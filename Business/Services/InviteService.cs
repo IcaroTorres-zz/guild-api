@@ -1,9 +1,9 @@
 ﻿using Domain.DTOs;
 using Domain.Entities;
 using Domain.Models;
-using Domain.Models.NullEntities;
 using Domain.Repositories;
 using Domain.Services;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,56 +12,58 @@ namespace Business.Services
 {
     public class InviteService : IInviteService
     {
-        private readonly IGuildRepository GuildRepository;
-        private readonly IMemberRepository MemberRepository;
-        private readonly IInviteRepository InviteRepository;
+        private readonly IGuildRepository _guildRepository;
+        private readonly IMemberRepository _memberRepository;
+        private readonly IInviteRepository _inviteRepository;
+        private readonly ModelFactory _modelFactory;
+        private readonly IValidator<Invite> _inviteValidator;
 
         public InviteService(IGuildRepository guilds,
             IMemberRepository members,
-            IInviteRepository invites)
+            IInviteRepository invites,
+            ModelFactory factory,
+            IValidator<Invite> validator)
         {
-            InviteRepository = invites;
-            GuildRepository = guilds;
-            MemberRepository = members;
+            _inviteRepository = invites;
+            _guildRepository = guilds;
+            _memberRepository = members;
+            _modelFactory = factory;
+            _inviteValidator = validator;
         }
 
         public InviteModel Get(Guid id, bool readOnly = false)
         {
-            return ModelFactory.ConstructWith<InviteModel, Invite>(InviteRepository.Get(id, readOnly));
+            return (InviteModel) _modelFactory
+                .Create(_inviteRepository.Get(id, readOnly))
+                .ApplyValidator(_inviteValidator);
         }
         public IReadOnlyList<InviteModel> List(InviteDto payload)
         {
-            return InviteRepository.Query(x =>
+            return _inviteRepository.Query(x =>
                 (payload.MemberId == Guid.Empty || x.MemberId == payload.MemberId) &&
                 (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId), readOnly: true)
                 .Take(payload.Count)
-                .Select(x => new InviteModel(x))
+                .Select(x => _modelFactory.Create(x))
                 .ToList();
         }
 
         public InviteModel InviteMember(InviteDto payload)
         {
-            var guildEntity = GuildRepository.Get(payload.GuildId);
-            var guildModel = ModelFactory.ConstructWith<GuildModel, Guild>(guildEntity);
-            var memberEntity = MemberRepository.Get(payload.MemberId);
-            var memberModel = ModelFactory.ConstructWith<MemberModel, Member>(memberEntity);
-            var newInvite = guildModel.Invite(memberModel);
-            if (newInvite is NullInvite)
-            {
-                newInvite.Entity.GetType()
-                    .GetProperty(nameof(Invite.Id))
-                    .SetValue(newInvite.Entity, Guid.Empty);
-            }
-            newInvite.Entity = InviteRepository.Insert(newInvite);
-            return newInvite;
+            var guildEntity = _guildRepository.Get(payload.GuildId);
+            var guildModel = _modelFactory.Create(guildEntity);
+            var memberEntity = _memberRepository.Get(payload.MemberId);
+            var memberModel = _modelFactory.Create(memberEntity);
+            var inviteModel = guildModel.Invite(memberModel);
+            inviteModel.Entity = _inviteRepository.Insert(inviteModel.ApplyValidator(_inviteValidator));
+            return inviteModel;
         }
-        public InviteModel Accept(Guid id) => Get(id).BeAccepted();
-        public InviteModel Decline(Guid id) => Get(id).BeDeclined();
-        public InviteModel Cancel(Guid id) => Get(id).BeCanceled();
+        public InviteModel Accept(Guid id) => (InviteModel) Get(id).BeAccepted().ApplyValidator(_inviteValidator);
+        public InviteModel Decline(Guid id) => (InviteModel)Get(id).BeDeclined().ApplyValidator(_inviteValidator);
+        public InviteModel Cancel(Guid id) => (InviteModel) Get(id).BeCanceled().ApplyValidator(_inviteValidator);
         public InviteModel Delete(Guid id)
         {
             var inviteModel = Get(id);
-            inviteModel.Entity = InviteRepository.Remove(inviteModel);
+            inviteModel.Entity = _inviteRepository.Remove(inviteModel);
             return inviteModel;
         }
     }

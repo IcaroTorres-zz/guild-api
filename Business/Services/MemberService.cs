@@ -1,9 +1,9 @@
 using Domain.DTOs;
 using Domain.Entities;
 using Domain.Models;
-using Domain.Models.NullEntities;
 using Domain.Repositories;
 using Domain.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
@@ -13,37 +13,52 @@ namespace Business.Services
 {
     public class MemberService : IMemberService
     {
-        private readonly IMemberRepository MemberRepository;
-        private readonly IGuildRepository GuildRepository;
+        private readonly IMemberRepository _memberRepository;
+        private readonly IGuildRepository _guildRepository;
+        private readonly IValidator<Member> _memberValidator;
+        private readonly ModelFactory _modelFactory;
 
-        public MemberService(IMemberRepository members, IGuildRepository guilds)
+        public MemberService(IMemberRepository members, 
+            IGuildRepository guilds,
+            IValidator<Member> validator,
+            ModelFactory factory)
         {
-            MemberRepository = members;
-            GuildRepository = guilds;
+            _memberRepository = members;
+            _guildRepository = guilds;
+            _memberValidator = validator;
+            _modelFactory = factory;
+        }
+
+        public MemberModel Get(Guid memberId, bool readOnly = false)
+        {
+            return (MemberModel) _modelFactory
+                .Create(_memberRepository.Get(memberId))
+                .ApplyValidator(_memberValidator);
         }
 
         public MemberModel Create(MemberDto payload)
         {
             var memberModel = new MemberModel(payload.Name);
-            memberModel.Entity = MemberRepository.Insert(memberModel);
+            memberModel.Entity = _memberRepository.Insert(memberModel.ApplyValidator(_memberValidator));
 
             return memberModel;
         }
+
         public MemberModel Update(MemberDto payload, Guid id)
         {
             var memberModel = Get(id);
             memberModel.ChangeName(payload.Name);
             if (payload.GuildId is Guid guildId && guildId != Guid.Empty)
             {
-                var guildEntity = GuildRepository.Get(guildId);
-                var guildModel = ModelFactory.ConstructWith<GuildModel, Guild>(guildEntity);
+                var guildEntity = _guildRepository.Get(guildId);
+                var guildModel = _modelFactory.Create(guildEntity);
                 guildModel.Invite(memberModel).BeAccepted();
             }
             else
             {
                 memberModel.LeaveGuild();
             }
-            memberModel.Entity = MemberRepository.Update(memberModel);
+            memberModel.Entity = _memberRepository.Update(memberModel.ApplyValidator(_memberValidator));
 
             return memberModel;
         }
@@ -51,31 +66,29 @@ namespace Business.Services
         {
             var memberModel = Get(id);
             payload.ApplyTo(memberModel.Entity);
+            memberModel.ApplyValidator(_memberValidator);
             return memberModel;
         }
-        public MemberModel Promote(Guid id) => Get(id).BePromoted();
+        public MemberModel Promote(Guid id) => (MemberModel) Get(id).BePromoted().ApplyValidator(_memberValidator);
 
-        public MemberModel Demote(Guid id) => Get(id).BeDemoted();
+        public MemberModel Demote(Guid id) => (MemberModel) Get(id).BeDemoted().ApplyValidator(_memberValidator);
 
-        public MemberModel LeaveGuild(Guid id) => Get(id).LeaveGuild();
+        public MemberModel LeaveGuild(Guid id) => (MemberModel) Get(id).LeaveGuild().ApplyValidator(_memberValidator);
 
         public IReadOnlyList<MemberModel> List(MemberFilterDto payload)
         {
-            return MemberRepository.Query(x => x.Name.Contains(payload.Name)
+            return _memberRepository.Query(x => x.Name.Contains(payload.Name)
                 && (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId),
                 readOnly: true)
                 .Take(payload.Count)
-                .Select(x => new MemberModel(x))
+                .Select(x => _modelFactory.Create(x))
                 .ToList();
         }
-        public MemberModel Get(Guid memberId, bool readOnly = false)
-        {
-            return ModelFactory.ConstructWith<MemberModel, Member>(MemberRepository.Get(memberId));
-        }
+
         public MemberModel Delete(Guid id)
         {
             var memberModel = Get(id);
-            memberModel.Entity = MemberRepository.Remove(memberModel);
+            memberModel.Entity = _memberRepository.Remove(memberModel);
             return memberModel;
         }
     }
