@@ -5,7 +5,6 @@ using Domain.Repositories;
 using Domain.Services;
 using FluentValidation;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Business.Services
@@ -37,14 +36,18 @@ namespace Business.Services
                 .Create(_inviteRepository.Get(id, readOnly))
                 .ApplyValidator(_inviteValidator);
         }
-        public IReadOnlyList<InviteModel> List(InviteDto payload)
+        public Pagination<Invite> List(InviteDto payload)
         {
-            return _inviteRepository.Query(x =>
+            var query = _inviteRepository.Query(x =>
                 (payload.MemberId == Guid.Empty || x.MemberId == payload.MemberId) &&
-                (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId), readOnly: true)
-                .Take(payload.Count)
-                .Select(x => _modelFactory.Create(x))
-                .ToList();
+                (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId), readOnly: true);
+            var totalCount = query.Count();
+            var validEntities = query.Take(payload.Count)
+                .Select(x => _modelFactory.Create(x)).ToList()
+                .Where(i => i.ApplyValidator(_inviteValidator).IsValid)
+                .Select(x => x.Entity).ToList();
+
+            return new Pagination<Invite>(validEntities, totalCount, payload.Count);
         }
 
         public InviteModel InviteMember(InviteDto payload)

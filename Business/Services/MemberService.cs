@@ -6,7 +6,6 @@ using Domain.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Business.Services
@@ -34,6 +33,20 @@ namespace Business.Services
             return (MemberModel) _modelFactory
                 .Create(_memberRepository.Get(memberId))
                 .ApplyValidator(_memberValidator);
+        }
+
+        public Pagination<Member> List(MemberFilterDto payload)
+        {
+            var query = _memberRepository.Query(x => x.Name.Contains(payload.Name) 
+                && (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId), readOnly: true);
+
+            var totalCount = query.Count();
+            var validEntities = query.Take(payload.Count)
+                .Select(x => _modelFactory.Create(x)).ToList()
+                .Where(i => i.ApplyValidator(_memberValidator).IsValid)
+                .Select(x => x.Entity).ToList();
+
+            return new Pagination<Member>(validEntities, totalCount, payload.Count);
         }
 
         public MemberModel Create(MemberDto payload)
@@ -74,16 +87,6 @@ namespace Business.Services
         public MemberModel Demote(Guid id) => (MemberModel) Get(id).BeDemoted().ApplyValidator(_memberValidator);
 
         public MemberModel LeaveGuild(Guid id) => (MemberModel) Get(id).LeaveGuild().ApplyValidator(_memberValidator);
-
-        public IReadOnlyList<MemberModel> List(MemberFilterDto payload)
-        {
-            return _memberRepository.Query(x => x.Name.Contains(payload.Name)
-                && (payload.GuildId == Guid.Empty || x.GuildId == payload.GuildId),
-                readOnly: true)
-                .Take(payload.Count)
-                .Select(x => _modelFactory.Create(x))
-                .ToList();
-        }
 
         public MemberModel Delete(Guid id)
         {

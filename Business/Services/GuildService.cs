@@ -30,9 +30,19 @@ namespace Business.Services
 
         public GuildModel Get(Guid id, bool readOnly = false)
         {
-            return (GuildModel) _modelFactory
-                .Create(_guildRepository.Get(id))
-                .ApplyValidator(_guildValidator);
+            return (GuildModel) _modelFactory.Create(_guildRepository.Get(id)).ApplyValidator(_guildValidator);
+        }
+
+        public Pagination<Guild> List(int count = 20)
+        {
+            var query = _guildRepository.GetAll(readOnly: true);
+            var totalCount = query.Count();
+            var validEntities = query.Take(count)
+                .Select(x => _modelFactory.Create(x)).ToList()
+                .Where(i => i.ApplyValidator(_guildValidator).IsValid)
+                .Select(x => x.Entity).ToList();
+
+            return new Pagination<Guild>(validEntities, totalCount, count);
         }
 
         public GuildModel Create(GuildDto payload)
@@ -69,14 +79,6 @@ namespace Business.Services
                 guildModelToUpdate.ApplyValidator(_guildValidator));
 
             return guildModelToUpdate;
-        }
-
-        public IReadOnlyList<GuildModel> List(int count = 20)
-        {
-            return _guildRepository.GetAll(readOnly: true)
-                .Take(count)
-                .Select(ge => _modelFactory.Create(ge))
-                .ToList();
         }
 
         public GuildModel Delete(Guid id)
