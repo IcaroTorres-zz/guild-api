@@ -22,8 +22,8 @@ namespace Application.Hateoas
         public static IMvcCoreBuilder EnableHateoasOutput(this IMvcCoreBuilder builder)
         {
             return builder.AddHateoasResources(options => options
-                .AddLink<List<Guild>>("get-guilds")
-                .AddLink<List<Guild>>("create-guild")
+                .AddLink<Pagination<Guild>>("get-guilds")
+                .AddLink<Pagination<Guild>>("create-guild")
 
                 .AddLink<Guild>("get-guild", e => new { id = e.Id })
                 .AddLink<Guild>("get-members", e => new { guildId = e.Id })
@@ -31,9 +31,9 @@ namespace Application.Hateoas
                 .AddLink<Guild>("patch-guild", e => new { id = e.Id })
                 .AddLink<Guild>("delete-guild", e => new { id = e.Id })
 
-                .AddLink<List<Member>>("get-members")
-                .AddLink<List<Member>>("create-member")
-                .AddLink<List<Member>>("invite-member")
+                .AddLink<Pagination<Member>>("get-members")
+                .AddLink<Pagination<Member>>("create-member")
+                .AddLink<Pagination<Member>>("invite-member")
 
                 .AddLink<Member>("get-member", e => new { id = e.Id })
                 .AddLink<Member>("get-guild", e => new { id = e.GuildId })
@@ -44,8 +44,8 @@ namespace Application.Hateoas
                 .AddLink<Member>("leave-guild", e => new { id = e.Id })
                 .AddLink<Member>("delete-member", e => new { id = e.Id })
 
-                .AddLink<List<Invite>>("get-invites")
-                .AddLink<List<Invite>>("invite-member")
+                .AddLink<Pagination<Invite>>("get-invites")
+                .AddLink<Pagination<Invite>>("invite-member")
 
                 .AddLink<Invite>("get-invite", e => new { id = e.Id })
                 .AddLink<Invite>("accept-invite", e => new { id = e.Id })

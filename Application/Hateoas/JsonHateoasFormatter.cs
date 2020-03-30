@@ -1,6 +1,8 @@
 ﻿using Application.Hateoas.DTOs;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Internal;
@@ -9,7 +11,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -26,53 +27,60 @@ namespace Application.Hateoas
         }
         public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
         {
-            var response = context.HttpContext.Response;
             if (context.Object is SerializableError error)
             {
                 var errorOutput = JsonConvert.SerializeObject(error);
-                response.ContentType = SupportedMediaTypes.First();
-                return response.WriteAsync(errorOutput);
+                context.HttpContext.Response.ContentType = SupportedMediaTypes.First();
+                return context.HttpContext.Response.WriteAsync(errorOutput);
             }
 
-            var hateoasOutput = context.ObjectType.ImplementsIEnumerable()
-                ? GetJsonStringWithHateoas(context.HttpContext, context.ObjectType, ((IEnumerable<object>)context.Object).ToArray())
-                : GetJsonStringWithHateoas(context.HttpContext, context.ObjectType, context.Object);
+            string hateoasOutput;
+            if (context.ObjectType.GetGenericTypeDefinition() == typeof(Pagination<>))
+            {
+                var items = (IEnumerable<object>)context.ObjectType.GetProperty("Items").GetValue(context.Object);
+                var count = (long)context.ObjectType.GetProperty("Count").GetValue(context.Object);
+                var pageSize = (int)context.ObjectType.GetProperty("PageSize").GetValue(context.Object);
+                var page = (int)context.ObjectType.GetProperty("Page").GetValue(context.Object);
+                var pagination = new Pagination<object>(items, count, pageSize, page);
 
-            response.ContentType = SupportedMediaTypes.Last();
-            return response.WriteAsync(hateoasOutput);
+                hateoasOutput = GeneratePaginatedHateoasOutput(context.HttpContext, context.ObjectType, pagination);
+            }
+            else hateoasOutput = GenerateHateoasOutput(context.HttpContext, context.ObjectType, context.Object);
+
+            context.HttpContext.Response.ContentType = SupportedMediaTypes.Last();
+            return context.HttpContext.Response.WriteAsync(hateoasOutput);
         }
 
-        public ContentResult GetResultWithHateoas(HttpContext context, Type targetResourceType, params object[] values)
+        public ContentResult GetResultWithHateoas(HttpContext context, Type targetResourceType, params object[] value)
         {
-            var hateoasOutput = GetJsonStringWithHateoas(context, targetResourceType, values);
-
             return new ContentResult
             {
-                Content = hateoasOutput,
+                Content = GenerateHateoasOutput(context, targetResourceType, value),
                 ContentType = SupportedMediaTypes.Last(),
                 StatusCode = (int)HttpStatusCode.OK
             };
         }
-        private string GetJsonStringWithHateoas(HttpContext context, Type targetResourceType, params object[] values)
-        {
-            ResourceDTO dataWithHateoas;
-            if (targetResourceType.ImplementsIEnumerable())
-            {
-                if (targetResourceType.GetGenericArguments().FirstOrDefault() is Type itemType)
-                {
-                    var InnerResourceValues = values.Select(value => WrapDataWithHateoas(itemType, value, context)).ToArray();
-                    dataWithHateoas = WrapDataWithHateoas(targetResourceType, InnerResourceValues, context);
-                }
-                else
-                {
-                    dataWithHateoas = WrapDataWithHateoas(targetResourceType, values, context);
-                }
-            }
-            else
-            {
-                dataWithHateoas = WrapDataWithHateoas(targetResourceType, values[0], context);
-            }
 
+        private string GeneratePaginatedHateoasOutput(HttpContext context, Type targetType, Pagination<object> pagination)
+        {
+            var itemType = targetType.GetGenericArguments().FirstOrDefault();
+            var innerResourceValues = pagination.Items.Select(item => WrapDataWithHateoas(itemType, item, context));
+
+            var paginatedResource = new Pagination<ResourceDTO>(innerResourceValues,
+                pagination.Count, pagination.PageSize, pagination.Page);
+
+            ResourceDTO dataWithHateoas = WrapDataWithHateoas(targetType, paginatedResource, context);
+            return SerializeHateoasData(dataWithHateoas);
+        }
+
+        private string GenerateHateoasOutput(HttpContext context, Type targetResourceType, object value)
+        {
+            ResourceDTO dataWithHateoas = WrapDataWithHateoas(targetResourceType, value, context);
+            return SerializeHateoasData(dataWithHateoas);
+        }
+
+        private string SerializeHateoasData(ResourceDTO dataWithHateoas)
+        {
             return JsonConvert.SerializeObject(dataWithHateoas, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
@@ -80,23 +88,26 @@ namespace Application.Hateoas
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
         }
+
         private SingleResourceDTO WrapDataWithHateoas(Type targetResourceType, object value, HttpContext context)
         {
-            return new SingleResourceDTO(value).AddRequiredLinks(targetResourceType, context) as SingleResourceDTO;
+            var singleResource = new SingleResourceDTO(value);
+            singleResource.AddRequiredLinks(targetResourceType, context);
+            return singleResource;
         }
-        private ArrayResourceDTO<ResourceDTO> WrapDataWithHateoas(Type targetResourceType, ResourceDTO[] value, HttpContext context)
+
+        private PaginationResourceDTO<ResourceDTO> WrapDataWithHateoas(Type targetResourceType,
+            Pagination<ResourceDTO> value,
+            HttpContext context)
         {
-            return new ArrayResourceDTO<ResourceDTO>(value).AddRequiredLinks(targetResourceType, context) as ArrayResourceDTO<ResourceDTO>;
+            var paginatedResource = new PaginationResourceDTO<ResourceDTO>(value);
+            paginatedResource.AddRequiredLinks(targetResourceType, context);
+            return paginatedResource;
         }
     }
 
     internal static class JsonHateoasFormatterExtentions
     {
-        public static bool ImplementsIEnumerable(this Type type)
-        {
-            return type.GetInterfaces().Contains(typeof(IEnumerable)) && type.GetGenericArguments().Any();
-        }
-
         public static T GetService<T>(this HttpContext context)
         {
             return (T)context.RequestServices.GetService(typeof(T));
@@ -105,20 +116,20 @@ namespace Application.Hateoas
         {
             var urlHelperFactory = context.GetService<IUrlHelperFactory>();
             var contextAccessor = context.GetService<IActionContextAccessor>();
-            var actionDescriptorProvider = context.GetService<IActionDescriptorCollectionProvider>();
+            var descriptorProvider = context.GetService<IActionDescriptorCollectionProvider>();
             var options = context.GetService<IOptions<HateoasOptions>>().Value;
             var urlHelper = urlHelperFactory.GetUrlHelper(contextAccessor.ActionContext);
 
-            foreach (var linkRequirement in options.RequiredLinks.Where(r => r.ResourceType == targetResourceType))
+            foreach (var link in options.RequiredLinks.Where(r => r.ResourceType == targetResourceType))
             {
-                var route = actionDescriptorProvider.ActionDescriptors.Items.FirstOrDefault(x => x.AttributeRouteInfo.Name == linkRequirement.Name);
-                if (route != null)
+                if (descriptorProvider.ActionDescriptors.Items.FirstOrDefault(
+                    x => x.AttributeRouteInfo.Name == link.Name) is ActionDescriptor route)
                 {
                     var method = route.ActionConstraints.OfType<HttpMethodActionConstraint>().First().HttpMethods.First();
-                    var routeValues = linkRequirement.GetRouteValues(resource.Data);
+                    var routeValues = link.GetRouteValues(resource.Data);
                     var routeValuesToFormUrl = routeValues.Count > 0 ? routeValues : null;
-                    var url = urlHelper.Link(linkRequirement.Name, routeValuesToFormUrl).ToLower();
-                    resource.Links.Add(new LinkDTO(linkRequirement.Name, url, method));
+                    var url = urlHelper.Link(link.Name, routeValuesToFormUrl).ToLower();
+                    resource.Links.Add(new LinkDTO(link.Name, url, method));
                 }
             }
             return resource;
