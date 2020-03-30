@@ -8,10 +8,10 @@ namespace Business.Validators
 {
     public class InviteValidator : BaseValidator<Invite>
     {
-        public InviteValidator(IInviteRepository repository)
+        public InviteValidator(IInviteRepository inviteRepository, IValidator<Member> memberValidator)
         {
             RuleFor(x => x)
-                .Must(x => !repository.Exists(y => y.Id.Equals(x.Id)))
+                .Must(x => x.Equals(inviteRepository.Get(x.Id)))
                 .WithErrorCode(_conflictCodeString)
                 .WithMessage(x => $"A {nameof(Guild)} with given {nameof(Guild.Id)} '{x.Id}' already exists.");
 
@@ -25,9 +25,9 @@ namespace Business.Validators
                 .WithErrorCode(_conflictCodeString)
                 .WithMessage(x => $"A {nameof(Guild)} with given {nameof(Guild.Id)} '{x.Id}' already exists.");
 
-            RuleFor(x => x.Member).InjectValidator();
+            RuleFor(x => x.Member).SetValidator(memberValidator);
 
-            RuleFor(x => x.Guild).InjectValidator();
+            //RuleFor(x => x.Guild).SetValidator(new GuildValidator(guildRepository));
 
             RuleFor(x => x.Member.Id)
                 .Equal(x => x.MemberId)

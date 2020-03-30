@@ -7,17 +7,19 @@ namespace Business.Validators
 {
     public class GuildValidator : BaseValidator<Guild>
     {
-        public GuildValidator(IGuildRepository repository)
+        public GuildValidator(IGuildRepository guildRepository,
+            IValidator<Member> memberValidator,
+            IValidator<Invite> inviteValidator)
         {
             RuleFor(x => x.Name).NotEmpty();
 
             RuleFor(x => x)
-                .Must(x => !repository.Exists(y => y.Id.Equals(x.Id)))
+                .Must(x => x.Equals(guildRepository.Get(x.Id)))
                 .WithErrorCode(_conflictCodeString)
                 .WithMessage(x => $"A {nameof(Guild)} with given {nameof(Guild.Id)} '{x.Id}' already exists.");
 
             RuleFor(x => x)
-                .Must(x => !repository.Exists(y => y.Name.Equals(x.Name)))
+                .Must(x => x.Equals(guildRepository.Query(y => y.Name.Equals(x.Name)).SingleOrDefault()))
                 .WithErrorCode(_conflictCodeString)
                 .WithMessage(x => $"A {nameof(Guild)} with given {nameof(Guild.Name)} '{x.Name}' already exists.");
 
@@ -34,7 +36,7 @@ namespace Business.Validators
             RuleFor(x => x.Members)
                 .Must(x => x.Any(m => m.IsGuildMaster))
                 .ForEach(memberRule => memberRule
-                    .InjectValidator()
+                    .SetValidator(memberValidator)
                     .NotEmpty()
                     .Must(x => !x.Disabled)
                     .Must(x => x.Guild.Invites.Any(i => i.MemberId == x.Id)))
@@ -42,7 +44,7 @@ namespace Business.Validators
                 .When(x => x.Members.Any());
 
             RuleForEach(x => x.Invites)
-                .InjectValidator()
+                .SetValidator(inviteValidator)
                 .NotEmpty()
                 .Must(x => !x.Disabled)
                 .WithErrorCode(_conflictCodeString)
