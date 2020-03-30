@@ -3,12 +3,12 @@ using Domain.Entities;
 using Domain.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
-using System.Collections.Generic;
 
 namespace Domain.Services
 {
     public interface IMemberService
     {
+        Pagination<Member> List(MemberFilterDto payload);
         MemberModel Get(Guid id, bool readOnly = false);
         MemberModel Create(MemberDto payload);
         MemberModel Update(MemberDto payload, Guid id);
@@ -17,6 +17,5 @@ namespace Domain.Services
         MemberModel Demote(Guid id);
         MemberModel LeaveGuild(Guid id);
         MemberModel Delete(Guid id);
-        IReadOnlyList<MemberModel> List(MemberFilterDto payload);
     }
 }
