@@ -49,11 +49,11 @@ namespace Application
                 .AddDataAnnotations()
 
                 // enabling validations
-                .AddFluentValidation(fv =>
-                {
-                    fv.ImplicitlyValidateChildProperties = true;
-                    fv.RegisterValidatorsFromAssemblyContaining<GuildValidator>();
-                })
+                //.AddFluentValidation(fv =>
+                //{
+                //    fv.ImplicitlyValidateChildProperties = true;
+                //    fv.RegisterValidatorsFromAssemblyContaining<GuildValidator>();
+                //})
 
                 .AddApiExplorer()
                 .AddJsonFormatters(options =>

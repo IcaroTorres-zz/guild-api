@@ -1,8 +1,8 @@
 using Business.Validators;
 using Business.Services;
-using DataAccess.Context;
-using DataAccess.Repositories;
-using DataAccess.Unities;
+using Infrastructure.Context;
+using Infrastructure.Repositories;
+using Infrastructure.Unities;
 using Domain.Entities;
 using Domain.Models;
 using Domain.Repositories;
@@ -44,10 +44,10 @@ namespace Application.Extensions
 
                 // Domain ModelFactory and validations
                 .AddScoped<ModelFactory>()
-                .AddScoped<IValidator<Guild>, GuildValidator>()
+                .AddTransient<IValidator<Membership>, MembershipValidator>()
                 .AddScoped<IValidator<Member>, MemberValidator>()
                 .AddScoped<IValidator<Invite>, InviteValidator>()
-                .AddScoped<IValidator<Membership>, MembershipValidator>();
+                .AddScoped<IValidator<Guild>, GuildValidator>();
         }
     }
 }
