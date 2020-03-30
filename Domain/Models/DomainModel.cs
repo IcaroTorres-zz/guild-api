@@ -13,7 +13,7 @@ namespace Domain.Models
         }
         public virtual T Entity { get; set; }
         public virtual IApiValidationResult ValidationResult { get; protected set; }
-        public virtual bool IsValid => ValidationResult.IsValid;
+        public virtual bool IsValid => ValidationResult?.IsValid ?? false;
 
         public virtual DomainModel<T> ApplyValidator(IValidator<T> validator)
         {
