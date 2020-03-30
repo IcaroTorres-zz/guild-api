@@ -13,5 +13,7 @@ namespace Domain.Repositories
         Member Insert(DomainModel<Member> domainModel);
         Member Update(DomainModel<Member> domainModel);
         Member Remove(DomainModel<Member> domainModel);
+        bool Exists(Expression<Func<Member, bool>> predicate);
+
     }
 }
