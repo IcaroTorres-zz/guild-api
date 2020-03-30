@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace DataAccess.Repositories
+namespace Infrastructure.Repositories
 {
     public class GuildRepository : IGuildRepository
     {
@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
         {
             BaseRepository = baseRepository;
         }
-        public virtual Guild Get(Guid id, bool readOnly)
+        public virtual Guild Get(Guid id, bool readOnly = false)
         {
             var query = Query(x => x.Id == id);
                 

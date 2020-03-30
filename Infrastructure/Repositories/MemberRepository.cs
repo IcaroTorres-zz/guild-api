@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace DataAccess.Repositories
+namespace Infrastructure.Repositories
 {
     public class MemberRepository : IMemberRepository
     {
@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
         {
             BaseRepository = baseRepository;
         }
-        public virtual Member Get(Guid id, bool readOnly)
+        public virtual Member Get(Guid id, bool readOnly = false)
         {
             var query = Query(x => x.Id == id);
                 
@@ -31,5 +31,6 @@ namespace DataAccess.Repositories
         public virtual Member Insert(DomainModel<Member> domainModel) => BaseRepository.Insert(domainModel);
         public virtual Member Update(DomainModel<Member> domainModel) => BaseRepository.Update(domainModel);
         public virtual Member Remove(DomainModel<Member> domainModel) => BaseRepository.Remove(domainModel);
+        public virtual bool Exists(Expression<Func<Member, bool>> predicate) => BaseRepository.Exists(predicate);
     }
 }

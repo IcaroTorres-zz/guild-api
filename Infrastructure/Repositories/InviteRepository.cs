@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace DataAccess.Repositories
+namespace Infrastructure.Repositories
 {
     public class InviteRepository : IInviteRepository
     {
@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
         {
             BaseRepository = baseRepository;
         }
-        public virtual Invite Get(Guid id, bool readOnly)
+        public virtual Invite Get(Guid id, bool readOnly = false)
         {
             var query = Query(x => x.Id == id);
 

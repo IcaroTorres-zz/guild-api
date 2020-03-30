@@ -1,4 +1,4 @@
-﻿using DataAccess.Context;
+﻿using Infrastructure.Context;
 using Domain.Entities;
 using Domain.Models;
 using Domain.Repositories;
@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace DataAccess.Repositories
+namespace Infrastructure.Repositories
 {
     public class Repository<T> : IRepository<T> where T : EntityModel<T> 
     {

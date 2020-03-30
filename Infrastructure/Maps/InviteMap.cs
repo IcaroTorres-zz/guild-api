@@ -2,18 +2,20 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DataAccess.Maps
+namespace Infrastructure.Maps
 {
-    public class GuildMap : IEntityTypeConfiguration<Guild>
+    public class InviteMap : IEntityTypeConfiguration<Invite>
     {
-        public void Configure(EntityTypeBuilder<Guild> builder)
+        public void Configure(EntityTypeBuilder<Invite> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.HasIndex(u => u.Name)
-                .IsUnique();
-            builder.HasMany(x => x.Members)
-                .WithOne(x => x.Guild)
+            builder.HasOne(x => x.Guild)
+                .WithMany(x => x.Invites)
                 .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.Member)
+                .WithMany()
+                .HasForeignKey(x => x.MemberId)
                 .OnDelete(DeleteBehavior.Restrict);
             builder.Property(x => x.CreatedDate)
                 .ValueGeneratedOnAdd()

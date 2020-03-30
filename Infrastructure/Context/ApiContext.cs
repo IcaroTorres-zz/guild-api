@@ -1,9 +1,9 @@
-using DataAccess.Maps;
+using Infrastructure.Maps;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
-namespace DataAccess.Context
+namespace Infrastructure.Context
 {
     public class ApiContext : DbContext
     {

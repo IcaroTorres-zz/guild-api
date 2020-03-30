@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 
-namespace Api.DataAccess.Migrations
+namespace Api.Infrastructure.Migrations
 {
     public partial class Indexes : Migration
     {

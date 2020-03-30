@@ -1,4 +1,4 @@
-﻿using DataAccess.Context;
+﻿using Infrastructure.Context;
 using Domain.Unities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace DataAccess.Unities
+namespace Infrastructure.Unities
 {
     public class UnitOfWork : IUnitOfWork
     {
