@@ -4,24 +4,24 @@ using System.Collections.Generic;
 
 namespace Application.Hateoas
 {
-    public class HateoasOptions
+  public class HateoasOptions
+  {
+    private readonly List<IRequiredLink> links = new List<IRequiredLink>();
+    public IReadOnlyList<IRequiredLink> RequiredLinks => links.AsReadOnly();
+
+    public HateoasOptions() { }
+
+    public HateoasOptions AddLink<T>(string routeName, Func<T, object> getValues = null) where T : class
     {
-        private readonly List<IRequiredLink> links = new List<IRequiredLink>();
-        public IReadOnlyList<IRequiredLink> RequiredLinks => links.AsReadOnly();
+      Func<T, RouteValueDictionary> getRouteValuesFunc = r => new RouteValueDictionary();
+      if (getValues != null)
+      {
+        getRouteValuesFunc = r => new RouteValueDictionary(getValues(r));
+      }
 
-        public HateoasOptions() { }
+      links.Add(new ResourceLink<T>(typeof(T), routeName, getRouteValuesFunc));
 
-        public HateoasOptions AddLink<T>(string routeName, Func<T, object> getValues = null) where T : class
-        {
-            Func<T, RouteValueDictionary> getRouteValuesFunc = r => new RouteValueDictionary();
-            if (getValues != null)
-            {
-                getRouteValuesFunc = r => new RouteValueDictionary(getValues(r));
-            }
-
-            links.Add(new ResourceLink<T>(typeof(T), routeName, getRouteValuesFunc));
-
-            return this;
-        }
+      return this;
     }
+  }
 }
