@@ -1,64 +1,83 @@
-﻿using Domain.Services;
-using Application.ActionFilters;
-using Domain.DTOs;
+﻿using Application.ActionFilters;
+using Business.Commands.Members;
+using Domain.Entities;
+using Domain.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-    [Route("api/[controller]/v1"), ApiController]
-    public class MembersController : ControllerBase
+  [ApiController, Route("api/[controller]/v1")]
+  public class MembersController : ControllerBase
+  {
+    private readonly IMemberRepository _memberRepository;
+    private readonly IMediator _mediator;
+
+    public MembersController(IMemberRepository memberRepository, IMediator mediator)
     {
-        [HttpGet("{id}", Name = "get-member"), UseCache(10)]
-        public ActionResult Get(Guid id, [FromServices] IMemberService service)
-        {
-            return Ok(service.Get(id, readOnly: true));
-        }
-
-        [HttpGet(Name = "get-members"), UseCache(10)]
-        public ActionResult GetAll([FromServices] IMemberService service, [FromQuery] MemberFilterDto payload)
-        {
-            return Ok(service.List(payload));
-        }
-
-        [HttpPost(Name = "create-member"), UseUnitOfWork]
-        public ActionResult Create([FromBody] MemberDto payload, [FromServices] IMemberService service)
-        {
-            var member = service.Create(payload);
-
-            return CreatedAtRoute("get-member", new { id = member.Id }, member);
-        }
-
-        [HttpPut("{id}", Name = "update-member"), UseUnitOfWork]
-        public ActionResult Update(Guid id, [FromBody] MemberDto payload, [FromServices] IMemberService service)
-        {
-            return Ok(service.Update(payload, id));
-        }
-
-        [HttpPatch("{id}/promote", Name = "promote-member"), UseUnitOfWork]
-        public ActionResult Promote(Guid id, [FromServices] IMemberService service)
-        {
-            return Ok(service.Promote(id));
-        }
-
-        [HttpPatch("{id}/demote", Name = "demote-member"), UseUnitOfWork]
-        public ActionResult Demote(Guid id, [FromServices] IMemberService service)
-        {
-            return Ok(service.Demote(id));
-        }
-
-        [HttpPatch("{id}/leave", Name = "leave-guild"), UseUnitOfWork]
-        public ActionResult LeaveGuild(Guid id, [FromServices] IMemberService service)
-        {
-            return Ok(service.LeaveGuild(id));
-        }
-
-        [HttpDelete("{id}", Name = "delete-member"), UseUnitOfWork]
-        public ActionResult Delete(Guid id, [FromServices] IMemberService service)
-        {
-            service.Delete(id);
-
-            return NoContent();
-        }
+      _memberRepository = memberRepository;
+      _mediator = mediator;
     }
+
+    [HttpGet("{id}", Name = "get-member"), UseCache(10)]
+    public async Task<IActionResult> GetAsync(Guid id)
+    {
+      var result = await _memberRepository.GetByIdAsync(id, readOnly: true);
+
+      return result is NullMember ? (IActionResult)NotFound() : Ok(result);
+    }
+
+    [HttpGet(Name = "get-members"), UseCache(10)]
+    public async Task<IActionResult> GetAllAsync([FromQuery] MemberFilterCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPost(Name = "create-member"), UseUnitOfWork]
+    public async Task<IActionResult> CreateAsync([FromBody] CreateMemberCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any()
+          ? (IActionResult)BadRequest(result.AsErrorOutput())
+          : CreatedAtAction(nameof(GetAsync), new { id = result.Value.Id }, result.Value);
+    }
+
+    [HttpPut("{id}", Name = "update-member"), UseUnitOfWork]
+    public async Task<IActionResult> UpdateAsync([FromBody] UpdateMemberCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPatch("{id}/promote", Name = "promote-member"), UseUnitOfWork]
+    public async Task<IActionResult> PromoteAsync(Guid id, [FromServices] IMemberRepository memberRepository)
+    {
+      var result = await _mediator.Send(new PromoteMemberCommand(id, memberRepository));
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPatch("{id}/demote", Name = "demote-member"), UseUnitOfWork]
+    public async Task<IActionResult> DemoteAsync(Guid id, [FromServices] IMemberRepository memberRepository)
+    {
+      var result = await _mediator.Send(new DemoteMemberCommand(id, memberRepository));
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPatch("{id}/leave", Name = "leave-guild"), UseUnitOfWork]
+    public async Task<IActionResult> LeaveGuildAsync(Guid id, [FromServices] IMemberRepository memberRepository)
+    {
+      var result = await _mediator.Send(new LeaveGuildCommand(id, memberRepository));
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+  }
 }
