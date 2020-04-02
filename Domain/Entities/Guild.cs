@@ -5,10 +5,11 @@ using System.Collections.Generic;
 namespace Domain.Entities
 {
     [Serializable]
-    public class Guild : EntityModel<Guild>
+    public partial class Guild : EntityModel<Guild>
     {
-        public virtual string Name { get; set; }
-        [JsonIgnore] public virtual ICollection<Member> Members { get; set; } = new List<Member>();
-        [JsonIgnore] public virtual ICollection<Invite> Invites { get; set; } = new List<Invite>();
+        public Guild() { }
+        public virtual string Name { get; internal set; }
+        [JsonIgnore] public virtual ICollection<Member> Members { get; internal set; } = new List<Member>();
+        [JsonIgnore] public virtual ICollection<Invite> Invites { get; internal set; } = new List<Invite>();
     }
 }

@@ -1,32 +1,28 @@
 ﻿using Domain.Entities;
 using Domain.Repositories;
 using FluentValidation;
-using System;
 
-namespace Business.Validators
+namespace Business.Validators.PosCommands
 {
-    public class MembershipValidator : BaseValidator<Membership>
+    public class MembershipValidator : AbstractValidator<Membership>
     {
-
         public MembershipValidator(IGuildRepository guildRepository, IMemberRepository memberRepository)
         {
             RuleFor(x => x.Since).NotEmpty()
-            .WithErrorCode(_conflictCodeString)
+            .WithErrorCode(CommonValidations.ConflictCodeString)
             .WithMessage($"{nameof(Membership)} must have a {nameof(Membership.Since)} start date.");
 
             RuleFor(x => x.MemberId)
                 .NotEmpty()
-                .NotEqual(Guid.Empty)
-                .Must(x => memberRepository.Exists(y => y.Id.Equals(x)))
-                .WithErrorCode(_conflictCodeString)
-                .WithMessage(x => $"{nameof(Member)} for {nameof(Membership.MemberId)} '{x.MemberId}' not exists.");
+                .MustAsync(async (x, _) => await memberRepository.ExistsAsync(y => y.Id.Equals(x)))
+                .WithErrorCode(CommonValidations.ConflictCodeString)
+                .WithMessage(x => CommonValidations.ForRecordNotFound(nameof(Member), x.MemberId));
 
             RuleFor(x => x.GuildId)
                 .NotEmpty()
-                .NotEqual(Guid.Empty)
-                .Must(x => guildRepository.Exists(y => y.Id.Equals(x)))
-                .WithErrorCode(_conflictCodeString)
-                .WithMessage(x => $"{nameof(Guild)} for {nameof(Membership.GuildId)} '{x.GuildId}' not exists.");
+                .MustAsync(async (x, _) => await guildRepository.ExistsAsync(y => y.Id.Equals(x)))
+                .WithErrorCode(CommonValidations.ConflictCodeString)
+                .WithMessage(x => CommonValidations.ForRecordNotFound(nameof(Guild), x.GuildId));
 
             RuleFor(x => x.Member.Id).Equal(x => x.MemberId).Unless(x => x.Member is null);
 

@@ -9,10 +9,10 @@ namespace Application.Hateoas.DTOs
         {
             Page = valores.Page;
             PageSize = valores.PageSize;
-            Pages = valores.Pages; 
+            Pages = valores.Pages;
             Count = valores.Count;
         }
-        private T[] DataArray => (T[]) base.Data;
+        private T[] DataArray => (T[])base.Data;
 
         [JsonProperty("items", Order = 2)] public override object Data => DataArray;
         [JsonProperty("inPage", Order = -1)] public long InPage => DataArray.Length;

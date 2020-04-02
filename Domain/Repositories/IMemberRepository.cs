@@ -1,19 +1,23 @@
 using Domain.Entities;
-using Domain.Models;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Domain.Repositories
 {
     public interface IMemberRepository
     {
-        Member Get(Guid id, bool readOnly = false);
+        Task<bool> ExistsAsync(Expression<Func<Member, bool>> predicate);
+        Task<bool> ExistsWithIdAsync(Guid id);
+        Task<bool> ExistsWithNameAsync(string name);
+        Task<Member> GetByIdAsync(Guid id, bool readOnly = false);
+        Task<Member> GetByNameAsync(string name, bool readOnly = false);
+        Task<Member> GetForGuildOperationsAsync(Guid id);
         IQueryable<Member> Query(Expression<Func<Member, bool>> predicate = null, bool readOnly = false);
-        Member Insert(DomainModel<Member> domainModel);
-        Member Update(DomainModel<Member> domainModel);
-        Member Remove(DomainModel<Member> domainModel);
-        bool Exists(Expression<Func<Member, bool>> predicate);
+        Task<Member> InsertAsync(Member entity);
+        Member Update(Member entity);
+        Member Remove(Member entity);
 
     }
 }

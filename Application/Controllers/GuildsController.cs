@@ -1,45 +1,59 @@
 ﻿using Application.ActionFilters;
-using Domain.DTOs;
-using Domain.Services;
+using Business.Commands.Guilds;
+using Domain.Entities;
+using Domain.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
     [ApiController, Route("api/[controller]/v1")]
     public class GuildsController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
-        public IActionResult Get(Guid id, [FromServices] IGuildService service)
+        private readonly IGuildRepository _guildRepository;
+        private readonly IMediator _mediator;
+
+        public GuildsController(IGuildRepository guildRepository, IMediator mediator)
         {
-            return Ok(service.Get(id, readOnly: true));
+            _guildRepository = guildRepository;
+            _mediator = mediator;
+        }
+
+        [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
+        public async Task<IActionResult> GetAsync(Guid id)
+        {
+            var result = await _guildRepository.GetByIdAsync(id, readOnly: true);
+
+            return result is NullGuild ? (IActionResult)NotFound() : Ok(result);
         }
 
         [HttpGet(Name = "get-guilds"), UseCache(20)]
-        public IActionResult Get([FromServices] IGuildService service, [FromQuery(Name = "count")] int count = 20)
+        public async Task<IActionResult> GetAsync([FromQuery] GuildFilterCommand command)
         {
-            return Ok(service.List(count));
+            var result = await _mediator.Send(command);
+
+            return result.Errors.Any() ? (IActionResult)BadRequest(result.Errors) : Ok(result.Value);
         }
 
         [HttpPost(Name = "create-guild"), UseUnitOfWork]
-        public IActionResult Post([FromBody] GuildDto payload, [FromServices] IGuildService service)
+        public async Task<IActionResult> PostAsync([FromBody] UpdateGuildCommand command)
         {
-            var guild = service.Create(payload);
+            var result = await _mediator.Send(command);
 
-            return CreatedAtRoute("get-guild", new { id = guild.Entity.Id }, guild);
+            return result.Errors.Any()
+                ? (IActionResult)BadRequest(result.Errors)
+                : CreatedAtAction(nameof(GetAsync), new { id = result.Value.Id }, result.Value);
         }
 
         [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]
-        public IActionResult Put(Guid id, [FromBody] GuildDto payload, [FromServices] IGuildService service)
+        public async Task<IActionResult> PutAsync([FromBody] UpdateGuildCommand command)
         {
-            return Ok(service.Update(payload, id));
-        }
+            var result = await _mediator.Send(command);
 
-        [HttpDelete("{id}", Name = "delete-guild"), UseUnitOfWork]
-        public IActionResult Delete(Guid id, [FromServices] IGuildService service)
-        {
-            service.Delete(id);
-            return NoContent();
+            return result.Errors.Any() ? (IActionResult)BadRequest(result.Errors) : Ok(result.Value);
         }
     }
 }

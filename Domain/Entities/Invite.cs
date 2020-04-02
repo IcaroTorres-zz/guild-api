@@ -4,13 +4,14 @@ using System;
 namespace Domain.Entities
 {
     [Serializable]
-    public class Invite : EntityModel<Invite>
+    public partial class Invite : EntityModel<Invite>
     {
-        public virtual InviteStatuses Status { get; set; } = InviteStatuses.Pending;
-        public Guid GuildId { get; set; }
-        public Guid MemberId { get; set; }
-        [JsonIgnore] public virtual Member Member { get; set; }
-        [JsonIgnore] public virtual Guild Guild { get; set; }
+        public Invite() { }
+        public virtual InviteStatuses Status { get; internal set; } = InviteStatuses.Pending;
+        public Guid GuildId { get; internal set; }
+        public Guid MemberId { get; internal set; }
+        [JsonIgnore] public virtual Member Member { get; internal set; }
+        [JsonIgnore] public virtual Guild Guild { get; internal set; }
     }
     public enum InviteStatuses : short
     {

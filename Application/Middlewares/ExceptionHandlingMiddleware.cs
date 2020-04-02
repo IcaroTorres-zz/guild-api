@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -18,15 +19,15 @@ namespace Application.Middlewares
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context /* other dependencies */)
+        public async Task Invoke(HttpContext context, IMediator mediator /* other dependencies */)
         {
             try
             {
                 await next(context);
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException dbex)
             {
-                await HandleExceptionAsync(context, ex);
+                await HandleExceptionAsync(context, dbex);
             }
             catch (Exception ex)
             {
@@ -34,14 +35,14 @@ namespace Application.Middlewares
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception ex)
-        {
-            return WriteResponseAsync(context, (int)HttpStatusCode.InternalServerError, GenerateExceptionErrorMessages(ex));
-        }
-
         private static Task HandleExceptionAsync(HttpContext context, DbUpdateException ex)
         {
             return WriteResponseAsync(context, (int)HttpStatusCode.Conflict, new[] { ex.Message });
+        }
+
+        private static Task HandleExceptionAsync(HttpContext context, Exception ex)
+        {
+            return WriteResponseAsync(context, (int)HttpStatusCode.InternalServerError, GenerateExceptionErrorMessages(ex));
         }
 
         private static Task WriteResponseAsync(HttpContext context, int status, IEnumerable<object> errors)

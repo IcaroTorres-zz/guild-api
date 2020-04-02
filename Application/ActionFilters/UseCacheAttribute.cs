@@ -1,9 +1,11 @@
-﻿using Application.ActionFilters.Extensions;
-using Application.Cache;
+﻿using Application.Cache;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.ActionFilters
@@ -23,7 +25,7 @@ namespace Application.ActionFilters
             var cacheSettings = context.HttpContext.RequestServices.GetRequiredService<RedisCacheSettings>();
             if (!cacheSettings.Enabled)
             {
-                (await next()).EnableResultValidation();
+                await next();
                 return;
             }
 
@@ -37,12 +39,40 @@ namespace Application.ActionFilters
                 return;
             }
 
-            var executedContext = (await next()).EnableResultValidation();
+            var executedContext = await next();
 
             if (executedContext.Result is OkObjectResult okObjectResult)
             {
                 await cacheService.CacheResponseAsync(cacheKey, okObjectResult.Value, timeToLive: TimeSpan.FromSeconds(_timeToLiveSeconds));
             }
+        }
+
+    }
+    public static class CacheExtensions
+    {
+        public static string GenerateCacheKeyFromRequest(this HttpRequest request)
+        {
+            var cacheKeyBuilder = new StringBuilder(request.Path);
+
+            if (request.Query.Any())
+            {
+                cacheKeyBuilder = request.Query
+                    .OrderBy(q => q.Key)
+                    .Aggregate(
+                        cacheKeyBuilder,
+                        (orderedQueryBuilder, currentQueryStringPair) =>
+                        {
+                            var previousFullValue = orderedQueryBuilder.Append(orderedQueryBuilder.ToString() == request.Path.ToString() ? "?" : "&").ToString();
+                            orderedQueryBuilder.Clear().Append($"{previousFullValue}{currentQueryStringPair.Key}={currentQueryStringPair.Value}");
+                            return orderedQueryBuilder;
+                        });
+            }
+
+            cacheKeyBuilder = request.Headers
+                .Where(header => !string.IsNullOrWhiteSpace(header.Value) && !header.Key.ToLowerInvariant().Contains("token"))
+                .Aggregate(cacheKeyBuilder, (headerBuilder, header) => headerBuilder.Append($"|{header.Key}={header.Value}"));
+
+            return cacheKeyBuilder.ToString();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Application.ActionFilters.Extensions;
-using Domain.Unities;
+﻿using Domain.Unities;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,7 +12,7 @@ namespace Application.ActionFilters
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             using var unitOfWork = context.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>().Begin();
-            var executedContext = (await next()).EnableResultValidation();
+            var executedContext = await next();
             if (executedContext.Exception != null || executedContext.HttpContext.Response.StatusCode >= 400)
             {
                 unitOfWork.RollbackTransaction();

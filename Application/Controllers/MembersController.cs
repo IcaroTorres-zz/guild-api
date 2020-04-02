@@ -1,64 +1,83 @@
 ﻿using Application.ActionFilters;
-using Domain.DTOs;
-using Domain.Services;
+using Business.Commands.Members;
+using Domain.Entities;
+using Domain.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
     [ApiController, Route("api/[controller]/v1")]
     public class MembersController : ControllerBase
     {
-        [HttpGet("{id}", Name = "get-member"), UseCache(10)]
-        public ActionResult Get(Guid id, [FromServices] IMemberService service)
+        private readonly IMemberRepository _memberRepository;
+        private readonly IMediator _mediator;
+
+        public MembersController(IMemberRepository memberRepository, IMediator mediator)
         {
-            return Ok(service.Get(id, readOnly: true));
+            _memberRepository = memberRepository;
+            _mediator = mediator;
+        }
+
+        [HttpGet("{id}", Name = "get-member"), UseCache(10)]
+        public async Task<IActionResult> GetAsync(Guid id)
+        {
+            var result = await _memberRepository.GetByIdAsync(id, readOnly: true);
+
+            return result is NullMember ? (IActionResult)NotFound() : Ok(result);
         }
 
         [HttpGet(Name = "get-members"), UseCache(10)]
-        public ActionResult GetAll([FromServices] IMemberService service, [FromQuery] MemberFilterDto payload)
+        public async Task<IActionResult> GetAllAsync([FromQuery] MemberFilterCommand command)
         {
-            return Ok(service.List(payload));
+            var result = await _mediator.Send(command);
+
+            return result.Errors.Any() ? (IActionResult)BadRequest(result.Errors) : Ok(result.Value);
         }
 
         [HttpPost(Name = "create-member"), UseUnitOfWork]
-        public ActionResult Create([FromBody] MemberDto payload, [FromServices] IMemberService service)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateMemberCommand command)
         {
-            var member = service.Create(payload);
+            var result = await _mediator.Send(command);
 
-            return CreatedAtRoute("get-member", new { id = member.Entity.Id }, member);
+            return result.Errors.Any()
+                ? (IActionResult)BadRequest(result.Errors)
+                : CreatedAtAction(nameof(GetAsync), new { id = result.Value.Id }, result.Value);
         }
 
         [HttpPut("{id}", Name = "update-member"), UseUnitOfWork]
-        public ActionResult Update(Guid id, [FromBody] MemberDto payload, [FromServices] IMemberService service)
+        public async Task<IActionResult> UpdateAsync([FromBody] UpdateMemberCommand command)
         {
-            return Ok(service.Update(payload, id));
+            var result = await _mediator.Send(command);
+
+            return result.Errors.Any() ? (IActionResult)BadRequest(result.Errors) : Ok(result.Value);
         }
 
         [HttpPatch("{id}/promote", Name = "promote-member"), UseUnitOfWork]
-        public ActionResult Promote(Guid id, [FromServices] IMemberService service)
+        public async Task<IActionResult> PromoteAsync([FromRoute] PromoteMemberCommand command)
         {
-            return Ok(service.Promote(id));
+            var result = await _mediator.Send(command);
+
+            return result.Errors.Any() ? (IActionResult)BadRequest(result.Errors) : Ok(result.Value);
         }
 
         [HttpPatch("{id}/demote", Name = "demote-member"), UseUnitOfWork]
-        public ActionResult Demote(Guid id, [FromServices] IMemberService service)
+        public async Task<IActionResult> DemoteAsync([FromRoute] DemoteMemberCommand command)
         {
-            return Ok(service.Demote(id));
+            var result = await _mediator.Send(command);
+
+            return result.Errors.Any() ? (IActionResult)BadRequest(result.Errors) : Ok(result.Value);
         }
 
         [HttpPatch("{id}/leave", Name = "leave-guild"), UseUnitOfWork]
-        public ActionResult LeaveGuild(Guid id, [FromServices] IMemberService service)
+        public async Task<IActionResult> LeaveGuildAsync([FromRoute] LeaveGuildCommand command)
         {
-            return Ok(service.LeaveGuild(id));
-        }
+            var result = await _mediator.Send(command);
 
-        [HttpDelete("{id}", Name = "delete-member"), UseUnitOfWork]
-        public ActionResult Delete(Guid id, [FromServices] IMemberService service)
-        {
-            service.Delete(id);
-
-            return NoContent();
+            return result.Errors.Any() ? (IActionResult)BadRequest(result.Errors) : Ok(result.Value);
         }
     }
 }

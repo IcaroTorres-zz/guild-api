@@ -9,9 +9,9 @@ namespace Application.Controllers
     public class MembershipsController : ControllerBase
     {
         [HttpGet(Name = "get-memberships"), UseCache(10)]
-        public ActionResult Get([FromServices] IRepository<Membership> repository)
+        public async System.Threading.Tasks.Task<IActionResult> GetAsync([FromServices] IRepository<Membership> repository)
         {
-            return Ok(repository.GetAll(readOnly: true));
+            return Ok(await repository.GetAllAsync(readOnly: true));
         }
     }
 }

@@ -5,12 +5,13 @@ using System.Collections.Generic;
 namespace Domain.Entities
 {
     [Serializable]
-    public class Member : EntityModel<Member>
+    public partial class Member : EntityModel<Member>
     {
-        public virtual string Name { get; set; }
-        public virtual bool IsGuildMaster { get; set; }
-        public virtual Guid? GuildId { get; set; }
-        [JsonIgnore] public virtual Guild Guild { get; set; }
-        [JsonIgnore] public virtual ICollection<Membership> Memberships { get; set; } = new List<Membership>();
+        public Member() { }
+        public virtual string Name { get; internal set; }
+        public virtual bool IsGuildMaster { get; internal set; }
+        public virtual Guid? GuildId { get; internal set; }
+        [JsonIgnore] public virtual Guild Guild { get; internal set; }
+        [JsonIgnore] public virtual ICollection<Membership> Memberships { get; internal set; } = new List<Membership>();
     }
 }
