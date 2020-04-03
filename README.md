@@ -1,19 +1,20 @@
-﻿# Guild.api
+# Guild.api
 
 # Description
 
-A REST API of a basic environment allowing interactions between models representing guilds, members, invites and memberships, made in .Net Core including the following list of concepts during development:
+A REST API with resources representing Guilds, Members, Invites and Memberships, developed in .Net Core including:
 
-- [x] **.Net Core 2.2**;
-- [x] **EF Core 2.2.6**;
-- [x] **Microsoft.EntityFrameworkCore.Sqlite 2.2.6** package;
-- [x] **Dependency Injection**;
-- [x] **Repository Pattern**;
+- [x] **.Net Core 3.1.3**;
+- [x] **Microsoft.EntityFrameworkCore**;
+- [x] **Microsoft.EntityFrameworkCore.Sqlite** package;
+- [x] **Domain-Driven Design**;
+- [x] **Repositories**;
 - [x] **Unit of Work**;
-- [x] **Rich Domain entities**;
-- [x] **Custom Domain Validations**;
-- [x] **Hateoas**;
-- [x] **Distributed Cache (Redis)**.
+- [x] **Null Objects**;
+- [x] **FluentValidations**;
+- [x] **MediatR Request/Response Pipelines**;
+- [x] **HATEOAS**;
+- [x] **Cache**.
 
 # Table of Contents
 
@@ -37,7 +38,7 @@ A REST API of a basic environment allowing interactions between models represent
 
 ## Requirements:
 
-This project require installation of some other tools. You need to have **[GIT](https://git-scm.com/downloads "git downloads")** to clone this repo, install **[.Net Core SDK 2.2](https://dotnet.microsoft.com/download "microsoft downloads")** to work with .net cross-platform development environment and use `dotnet cli` commands to restore the project and get all packages and dependencies needed properly installed, including **[Package EntityFrameworkCore 2.2.6](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore/ "nuget gallery")**, **[Package SQLite 2.2.6](https://www.nuget.org/packages/System.Data.SQLite "nuget gallery")** and **[Package StackExchangeRedis 2.2.5](https://www.nuget.org/packages/Microsoft.Extensions.Caching.StackExchangeRedis "nuget gallery")**. At last but not least, you will need **[Redis](https://redis.io/download "redis downloads")** installed on your system and run it before starts the project execution.
+This project require installation of some other tools. You need to have **[GIT](https://git-scm.com/downloads "git downloads")** to clone this repo, install **[.Net Core SDK](https://dotnet.microsoft.com/download "microsoft downloads")** to work with .net cross-platform development environment and use `dotnet cli` commands to restore the project and get all packages and dependencies needed properly installed, including **[EntityFrameworkCore](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore/ "nuget gallery")**, **[SQLite](https://www.nuget.org/packages/System.Data.SQLite "nuget gallery")** and **[StackExchangeRedis](https://www.nuget.org/packages/Microsoft.Extensions.Caching.StackExchangeRedis "nuget gallery")**. At last but not least, you will need **[Redis](https://redis.io/download "redis downloads")** installed on your system and run it before starts the project execution.
 
 ## Clone and Restore
 
@@ -65,14 +66,14 @@ The binaries that are now compiled are available in the src directory. Run Redis
  - You can download it directly from **[Redis](https://redis.io/download "redis downloads")** oficiall downloads page, compile with **[Make](http://gnuwin32.sourceforge.net/packages/make.htm "Make page")** for Windows similarly to linux instalation;
  - Acquire it using **[Chocolatey](https://chocolatey.org/install "Chocolatey")** and installing Redis-64 package with `choco install redis-64` in powershell;
  - Get a compiled Windows version from [dmajkic / redis](https://github.com/dmajkic/redis/downloads "github dmajkic/redis download packages") and set Redis on your environment variables, and use following command to run a basic configuration of redis on prompt like below:
-
-    $ redis-server
+ 
+ 		$ redis-server
 
 This will start your Redis local server with default settings.
 
 ## Redis in the project
 
-Configure an entry for your settings in your pppsetings.json. Following there is an example:
+Configure an entry for your settings in your appsetings.json. Following there is an example:
 
 ```json
 {
@@ -143,7 +144,7 @@ tasks.json:
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/guild.api.csproj"
+        "${workspaceFolder}/Api.csproj"
       ],
       "problemMatcher": "$msCompile"
     }
