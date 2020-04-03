@@ -1,57 +1,75 @@
-﻿using Domain.Services;
-using Application.ActionFilters;
-using Domain.DTOs;
+﻿using Application.ActionFilters;
+using Business.Commands.Invites;
+using Domain.Entities;
+using Domain.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-    [Route("api/[controller]/v1"), ApiController]
-    public class InvitesController : ControllerBase
+  [ApiController, Route("api/[controller]/v1")]
+  public class InvitesController : ControllerBase
+  {
+    private readonly IInviteRepository _repository;
+    private readonly IMediator _mediator;
+
+    public InvitesController(IInviteRepository repository, IMediator mediator)
     {
-        [HttpGet("{id}", Name = "get-invite"), UseCache(20)]
-        public ActionResult Get(Guid id, [FromServices] IInviteService service)
-        {
-            return Ok(service.Get(id, readOnly: true));
-        }
-
-        [HttpGet(Name = "get-invites"), UseCache(30)]
-        public ActionResult GetAll([FromServices] IInviteService service, [FromQuery] InviteDto payload)
-        {
-            return Ok(service.List(payload));
-        }
-
-        [HttpPost(Name = "invite-member"), UseUnitOfWork]
-        public ActionResult InviteMember([FromBody] InviteDto payload, [FromServices] IInviteService service)
-        {
-            var invite = service.InviteMember(payload);
-
-            return CreatedAtRoute("get-invite", new { id = invite.Id }, invite);
-        }
-
-        [HttpPatch("{id}/accept", Name = "accept-invite"), UseUnitOfWork]
-        public ActionResult Accept(Guid id, [FromServices] IInviteService service)
-        {
-            return Ok(service.Accept(id));
-        }
-
-        [HttpPatch("{id}/decline", Name = "decline-invite"), UseUnitOfWork]
-        public ActionResult Decline(Guid id, [FromServices] IInviteService service)
-        {
-            return Ok(service.Decline(id));
-        }
-
-        [HttpPatch("{id}/cancel", Name = "cancel-invite"), UseUnitOfWork]
-        public ActionResult Cancel(Guid id, [FromServices] IInviteService service)
-        {
-            return Ok(service.Cancel(id));
-        }
-
-        [HttpDelete("{id}", Name = "delete-invite"), UseUnitOfWork]
-        public ActionResult Delete(Guid id, [FromServices] IInviteService service)
-        {
-            service.Delete(id);
-            return NoContent();
-        }
+      _repository = repository;
+      _mediator = mediator;
     }
+
+    [HttpGet("{id}", Name = "get-invite"), UseCache(20)]
+    public async Task<IActionResult> GetAsync(Guid id)
+    {
+      var result = await _repository.GetByIdAsync(id, readOnly: true);
+
+      return result is NullInvite ? (IActionResult)NotFound() : Ok(result);
+    }
+
+    [HttpGet(Name = "get-invites"), UseCache(30)]
+    public async Task<IActionResult> GetAllAsync([FromQuery] InviteFilterCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPost(Name = "invite-member"), UseUnitOfWork]
+    public async Task<IActionResult> InviteMember([FromBody] InviteMemberCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any()
+          ? (IActionResult)BadRequest(result.AsErrorOutput())
+          : CreatedAtAction(nameof(GetAsync), new { id = result.Value.Id }, result.Value);
+    }
+
+    [HttpPatch("{id}/accept", Name = "accept-invite"), UseUnitOfWork]
+    public async Task<IActionResult> AcceptAsync([FromRoute] AcceptInviteCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPatch("{id}/decline", Name = "decline-invite"), UseUnitOfWork]
+    public async Task<IActionResult> DeclineAsync([FromRoute] DeclineInviteCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPatch("{id}/cancel", Name = "cancel-invite"), UseUnitOfWork]
+    public async Task<IActionResult> CancelAsync([FromRoute] CancelInviteCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+  }
 }

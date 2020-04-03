@@ -1,45 +1,59 @@
-﻿using Domain.Services;
-using Application.ActionFilters;
-using Domain.DTOs;
+﻿using Application.ActionFilters;
+using Business.Commands.Guilds;
+using Domain.Entities;
+using Domain.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-    [Route("api/[controller]/v1"), ApiController]
-    public class GuildsController : ControllerBase
+  [ApiController, Route("api/[controller]/v1")]
+  public class GuildsController : ControllerBase
+  {
+    private readonly IGuildRepository _guildRepository;
+    private readonly IMediator _mediator;
+
+    public GuildsController(IGuildRepository guildRepository, IMediator mediator)
     {
-        [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
-        public IActionResult Get(Guid id, [FromServices] IGuildService service)
-        {
-            return Ok(service.Get(id, readOnly: true));
-        }
-
-        [HttpGet(Name = "get-guilds"), UseCache(20)]
-        public IActionResult Get([FromServices] IGuildService service, [FromQuery(Name = "count")] int count = 20)
-        {
-            return Ok(service.List(count));
-        }
-
-        [HttpPost(Name = "create-guild"), UseUnitOfWork]
-        public IActionResult Post([FromBody] GuildDto payload, [FromServices] IGuildService service)
-        {
-            var guild = service.Create(payload);
-
-            return CreatedAtRoute("get-guild", new { id = guild.Id } , guild);
-        }
-
-        [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]
-        public IActionResult Put(Guid id, [FromBody] GuildDto payload, [FromServices] IGuildService service)
-        {
-            return Ok(service.Update(payload, id));
-        }
-
-        [HttpDelete("{id}", Name = "delete-guild"), UseUnitOfWork]
-        public IActionResult Delete(Guid id, [FromServices] IGuildService service)
-        {
-            service.Delete(id);
-            return NoContent();
-        }
+      _guildRepository = guildRepository;
+      _mediator = mediator;
     }
+
+    [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
+    public async Task<IActionResult> GetAsync(Guid id)
+    {
+      var result = await _guildRepository.GetByIdAsync(id, readOnly: true);
+
+      return result is NullGuild ? (IActionResult)NotFound() : Ok(result);
+    }
+
+    [HttpGet(Name = "get-guilds"), UseCache(20)]
+    public async Task<IActionResult> GetAsync([FromQuery] GuildFilterCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+
+    [HttpPost(Name = "create-guild"), UseUnitOfWork]
+    public async Task<IActionResult> PostAsync([FromBody] UpdateGuildCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any()
+          ? (IActionResult)BadRequest(result.AsErrorOutput())
+          : CreatedAtAction(nameof(GetAsync), new { id = result.Value.Id }, result.Value);
+    }
+
+    [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]
+    public async Task<IActionResult> PutAsync([FromBody] UpdateGuildCommand command)
+    {
+      var result = await _mediator.Send(command);
+
+      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+    }
+  }
 }

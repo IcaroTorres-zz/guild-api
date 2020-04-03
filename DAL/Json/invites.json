@@ -1,0 +1,68 @@
+[
+  {
+    "status": 2,
+    "guildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+    "memberId": "5cd3f816-6b0f-4ba6-aeb5-26d70281f7e1",
+    "id": "89dd1816-dd87-4e8e-97f5-fc5b32f900bd"
+  },
+  {
+    "status": 2,
+    "guildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+    "memberId": "3cb0ba50-03d9-48db-93ca-692cb9d68131",
+    "id": "8cac0c89-b5b4-4b1a-8395-525395ba3d3b"
+  },
+  {
+    "status": 3,
+    "guildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+    "memberId": "18234e65-8cb1-42e8-9cf4-e4d37980752a",
+    "id": "bedfa422-317d-4640-a4c7-84f47e2fcd6d"
+  },
+  {
+    "status": 4,
+    "guildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+    "memberId": "bf449ca7-5183-46ad-a2eb-edf804e20a0e",
+    "id": "700dad75-3364-4d75-ab44-cec40dcfdeca"
+  },
+  {
+    "status": 2,
+    "guildId": "0bf46ff3-42a8-4dbb-a037-009d831b3263",
+    "memberId": "5cd3f816-6b0f-4ba6-aeb5-26d70281f7e1",
+    "id": "c06ed199-312c-42f0-a582-b471129e41af"
+  },
+  {
+    "status": 2,
+    "guildId": "0bf46ff3-42a8-4dbb-a037-009d831b3263",
+    "memberId": "bf449ca7-5183-46ad-a2eb-edf804e20a0e",
+    "id": "ae609940-4505-4977-813d-d26428672315"
+  },
+  {
+    "status": 2,
+    "guildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+    "memberId": "18234e65-8cb1-42e8-9cf4-e4d37980752a",
+    "id": "b2b4625b-d424-4d8e-aee7-19efa63eb062"
+  },
+  {
+    "status": 2,
+    "guildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+    "memberId": "e3f46444-78f3-4b94-b703-bc056121fc16",
+    "id": "684737ff-ab4b-4b68-b7f1-a8739e0b1840"
+  },
+  {
+    "status": 2,
+    "guildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+    "memberId": "84a7896c-264e-44de-9d36-e2edc3d201e7",
+    "id": "ab532a05-606d-4931-b81b-8ce522dd4496"
+  },
+  {
+    "status": 2,
+    "guildId": "0bf46ff3-42a8-4dbb-a037-009d831b3263",
+    "memberId": "5cd3f816-6b0f-4ba6-aeb5-26d70281f7e1",
+    "id": "1d350c02-d364-41cf-b38c-fa2c242af4c6"
+  },
+  {
+    "status": 2,
+    "guildId": "0bf46ff3-42a8-4dbb-a037-009d831b3263",
+    "memberId": "9fad438a-3555-4583-9621-2c065ad93084",
+    "id": "f0dc8d5a-89eb-4496-a14c-bd041b36448f"
+  }
+]
