@@ -13,19 +13,19 @@ namespace Application.Controllers
   [ApiController, Route("api/[controller]/v1")]
   public class MembersController : ControllerBase
   {
-    private readonly IMemberRepository _memberRepository;
+    private readonly IMemberRepository _repository;
     private readonly IMediator _mediator;
 
-    public MembersController(IMemberRepository memberRepository, IMediator mediator)
+    public MembersController(IMemberRepository repository, IMediator mediator)
     {
-      _memberRepository = memberRepository;
+      _repository = repository;
       _mediator = mediator;
     }
 
     [HttpGet("{id}", Name = "get-member"), UseCache(10)]
     public async Task<IActionResult> GetAsync(Guid id)
     {
-      var result = await _memberRepository.GetByIdAsync(id, readOnly: true);
+      var result = await _repository.GetByIdAsync(id, readOnly: true);
 
       return result is NullMember ? (IActionResult)NotFound() : Ok(result);
     }
@@ -57,25 +57,25 @@ namespace Application.Controllers
     }
 
     [HttpPatch("{id}/promote", Name = "promote-member"), UseUnitOfWork]
-    public async Task<IActionResult> PromoteAsync(Guid id, [FromServices] IMemberRepository memberRepository)
+    public async Task<IActionResult> PromoteAsync(Guid id)
     {
-      var result = await _mediator.Send(new PromoteMemberCommand(id, memberRepository));
+      var result = await _mediator.Send(new PromoteMemberCommand(id, _repository));
 
       return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
     }
 
     [HttpPatch("{id}/demote", Name = "demote-member"), UseUnitOfWork]
-    public async Task<IActionResult> DemoteAsync(Guid id, [FromServices] IMemberRepository memberRepository)
+    public async Task<IActionResult> DemoteAsync(Guid id)
     {
-      var result = await _mediator.Send(new DemoteMemberCommand(id, memberRepository));
+      var result = await _mediator.Send(new DemoteMemberCommand(id, _repository));
 
       return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
     }
 
     [HttpPatch("{id}/leave", Name = "leave-guild"), UseUnitOfWork]
-    public async Task<IActionResult> LeaveGuildAsync(Guid id, [FromServices] IMemberRepository memberRepository)
+    public async Task<IActionResult> LeaveGuildAsync(Guid id)
     {
-      var result = await _mediator.Send(new LeaveGuildCommand(id, memberRepository));
+      var result = await _mediator.Send(new LeaveGuildCommand(id, _repository));
 
       return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
     }

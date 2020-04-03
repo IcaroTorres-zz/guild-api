@@ -13,19 +13,18 @@ namespace Application.Controllers
   [ApiController, Route("api/[controller]/v1")]
   public class GuildsController : ControllerBase
   {
-    private readonly IGuildRepository _guildRepository;
+    private readonly IGuildRepository _repository;
     private readonly IMediator _mediator;
-
     public GuildsController(IGuildRepository guildRepository, IMediator mediator)
     {
-      _guildRepository = guildRepository;
+      _repository = guildRepository;
       _mediator = mediator;
     }
 
     [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
     public async Task<IActionResult> GetAsync(Guid id)
     {
-      var result = await _guildRepository.GetByIdAsync(id, readOnly: true);
+      var result = await _repository.GetByIdAsync(id, readOnly: true);
 
       return result is NullGuild ? (IActionResult)NotFound() : Ok(result);
     }
@@ -39,7 +38,7 @@ namespace Application.Controllers
     }
 
     [HttpPost(Name = "create-guild"), UseUnitOfWork]
-    public async Task<IActionResult> PostAsync([FromBody] UpdateGuildCommand command)
+    public async Task<IActionResult> PostAsync([FromBody] CreateGuildCommand command)
     {
       var result = await _mediator.Send(command);
 

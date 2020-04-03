@@ -49,25 +49,25 @@ namespace Application.Controllers
     }
 
     [HttpPatch("{id}/accept", Name = "accept-invite"), UseUnitOfWork]
-    public async Task<IActionResult> AcceptAsync([FromRoute] AcceptInviteCommand command)
+    public async Task<IActionResult> AcceptAsync(Guid id)
     {
-      var result = await _mediator.Send(command);
+      var result = await _mediator.Send(new AcceptInviteCommand(id, _repository));
 
       return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
     }
 
     [HttpPatch("{id}/decline", Name = "decline-invite"), UseUnitOfWork]
-    public async Task<IActionResult> DeclineAsync([FromRoute] DeclineInviteCommand command)
+    public async Task<IActionResult> DeclineAsync(Guid id)
     {
-      var result = await _mediator.Send(command);
+      var result = await _mediator.Send(new DeclineInviteCommand(id, _repository));
 
       return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
     }
 
     [HttpPatch("{id}/cancel", Name = "cancel-invite"), UseUnitOfWork]
-    public async Task<IActionResult> CancelAsync([FromRoute] CancelInviteCommand command)
+    public async Task<IActionResult> CancelAsync(Guid id)
     {
-      var result = await _mediator.Send(command);
+      var result = await _mediator.Send(new CancelInviteCommand(id, _repository));
 
       return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
     }
