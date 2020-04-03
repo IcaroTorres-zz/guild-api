@@ -10,9 +10,9 @@ namespace Business.Validators.Requests.Members
     public CreateMemberValidator(IMemberRepository memberRepository)
     {
       RuleFor(x => x.Name)
-          .NotEmpty()
-          .MustAsync(async (name, _) => !await memberRepository.ExistsWithNameAsync(name))
-          .WithMessage(x => CommonValidationMessages.ForConflictWithKey(nameof(Member), x.Name));
+        .NotEmpty()
+        .MustAsync(async (name, _) => !await memberRepository.ExistsWithNameAsync(name))
+        .WithMessage(x => CommonValidationMessages.ForConflictWithKey(nameof(Member), x.Name));
     }
   }
 }
