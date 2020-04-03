@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -23,18 +25,17 @@ namespace Application.Middlewares
 
     public async Task Invoke(HttpContext context, IMediator mediator, IWebHostEnvironment env /* other dependencies */)
     {
-      var isDevelopment = env.EnvironmentName.ToLowerInvariant().Equals("development");
       try
       {
         await next(context);
       }
       catch (DbUpdateException dbex)
       {
-        await HandleExceptionAsync(dbex, context, isDevelopment);
+        await HandleExceptionAsync(dbex, context, env.IsDevelopment());
       }
       catch (Exception ex)
       {
-        await HandleExceptionAsync(ex, context, isDevelopment);
+        await HandleExceptionAsync(ex, context, env.IsDevelopment());
       }
     }
 
@@ -72,9 +73,15 @@ namespace Application.Middlewares
 
     private static Task WriteCustomOutputAsync(ApiErrorOutput errorOutput, HttpContext context)
     {
-      var stringResult = JsonConvert.SerializeObject(errorOutput, Formatting.Indented);
+      var stringResult = JsonConvert.SerializeObject(errorOutput, new JsonSerializerSettings
+      {
+        ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        Formatting = Formatting.Indented,
+        NullValueHandling = NullValueHandling.Ignore,
+        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+      });
       context.Response.ContentType = "application/json";
-      context.Response.StatusCode = errorOutput.Status;
+      context.Response.StatusCode = errorOutput?.Status ?? 500;
       return context.Response.WriteAsync(stringResult);
     }
 
