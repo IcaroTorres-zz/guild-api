@@ -14,7 +14,7 @@ namespace Business.Commands.Guilds
     public Guid MasterId { get; set; }
     public HashSet<Guid> MemberIds { get; set; } = new HashSet<Guid>();
 
-    public UpdateGuildCommand(string name, Guid masterId, HashSet<Guid> memberIds, [FromRoute(Name = "id")] Guid id)
+    public UpdateGuildCommand([FromRoute(Name = "id")] Guid id, string name, Guid masterId, HashSet<Guid> memberIds)
     {
       Id = id;
       Name = name;
