@@ -2,7 +2,6 @@
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace Business.Commands.Invites
@@ -12,7 +11,7 @@ namespace Business.Commands.Invites
     public Guid Id { get; set; }
     public Invite Invite { get; private set; }
 
-    public CancelInviteCommand([FromRoute(Name = "id")] Guid id, [FromServices] IInviteRepository repository)
+    public CancelInviteCommand(Guid id, IInviteRepository repository)
     {
       Id = id;
       Invite = repository.GetByIdAsync(id).Result;
