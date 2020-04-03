@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -43,7 +44,7 @@ namespace Application
           .BootstrapPipelinesServices()
 
           // enabling Mvc framework services and resources
-          .AddMvcCore(options => options.EnableEndpointRouting = false)
+          .AddControllers()//options => options.EnableEndpointRouting = false)
 
           // enabling validations
           .AddFluentValidation(fv =>
@@ -51,12 +52,6 @@ namespace Application
             fv.ImplicitlyValidateChildProperties = true;
             fv.RegisterValidatorsFromAssemblyContaining<CreateGuildCommandValidator>();
           })
-
-          // Default framework resources
-          .AddFormatterMappings()
-          .AddCacheTagHelper()
-          .AddDataAnnotations()
-          .AddApiExplorer()
 
           // new integration with newtonsoft json net for net core 3.0 +
           .AddNewtonsoftJson(options =>
@@ -76,7 +71,7 @@ namespace Application
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-      if (env.EnvironmentName.ToLowerInvariant() == "development")
+      if (env.IsDevelopment())
       {
         app.UseDeveloperExceptionPage();
       }
@@ -90,6 +85,9 @@ namespace Application
       Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
 
       app
+          // new .net core routing services required before using middlewares 
+          .UseRouting()
+
           // exception handling as Internal server error output
           .UseMiddleware(typeof(ExceptionHandlingMiddleware))
 
@@ -100,9 +98,11 @@ namespace Application
             option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description);
           })
 
-          // redirection and mvc resources
+          // redirection
           .UseHttpsRedirection()
-          .UseMvc();
+
+          // new endpoint resources registrations
+          .UseEndpoints(e => e.MapControllers());
     }
   }
 }
