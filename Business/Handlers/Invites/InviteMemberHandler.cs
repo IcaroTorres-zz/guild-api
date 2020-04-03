@@ -17,10 +17,12 @@ namespace Business.Handlers.Invites
       _inviteRepository = inviteRepository;
     }
 
-    public async Task<ApiResponse<Invite>> Handle(InviteMemberCommand request,
-        CancellationToken cancellationToken, RequestHandlerDelegate<ApiResponse<Invite>> next)
+    public async Task<ApiResponse<Invite>> Handle(InviteMemberCommand request, CancellationToken cancelToken,
+                                                  RequestHandlerDelegate<ApiResponse<Invite>> next)
     {
-      return new ApiResponse<Invite>(await _inviteRepository.InsertAsync(request.Invite));
+      var invite = new Invite(request.MemberId, request.GuildId);
+
+      return new ApiResponse<Invite>(await _inviteRepository.InsertAsync(invite));
     }
   }
 }
