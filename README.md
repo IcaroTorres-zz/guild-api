@@ -46,7 +46,7 @@ The restore command will provide installations for needed packages.
 
     $ git clone https://github.com/IcaroTorres/guild-api.git
     $ cd guild-api
-    $ dotnet restore Api.csproj
+    $ dotnet restore Application
 
 ## Redis Installation (Non Windows)
 
@@ -96,33 +96,32 @@ Startup.cs
 public void ConfigureServices(IServiceCollection services)
 {
     services
-      .AddEntityFrameworkSqlite()
       .AddDbContext<YourContext>(options => options.UseSqlite(yourSqlConnectionString));
 }
 ```
 
-You can use `appsettings.json` to set absolute or relative paths for Sqlite. If you want to get the absolute path of your application host, you can change default `Startup` class constructor adding the `IHostingEnvironment` as parameter like hereinafter:
+You can use `appsettings.json` to set absolute or relative paths for Sqlite. If you want to get the absolute path of your application host, you can change default `Startup` class constructor adding the `IWebHostEnvironment` as parameter like hereinafter:
 
 Startup.cs
 
 ```c#
-public Startup(IConfiguration configuration, IHostingEnvironment appHost)
+public Startup(IConfiguration configuration, IWebHostEnvironment env)
 {
     Configuration = configuration;
-    AppHost = appHost;
+    Environment = env;
 }
 
 public IConfiguration Configuration { get; }
-public IHostingEnvironment AppHost { get; }
+public IHostingEnvironment Environment { get; }
 ```
 
-And alter the context registration in the `ConfigureServices` method of `Startup.cs` class. Code below is mounting sql connection using `AppHost.ContentRootPath` and `Configuration` key/value from `appsettings.json`.
+And alter the context registration in the `ConfigureServices` method of `Startup.cs` class. Code below is mounting sql connection using `Environment.ContentRootPath` and `Configuration` key/value from `appsettings.json`.
 
 
 Startup.cs
 
 ```c#
-var SqliteAbsolutePathConnectionString = $"Data Source={AppHost.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
+var SqliteAbsolutePathConnectionString = $"Data Source={Environment.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
 
 services.AddDbContext<YourContext>(options => options.UseSqlite(SqliteAbsolutePathConnectionString));
 ```
@@ -144,7 +143,7 @@ tasks.json:
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/Api.csproj"
+        "${workspaceFolder}/Application/Application.csproj"
       ],
       "problemMatcher": "$msCompile"
     }
@@ -152,7 +151,7 @@ tasks.json:
 }
 ```
 
-You can **Compile** project with `dotnet build Api.csproj` and **Publish** production folder with `dotnet publish Api.csproj`.
+You can **Compile** project with `dotnet build Application` and **Publish** production folder with `dotnet publish Application`.
 
 To run, start your Redis server instance and run your project like example below:
 
@@ -162,7 +161,7 @@ To run, start your Redis server instance and run your project like example below
 
 > Inside the project directory.
 
-    $ dotnet run Api.csproj
+    $ dotnet run Application
 
 # Contributing
 
