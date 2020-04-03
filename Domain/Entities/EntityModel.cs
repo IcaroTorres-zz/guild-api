@@ -18,7 +18,7 @@ namespace Domain.Entities
     }
     public static bool operator ==(EntityModel<T> a, EntityModel<T> b)
     {
-      return (a is null && b is null) || !(a is null || b is null) || a.Equals(b);
+      return (a is null && b is null) || !(a is null || b is null) || (a?.Equals(b) ?? false);
     }
     public static bool operator !=(EntityModel<T> a, EntityModel<T> b) => !(a == b);
     public override int GetHashCode() => Id.GetHashCode();
