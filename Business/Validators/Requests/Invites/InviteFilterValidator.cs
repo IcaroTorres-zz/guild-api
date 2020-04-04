@@ -3,11 +3,11 @@ using FluentValidation;
 
 namespace Business.Validators.Requests.Invites
 {
-  public class InviteFilterValidator : AbstractValidator<InviteFilterCommand>
-  {
-    public InviteFilterValidator()
-    {
-      RuleFor(x => x.Count).GreaterThan(0);
-    }
-  }
+	public class InviteFilterValidator : AbstractValidator<InviteFilterCommand>
+	{
+		public InviteFilterValidator()
+		{
+			RuleFor(x => x.Count).GreaterThan(0);
+		}
+	}
 }

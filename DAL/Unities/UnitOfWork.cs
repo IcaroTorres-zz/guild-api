@@ -1,133 +1,100 @@
-﻿using Domain.Unities;
+﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using DAL.Context;
+using Domain.Unities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Win32.SafeHandles;
-using System;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace DAL.Unities
 {
-  public class UnitOfWork : IUnitOfWork
-  {
-    private readonly ApiContext Context;
-    private IDbContextTransaction ContextTransaction;
-    private int Changes = 0;
+	public sealed class UnitOfWork : IUnitOfWork
+	{
+		private readonly ApiContext _context;
+		private int _changes;
+		private IDbContextTransaction _contextTransaction;
 
-    protected bool Disposed { get; set; } = false;
-    protected SafeHandle Handle { get; } = new SafeFileHandle(IntPtr.Zero, true);
+		public UnitOfWork(ApiContext context)
+		{
+			_context = context;
+		}
 
-    /// <summary>
-    /// Construtor de Unidade de trabalho, injetada com os Contextos.
-    /// </summary>
-    /// <param name="context"/>
-    public UnitOfWork(ApiContext context)
-    {
-      Context = context;
-    }
+		private bool Disposed { get; set; }
+		private SafeHandle Handle { get; } = new SafeFileHandle(IntPtr.Zero, true);
 
-    /// <summary>
-    /// Begin a db transaction context
-    /// </summary>
-    public IUnitOfWork Begin()
-    {
-      ContextTransaction = Context.Database.BeginTransaction();
+		public IUnitOfWork Begin()
+		{
+			_contextTransaction = _context.Database.BeginTransaction();
+			return this;
+		}
 
-      return this;
-    }
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
+		public async Task<int> CommitAsync(CancellationToken token = default)
+		{
+			try
+			{
+				await SaveAsync(token);
+				if (_changes > 0) _contextTransaction?.CommitAsync(token);
+				return _changes;
+			}
+			catch (Exception dbUpdateException)
+			{
+				await RollbackTransactionAsync(token);
+				throw new DbUpdateException(
+					"Data constraint violation. Register is invalid or Already exists.", dbUpdateException);
+			}
+		}
 
-    /// <summary>
-    /// Dispose all unmanaged objects and the opened context
-    /// </summary>
-    public void Dispose()
-    {
-      Dispose(true);
-      GC.SuppressFinalize(this);
-    }
+		public async Task<int> SaveAsync(CancellationToken token = default)
+		{
+			try
+			{
+				var newChanges = await _context.SaveChangesAsync(token);
+				_changes += newChanges;
+				return newChanges;
+			}
+			catch (Exception exception)
+			{
+				await RollbackStatesAsync(token);
+				throw new DbUpdateException(
+					"Data constraint violation. Register is invalid or Already exists.", exception);
+			}
+		}
 
-    // Protected implementation of Dispose pattern.
-    /// <summary>
-    /// Dispose all unmanaged objects and the opened context
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-      if (Disposed)
-      {
-        return;
-      }
+		public async Task RollbackTransactionAsync(CancellationToken token = default)
+		{
+			await RollbackStatesAsync(token);
+			if (_contextTransaction != null) await _contextTransaction?.RollbackAsync(token);
+		}
 
-      if (disposing)
-      {
-        Handle.Dispose();
-        ContextTransaction?.Dispose();
-        Context.Dispose();
+		public async Task RollbackStatesAsync(CancellationToken token = default)
+		{
+			await Task.Run(() => _context.ChangeTracker
+				.Entries()
+				.Where(e => e.State != EntityState.Added)
+				.ToList()
+				.ForEach(x => x.Reload()), token);
+		}
 
-        ContextTransaction = null;
-        Disposed = true;
-      }
-    }
+		private void Dispose(bool disposing)
+		{
+			if (Disposed) return;
 
-    /// <summary>
-    /// Try committing all changes in transaction and perform Rollback if fail
-    /// </summary>
-    public int Commit()
-    {
-      try
-      {
-        Save();
-        if (Changes > 0)
-        {
-          ContextTransaction?.Commit();
-        }
-        return Changes;
-      }
-      catch (Exception dbex)
-      {
-        RollbackTransaction();
-        throw new DbUpdateException("Data constraint violation. Register is invalid or Already exists.", dbex);
-      }
-    }
+			if (!disposing) return;
+			Handle.Dispose();
+			_contextTransaction?.Dispose();
+			_context.Dispose();
 
-    public int Save()
-    {
-      try
-      {
-        var newCanges = Context.SaveChanges();
-        Changes += newCanges;
-        return newCanges;
-      }
-      catch (Exception dbex)
-      {
-        RollbackStates();
-        throw dbex;
-      }
-    }
-
-    /// <summary>
-    /// Discard all unsaved changes, dispatched when Commit fails and used when some part of a transaction fails
-    /// </summary>
-    public void RollbackTransaction()
-    {
-      RollbackStates();
-
-      if (ContextTransaction != null)
-      {
-        ContextTransaction.Rollback();
-      }
-    }
-
-    /// <summary>
-    /// Rollback all changes in the context instance
-    /// </summary>
-    public void RollbackStates()
-    {
-      Context.ChangeTracker
-          .Entries()
-          .Where(e => e.State != EntityState.Added)
-          .ToList()
-          .ForEach(x => x.Reload());
-    }
-  }
+			_contextTransaction = null;
+			Disposed = true;
+		}
+	}
 }

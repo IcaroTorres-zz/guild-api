@@ -1,20 +1,12 @@
-﻿using Business.ResponseOutputs;
-using Domain.Entities;
+﻿using System;
 using Domain.Repositories;
-using MediatR;
-using System;
 
 namespace Business.Commands.Invites
 {
-  public class AcceptInviteCommand : IRequest<ApiResponse<Invite>>
-  {
-    public Guid Id { get; set; }
-    public Invite Invite { get; private set; }
-
-    public AcceptInviteCommand(Guid id, IInviteRepository repository)
-    {
-      Id = id;
-      Invite = repository.GetForAcceptOperation(id).Result;
-    }
-  }
+	public class AcceptInviteCommand : PatchInviteCommand
+	{
+		public AcceptInviteCommand(Guid id, IInviteRepository repository) : base(id, repository)
+		{
+		}
+	}
 }

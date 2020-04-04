@@ -6,7 +6,7 @@ A REST API with resources representing Guilds, Members, Invites and Memberships,
 
 - [x] **.Net Core 3.1.3**;
 - [x] **Microsoft.EntityFrameworkCore**;
-- [x] **Microsoft.EntityFrameworkCore.Sqlite** package;
+- [x] **Microsoft.EntityFrameworkCore.SQLite** package;
 - [x] **Domain-Driven Design**;
 - [x] **Repositories**;
 - [x] **Unit of Work**;
@@ -28,7 +28,7 @@ A REST API with resources representing Guilds, Members, Invites and Memberships,
     3. **[Redis Installation (Non Windows)](#redis-installation-non-windows "Redis Installation (Non Windows)")**
     4. **[Redis Installation (Windows)](#redis-installation-windows "Redis Installation (Windows)")**
     5. **[Redis in the project](#redis-in-the-project "Redis in the project")**
-    6. **[Sqlite in the project](#sqlite-in-the-project "Sqlite in the project")**
+    6. **[SQLite in the project](#sqlite-in-the-project "SQLite in the project")**
 
 5. **[Usage](#usage "Usage")**
 6. **[Contributing](#contributing "Contributing")**
@@ -63,8 +63,8 @@ The binaries that are now compiled are available in the src directory. Run Redis
 
 ## Redis Installation (Windows)
 
- - You can download it directly from **[Redis](https://redis.io/download "redis downloads")** oficiall downloads page, compile with **[Make](http://gnuwin32.sourceforge.net/packages/make.htm "Make page")** for Windows similarly to linux instalation;
- - Acquire it using **[Chocolatey](https://chocolatey.org/install "Chocolatey")** and installing Redis-64 package with `choco install redis-64` in powershell;
+ - You can download it directly from **[Redis](https://redis.io/download "redis downloads")** official downloads page, compile with **[Make](http://gnuwin32.sourceforge.net/packages/make.htm "Make page")** for Windows similarly to linux installation;
+ - Acquire it using **[Chocolatey](https://chocolatey.org/install "Chocolatey")** and installing Redis-64 package with `choco install redis-64` in Powershell;
  - Get a compiled Windows version from [dmajkic / redis](https://github.com/dmajkic/redis/downloads "github dmajkic/redis download packages") and set Redis on your environment variables, and use following command to run a basic configuration of redis on prompt like below:
  
  		$ redis-server
@@ -73,20 +73,20 @@ This will start your Redis local server with default settings.
 
 ## Redis in the project
 
-Configure an entry for your settings in your appsetings.json. Following there is an example:
+Configure an entry for your settings in your `appsettings.json`. Following there is an example:
 
 ```json
 {
   "RedisCacheSettings": {
     "ConnectionString": "localhost,port: 6379,password=your_redis_password!",
     "Enabled": true
-  },
+  }
 }
 ```
 
-## Sqlite in the project
+## SQLite in the project
 
-To add Sqlite to the project you need to register on your dependenci injection services through the method `ConfigureServices` in the `Startup.cs`.
+To add SQLite to the project you need to register on your dependency injection services through the method `ConfigureServices` in the `Startup.cs`.
 
 You can do it in many ways. Following there is an example on how to do so:
 
@@ -96,11 +96,11 @@ Startup.cs
 public void ConfigureServices(IServiceCollection services)
 {
     services
-      .AddDbContext<YourContext>(options => options.UseSqlite(yourSqlConnectionString));
+      .AddDbContext<YourContext>(options => options.UseSQLite(yourSqlConnectionString));
 }
 ```
 
-You can use `appsettings.json` to set absolute or relative paths for Sqlite. If you want to get the absolute path of your application host, you can change default `Startup` class constructor adding the `IWebHostEnvironment` as parameter like hereinafter:
+You can use `appsettings.json` to set absolute or relative paths for SQLite. If you want to get the absolute path of your application host, you can change default `Startup` class constructor adding the `IWebHostEnvironment` as parameter like hereinafter:
 
 Startup.cs
 
@@ -121,9 +121,9 @@ And alter the context registration in the `ConfigureServices` method of `Startup
 Startup.cs
 
 ```c#
-var SqliteAbsolutePathConnectionString = $"Data Source={Environment.ContentRootPath}\\{Configuration["SqliteSettings:SourceName"]}";
+var SQLiteAbsolutePathConnectionString = $"Data Source={Environment.ContentRootPath}\\{Configuration["SQLiteSettings:SourceName"]}";
 
-services.AddDbContext<YourContext>(options => options.UseSqlite(SqliteAbsolutePathConnectionString));
+services.AddDbContext<YourContext>(options => options.UseSQLite(SQLiteAbsolutePathConnectionString));
 ```
 
 #  Usage

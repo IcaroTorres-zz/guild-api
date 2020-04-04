@@ -1,27 +1,23 @@
-﻿using Microsoft.AspNetCore.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Routing;
 
 namespace Application.Hateoas
 {
-  public class HateoasOptions
-  {
-    private readonly List<IRequiredLink> links = new List<IRequiredLink>();
-    public IReadOnlyList<IRequiredLink> RequiredLinks => links.AsReadOnly();
+	public class HateoasOptions
+	{
+		private readonly List<IRequiredLink> _links = new List<IRequiredLink>();
 
-    public HateoasOptions() { }
+		public IEnumerable<IRequiredLink> RequiredLinks => _links.AsReadOnly();
 
-    public HateoasOptions AddLink<T>(string routeName, Func<T, object> getValues = null) where T : class
-    {
-      Func<T, RouteValueDictionary> getRouteValuesFunc = r => new RouteValueDictionary();
-      if (getValues != null)
-      {
-        getRouteValuesFunc = r => new RouteValueDictionary(getValues(r));
-      }
+		public HateoasOptions AddLink<T>(string routeName, Func<T, object> getValues = null) where T : class
+		{
+			Func<T, RouteValueDictionary> getRouteValuesFunc = r => new RouteValueDictionary();
+			if (getValues != null) getRouteValuesFunc = r => new RouteValueDictionary(getValues(r));
 
-      links.Add(new ResourceLink<T>(typeof(T), routeName, getRouteValuesFunc));
+			_links.Add(new ResourceLink<T>(typeof(T), routeName, getRouteValuesFunc));
 
-      return this;
-    }
-  }
+			return this;
+		}
+	}
 }

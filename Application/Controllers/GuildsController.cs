@@ -1,58 +1,66 @@
-﻿using Application.ActionFilters;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.ActionFilters;
 using Business.Commands.Guilds;
 using Domain.Entities;
+using Domain.Entities.Nulls;
 using Domain.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Application.Controllers
 {
-  [ApiController, Route("api/[controller]/v1")]
-  public class GuildsController : ControllerBase
-  {
-    private readonly IGuildRepository _repository;
-    private readonly IMediator _mediator;
-    public GuildsController(IGuildRepository guildRepository, IMediator mediator)
-    {
-      _repository = guildRepository;
-      _mediator = mediator;
-    }
+	[ApiController]
+	[Route("api/[controller]/v1")]
+	public class GuildsController : ControllerBase
+	{
+		private readonly IMediator _mediator;
+		private readonly IGuildRepository _repository;
 
-    [HttpGet("{id}", Name = "get-guild"), UseCache(10)]
-    public async Task<IActionResult> GetAsync(Guid id)
-    {
-      var result = await _repository.GetByIdAsync(id, readOnly: true);
+		public GuildsController(IGuildRepository guildRepository, IMediator mediator)
+		{
+			_repository = guildRepository;
+			_mediator = mediator;
+		}
 
-      return result is NullGuild ? (IActionResult)NotFound() : Ok(result);
-    }
+		[HttpGet("{id}", Name = "get-guild")]
+		[UseCache(10)]
+		public async Task<IActionResult> GetAsync(Guid id, CancellationToken token)
+		{
+			var result = await _repository.GetByIdAsync(id, true);
 
-    [HttpGet(Name = "get-guilds"), UseCache(20)]
-    public async Task<IActionResult> GetAsync([FromQuery] GuildFilterCommand command)
-    {
-      var result = await _mediator.Send(command);
+			return result is NullGuild ? (IActionResult) NotFound() : Ok(result);
+		}
 
-      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
-    }
+		[HttpGet(Name = "get-guilds")]
+		[UseCache(20)]
+		public async Task<IActionResult> GetAsync([FromQuery] GuildFilterCommand command, CancellationToken token)
+		{
+			var result = await _mediator.Send(command, token);
 
-    [HttpPost(Name = "create-guild"), UseUnitOfWork]
-    public async Task<IActionResult> PostAsync([FromBody] CreateGuildCommand command)
-    {
-      var result = await _mediator.Send(command);
+			return result.Errors.Any() ? (IActionResult) BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+		}
 
-      return result.Errors.Any()
-          ? (IActionResult)BadRequest(result.AsErrorOutput())
-          : CreatedAtAction(nameof(GetAsync), new { id = result.Value.Id }, result.Value);
-    }
+		[HttpPost(Name = "create-guild")]
+		[UseUnitOfWork]
+		public async Task<IActionResult> PostAsync([FromBody] CreateGuildCommand command, CancellationToken token)
+		{
+			var result = await _mediator.Send(command, token);
 
-    [HttpPut("{id}", Name = "update-guild"), UseUnitOfWork]
-    public async Task<IActionResult> PutAsync([FromBody] UpdateGuildCommand command)
-    {
-      var result = await _mediator.Send(command);
+			return result.Errors.Any()
+				? (IActionResult) BadRequest(result.AsErrorOutput())
+				: CreatedAtAction(nameof(GetAsync), new {id = result.Value.Id}, result.Value);
+		}
 
-      return result.Errors.Any() ? (IActionResult)BadRequest(result.AsErrorOutput()) : Ok(result.Value);
-    }
-  }
+		[HttpPut("{id}", Name = "update-guild")]
+		[UseUnitOfWork]
+		public async Task<IActionResult> PutAsync([FromBody] UpdateGuildCommand command, CancellationToken token)
+		{
+			var result = await _mediator.Send(command, token);
+
+			return result.Errors.Any() ? (IActionResult) BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+		}
+	}
 }

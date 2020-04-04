@@ -1,74 +1,78 @@
-﻿using Domain.Entities;
-using Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities;
+using Domain.Entities.Nulls;
+using Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
 {
-  public class GuildRepository : IGuildRepository
-  {
-    private readonly IRepository<Guild> BaseRepository;
+	public sealed class GuildRepository : IGuildRepository
+	{
+		private readonly IRepository<Guild> _baseRepository;
 
-    public GuildRepository(IRepository<Guild> baseRepository)
-    {
-      BaseRepository = baseRepository;
-    }
+		public GuildRepository(IRepository<Guild> baseRepository)
+		{
+			_baseRepository = baseRepository;
+		}
 
-    public virtual async Task<bool> ExistsAsync(Expression<Func<Guild, bool>> predicate)
-    {
-      return await BaseRepository.ExistsAsync(predicate);
-    }
+		public async Task<bool> ExistsAsync(Expression<Func<Guild, bool>> predicate, CancellationToken token = default)
+		{
+			return await _baseRepository.ExistsAsync(predicate, token);
+		}
 
-    public virtual async Task<bool> ExistsWithIdAsync(Guid id)
-    {
-      return await BaseRepository.ExistsWithIdAsync(id);
-    }
+		public async Task<bool> ExistsWithIdAsync(Guid id, CancellationToken token = default)
+		{
+			return await _baseRepository.ExistsWithIdAsync(id, token);
+		}
 
-    public virtual async Task<bool> ExistsWithNameAsync(string name)
-    {
-      return await BaseRepository.ExistsAsync(x => x.Name.Equals(name));
-    }
+		public async Task<bool> ExistsWithNameAsync(string name, CancellationToken token = default)
+		{
+			return await _baseRepository.ExistsAsync(x => x.Name.Equals(name), token);
+		}
 
-    public virtual async Task<Guild> GetByIdAsync(Guid id, bool readOnly = false)
-    {
-      return (await BaseRepository.GetByKeysAsync(id)) ?? new NullGuild();
-    }
+		public async Task<Guild> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken token = default)
+		{
+			return await _baseRepository.GetByKeysAsync(token, id) ?? new NullGuild();
+		}
 
-    public virtual async Task<Guild> GetForMemberHandlingAsync(Guid id)
-    {
-      return (await BaseRepository.Query()
-          .Include(x => x.Members).ThenInclude(x => x.Memberships)
-          .Include(x => x.Invites).ThenInclude(x => x.Member)
-          .SingleOrDefaultAsync(x => !x.Disabled && x.Id.Equals(id))) ?? new NullGuild();
-    }
+		public async Task<Guild> GetForMemberHandlingAsync(Guid id, CancellationToken token = default)
+		{
+			return await _baseRepository.Query()
+				.Include(x => x.Members)
+				.ThenInclude(x => x.Memberships)
+				.Include(x => x.Invites)
+				.ThenInclude(x => x.Member)
+				.SingleOrDefaultAsync(x => x.Id.Equals(id), token) ?? new NullGuild();
+		}
 
-    public virtual async Task<IReadOnlyList<Guild>> GetAllAsync(bool readOnly = false)
-    {
-      return await Query(e => true, readOnly).ToListAsync();
-    }
+		public async Task<IReadOnlyList<Guild>> GetAllAsync(bool readOnly = false, CancellationToken token = default)
+		{
+			return await Query(e => true, readOnly).ToListAsync(token);
+		}
 
-    public virtual IQueryable<Guild> Query(Expression<Func<Guild, bool>>? predicate = null, bool readOnly = false)
-    {
-      return BaseRepository.Query(predicate, readOnly);
-    }
+		public IQueryable<Guild> Query(Expression<Func<Guild, bool>>? predicate = null, bool readOnly = false)
+		{
+			return _baseRepository.Query(predicate, readOnly);
+		}
 
-    public virtual async Task<Guild> InsertAsync(Guild entity)
-    {
-      return await BaseRepository.InsertAsync(entity);
-    }
+		public async Task<Guild> InsertAsync(Guild entity, CancellationToken token = default)
+		{
+			return await _baseRepository.InsertAsync(entity, token);
+		}
 
-    public virtual Guild Update(Guild entity)
-    {
-      return BaseRepository.Update(entity);
-    }
+		public Guild Update(Guild entity)
+		{
+			return _baseRepository.Update(entity);
+		}
 
-    public virtual Guild Remove(Guild entity)
-    {
-      return BaseRepository.Remove(entity);
-    }
-  }
+		public Guild Remove(Guild entity)
+		{
+			return _baseRepository.Remove(entity);
+		}
+	}
 }

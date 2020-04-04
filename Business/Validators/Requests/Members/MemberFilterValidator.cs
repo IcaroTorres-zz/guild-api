@@ -3,11 +3,11 @@ using FluentValidation;
 
 namespace Business.Validators.Requests.Members
 {
-  public class MemberFilterValidator : AbstractValidator<MemberFilterCommand>
-  {
-    public MemberFilterValidator()
-    {
-      RuleFor(x => x.Count).GreaterThan(0);
-    }
-  }
+	public class MemberFilterValidator : AbstractValidator<MemberFilterCommand>
+	{
+		public MemberFilterValidator()
+		{
+			RuleFor(x => x.Count).GreaterThan(0);
+		}
+	}
 }
