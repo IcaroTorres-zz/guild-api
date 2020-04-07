@@ -11,7 +11,7 @@ namespace Application.ActionFilters
 	{
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
-			using var unitOfWork = context.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>().Begin();
+			using var unitOfWork = context.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>().BeginTransaction();
 			var executedContext = await next();
 			if (executedContext.Exception != null || executedContext.HttpContext.Response.StatusCode >= 400)
 				await unitOfWork.RollbackTransactionAsync();
