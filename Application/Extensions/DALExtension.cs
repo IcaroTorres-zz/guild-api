@@ -21,8 +21,7 @@ namespace Application.Extensions
 				// DbContext dependency registration
 				.AddDbContext<ApiContext>(options =>
 				{
-					var sourcePath = Path.Combine(env.ContentRootPath, "../DAL",
-						configuration["SqliteSettings:Source"]);
+					var sourcePath = Path.Combine(env.ContentRootPath, "../DAL", configuration["SQLiteSettings:Source"]);
 					options.UseSqlite($"Data Source={sourcePath}");
 				})
 
