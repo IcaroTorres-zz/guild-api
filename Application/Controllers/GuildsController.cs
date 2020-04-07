@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.ActionFilters;
+using Application.Extensions;
 using Business.Commands.Guilds;
 using Domain.Entities;
 using Domain.Entities.Nulls;
@@ -27,40 +28,41 @@ namespace Application.Controllers
 
 		[HttpGet("{id}", Name = "get-guild")]
 		[UseCache(10)]
-		public async Task<IActionResult> GetAsync(Guid id, CancellationToken token)
+		public async Task<IActionResult> GetAsync(Guid id, CancellationToken cancellationToken)
 		{
-			var result = await _repository.GetByIdAsync(id, true);
+			var result = await _repository.GetByIdAsync(id, true, cancellationToken);
 
-			return result is NullGuild ? (IActionResult) NotFound() : Ok(result);
+			return result is NullGuild ? this.NotFoundFor<Guild>(id) : Ok(result);
 		}
 
 		[HttpGet(Name = "get-guilds")]
 		[UseCache(20)]
-		public async Task<IActionResult> GetAsync([FromQuery] GuildFilterCommand command, CancellationToken token)
+		public async Task<IActionResult> GetAsync([FromQuery] GuildFilterCommand command,
+			CancellationToken cancellationToken)
 		{
-			var result = await _mediator.Send(command, token);
+			var result = await _mediator.Send(command, cancellationToken);
 
-			return result.Errors.Any() ? (IActionResult) BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+			return result.Failures.Any() ? BadRequest(result.GenerateFailuresOutput()) as IActionResult : Ok(result.Data);
 		}
 
 		[HttpPost(Name = "create-guild")]
-		[UseUnitOfWork]
-		public async Task<IActionResult> PostAsync([FromBody] CreateGuildCommand command, CancellationToken token)
+		public async Task<IActionResult> PostAsync([FromBody] CreateGuildCommand command,
+			CancellationToken cancellationToken)
 		{
-			var result = await _mediator.Send(command, token);
+			var result = await _mediator.Send(command, cancellationToken);
 
-			return result.Errors.Any()
-				? (IActionResult) BadRequest(result.AsErrorOutput())
-				: CreatedAtAction(nameof(GetAsync), new {id = result.Value.Id}, result.Value);
+			return result.Failures.Any()
+				? BadRequest(result.GenerateFailuresOutput()) as IActionResult
+				: CreatedAtRoute("get-guild", new {id = result.Data.Id}, result.Data);
 		}
 
 		[HttpPut("{id}", Name = "update-guild")]
-		[UseUnitOfWork]
-		public async Task<IActionResult> PutAsync([FromBody] UpdateGuildCommand command, CancellationToken token)
+		public async Task<IActionResult> PutAsync([FromBody] UpdateGuildCommand command,
+			CancellationToken cancellationToken)
 		{
-			var result = await _mediator.Send(command, token);
+			var result = await _mediator.Send(command, cancellationToken);
 
-			return result.Errors.Any() ? (IActionResult) BadRequest(result.AsErrorOutput()) : Ok(result.Value);
+			return result.Failures.Any() ? BadRequest(result.GenerateFailuresOutput()) as IActionResult : Ok(result.Data);
 		}
 	}
 }

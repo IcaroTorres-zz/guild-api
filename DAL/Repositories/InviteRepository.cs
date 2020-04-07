@@ -19,39 +19,41 @@ namespace DAL.Repositories
 			_baseRepository = baseRepository;
 		}
 
-		public async Task<bool> ExistsAsync(Expression<Func<Invite, bool>> predicate, CancellationToken token = default)
+		public async Task<bool> ExistsAsync(Expression<Func<Invite, bool>> predicate,
+			CancellationToken cancellationToken = default)
 		{
-			return await _baseRepository.ExistsAsync(predicate, token);
+			return await _baseRepository.ExistsAsync(predicate, cancellationToken);
 		}
 
-		public async Task<bool> ExistsWithIdAsync(Guid id, CancellationToken token = default)
+		public async Task<bool> ExistsWithIdAsync(Guid id, CancellationToken cancellationToken = default)
 		{
-			return await _baseRepository.ExistsWithIdAsync(id, token);
+			return await _baseRepository.ExistsWithIdAsync(id, cancellationToken);
 		}
 
-		public async Task<Invite> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken token = default)
+		public async Task<Invite> GetByIdAsync(Guid id, bool readOnly = false,
+			CancellationToken cancellationToken = default)
 		{
-			return await _baseRepository.GetByKeysAsync(token, id) ?? new NullInvite();
+			return await _baseRepository.GetByKeysAsync(cancellationToken, id) ?? new NullInvite();
 		}
 
-		public async Task<Invite> GetForAcceptOperation(Guid id, CancellationToken token = default)
+		public async Task<Invite> GetForAcceptOperation(Guid id, CancellationToken cancellationToken = default)
 		{
 			return await Query()
 				.Include(x => x.Guild)
 				.ThenInclude(g => g.Members)
 				.Include(x => x.Member)
 				.ThenInclude(m => m.Memberships)
-				.SingleOrDefaultAsync(x => x.Id.Equals(id), token) ?? new NullInvite();
+				.SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken) ?? new NullInvite();
 		}
 
-		public IQueryable<Invite> Query(Expression<Func<Invite, bool>>? predicate = null, bool readOnly = false)
+		public IQueryable<Invite> Query(Expression<Func<Invite, bool>> predicate = null, bool readOnly = false)
 		{
 			return _baseRepository.Query(predicate, readOnly);
 		}
 
-		public async Task<Invite> InsertAsync(Invite entity, CancellationToken token = default)
+		public async Task<Invite> InsertAsync(Invite entity, CancellationToken cancellationToken = default)
 		{
-			return await _baseRepository.InsertAsync(entity, token);
+			return await _baseRepository.InsertAsync(entity, cancellationToken);
 		}
 
 		public Invite Remove(Invite entity)

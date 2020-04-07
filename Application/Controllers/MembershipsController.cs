@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Application.ActionFilters;
 using Domain.Entities;
@@ -12,9 +13,10 @@ namespace Application.Controllers
 	{
 		[HttpGet(Name = "get-memberships")]
 		[UseCache(10)]
-		public async Task<IActionResult> GetAsync([FromServices] IRepository<Membership> repository)
+		public async Task<IActionResult> GetAsync([FromServices] IRepository<Membership> repository,
+			CancellationToken cancellationToken)
 		{
-			return Ok(await repository.GetAllAsync(true));
+			return Ok(await repository.GetAllAsync(true, cancellationToken));
 		}
 	}
 }

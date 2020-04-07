@@ -20,27 +20,29 @@ namespace DAL.Repositories
 			_dbSet = context.Set<T>();
 		}
 
-		public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate, CancellationToken token = default)
+		public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate,
+			CancellationToken cancellationToken = default)
 		{
-			return await Query(predicate, true).AnyAsync(token);
+			return await Query(predicate, true).AnyAsync(cancellationToken);
 		}
 
-		public async Task<bool> ExistsWithIdAsync(Guid id, CancellationToken token = default)
+		public async Task<bool> ExistsWithIdAsync(Guid id, CancellationToken cancellationToken = default)
 		{
-			return await _dbSet.FindAsync(new []{ (object) id }, token) != null;
+			return await _dbSet.FindAsync(new[] {(object) id}, cancellationToken) != null;
 		}
 
-		public async Task<T> GetByKeysAsync(CancellationToken token = default, params object[] keys)
+		public async Task<T> GetByKeysAsync(CancellationToken cancellationToken = default, params object[] keys)
 		{
-			return await _dbSet.FindAsync(keys, token);
+			return await _dbSet.FindAsync(keys, cancellationToken);
 		}
 
-		public async Task<IReadOnlyList<T>> GetAllAsync(bool readOnly = false, CancellationToken token = default)
+		public async Task<IReadOnlyList<T>> GetAllAsync(bool readOnly = false,
+			CancellationToken cancellationToken = default)
 		{
-			return await Query(e => true, readOnly).ToListAsync(cancellationToken: token);
+			return await Query(e => true, readOnly).ToListAsync(cancellationToken: cancellationToken);
 		}
 
-		public IQueryable<T> Query(Expression<Func<T, bool>>? predicate = null, bool readOnly = false)
+		public IQueryable<T> Query(Expression<Func<T, bool>> predicate = null, bool readOnly = false)
 		{
 			var query = _dbSet
 				.Where(e => !e.Disabled)
@@ -48,9 +50,9 @@ namespace DAL.Repositories
 			return readOnly ? query.AsNoTracking() : query;
 		}
 
-		public async Task<T> InsertAsync(T entity, CancellationToken token = default)
+		public async Task<T> InsertAsync(T entity, CancellationToken cancellationToken = default)
 		{
-			return (await _dbSet.AddAsync(entity, token)).Entity;
+			return (await _dbSet.AddAsync(entity, cancellationToken)).Entity;
 		}
 
 		public T Update(T entity)
