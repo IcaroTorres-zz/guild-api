@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Business.Commands.Guilds;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Business.Handlers.Guilds
 {
-	public class GuildFilterHandler : IPipelineBehavior<GuildFilterCommand, ApiResponse<Pagination<Guild>>>
+	public class GuildFilterHandler : IRequestHandler<GuildFilterCommand, ApiResponse<Pagination<Guild>>>
 	{
 		private readonly IGuildRepository _guildRepository;
 
@@ -20,13 +20,13 @@ namespace Business.Handlers.Guilds
 		}
 
 		public async Task<ApiResponse<Pagination<Guild>>> Handle(GuildFilterCommand request,
-			CancellationToken cancellationToken, RequestHandlerDelegate<ApiResponse<Pagination<Guild>>> next)
+			CancellationToken cancellationToken)
 		{
-			var query = _guildRepository.Query(x => !x.Disabled, true);
+			var query = _guildRepository.Query(readOnly: true);
 			var totalCount = query.Count();
 			var guilds = await query.Take((int) request.Count).ToListAsync(cancellationToken);
-
-			return new ApiResponse<Pagination<Guild>>(new Pagination<Guild>(guilds, totalCount, (int) request.Count));
+			var guildsPaginated = new Pagination<Guild>(guilds, totalCount, (int) request.Count);
+			return new ApiResponse<Pagination<Guild>>(guildsPaginated);
 		}
 	}
 }

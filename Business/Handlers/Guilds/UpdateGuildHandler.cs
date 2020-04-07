@@ -2,14 +2,15 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Business.Commands.Guilds;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Handlers.Guilds
 {
-	public class UpdateGuildHandler : IPipelineBehavior<UpdateGuildCommand, ApiResponse<Guild>>
+	public class UpdateGuildHandler : IRequestHandler<UpdateGuildCommand, ApiResponse<Guild>>
 	{
 		private readonly IGuildRepository _guildRepository;
 		private readonly IMemberRepository _memberRepository;
@@ -21,23 +22,25 @@ namespace Business.Handlers.Guilds
 		}
 
 		public async Task<ApiResponse<Guild>> Handle(UpdateGuildCommand request,
-			CancellationToken cancellationToken, RequestHandlerDelegate<ApiResponse<Guild>> next)
+			CancellationToken cancellationToken)
 		{
-			var guild = await _guildRepository.GetForMemberHandlingAsync(request.Id);
-			var master = await _memberRepository.GetForGuildOperationsAsync(request.MasterId);
+			var guild = await _guildRepository.GetForMemberHandlingAsync(request.Id, cancellationToken);
+			var master = await _memberRepository.GetForGuildOperationsAsync(request.MasterId, cancellationToken);
 
-			var currentMemberIds = guild.Members.Select(x => x.Id);
-			var receivedAlreadyMemberIds = request.MemberIds.Intersect(currentMemberIds);
-			var idsToInvite = request.MemberIds.Except(receivedAlreadyMemberIds);
-			var idsToKick = currentMemberIds.Except(receivedAlreadyMemberIds);
-
-			_memberRepository.Query(x => !x.Disabled)
-				.Join(idsToInvite, x => x.Id, id => id, (member, _) => member).ToList()
-				.ForEach(memberToInvite => guild.Invite(memberToInvite)?.BeAccepted());
-
-			guild.Members
-				.Join(idsToKick, x => x.Id, id => id, (member, _) => member).ToList()
-				.ForEach(memberToKick => memberToKick.LeaveGuild());
+			var currentMemberIds = guild.Members.Select(x => x.Id).ToArray();
+			var receivedAlreadyMemberIds = request.MemberIds.Intersect(currentMemberIds).ToArray();
+			var idsToInvite = request.MemberIds.Except(receivedAlreadyMemberIds).ToArray();
+			var idsToKick = currentMemberIds.Except(receivedAlreadyMemberIds).ToArray();
+			
+			// invite and accept new members
+			await _memberRepository.Query(x => !x.Disabled)
+				.Join(idsToInvite, x => x.Id, id => id, (member, _) => member).AsQueryable()
+				.ForEachAsync(memberToInvite => guild.Invite(memberToInvite)?.BeAccepted(), cancellationToken);
+			
+			// kick members not received from the request
+			await guild.Members
+				.Join(idsToKick, x => x.Id, id => id, (member, _) => member).AsQueryable()
+				.ForEachAsync(memberToKick => memberToKick.LeaveGuild(), cancellationToken);
 
 			guild.ChangeName(request.Name);
 			guild.Promote(master);

@@ -2,14 +2,14 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Business.Commands.Members;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
 
 namespace Business.Handlers.Members
 {
-	public class UpdateMemberHandler : IPipelineBehavior<UpdateMemberCommand, ApiResponse<Member>>
+	public class UpdateMemberHandler : IRequestHandler<UpdateMemberCommand, ApiResponse<Member>>
 	{
 		private readonly IGuildRepository _guildRepository;
 		private readonly IMemberRepository _memberRepository;
@@ -20,18 +20,18 @@ namespace Business.Handlers.Members
 			_memberRepository = memberRepository;
 		}
 
-		public async Task<ApiResponse<Member>> Handle(UpdateMemberCommand request,
-			CancellationToken cancellationToken, RequestHandlerDelegate<ApiResponse<Member>> next)
+		public async Task<ApiResponse<Member>> Handle(UpdateMemberCommand request, CancellationToken cancellationToken)
 		{
-			var member = await _memberRepository.GetForGuildOperationsAsync(request.Id);
-			member.ChangeName(request.Name);
-			if (request.GuildId is Guid guildId && guildId != Guid.Empty)
-				(await _guildRepository.GetForMemberHandlingAsync(guildId))
-					.Invite(member)
-					.BeAccepted();
-			else
-				member.LeaveGuild();
-			return new ApiResponse<Member>(_memberRepository.Update(member));
+			var updatedMember = await _memberRepository.GetForGuildOperationsAsync(request.Id, cancellationToken);
+			updatedMember.ChangeName(request.Name);
+			if (request.GuildId is { } guildId && guildId != Guid.Empty)
+			{
+				var invitingGuild = await _guildRepository.GetForMemberHandlingAsync(guildId, cancellationToken);
+				invitingGuild.Invite(updatedMember).BeAccepted();
+			}
+			else updatedMember.LeaveGuild();
+
+			return new ApiResponse<Member>(_memberRepository.Update(updatedMember));
 		}
 	}
 }

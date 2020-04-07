@@ -1,14 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Business.Commands.Members;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
 
 namespace Business.Handlers.Members
 {
-	public class PromoteMemberHandler : IPipelineBehavior<PromoteMemberCommand, ApiResponse<Member>>
+	public class PromoteMemberHandler : IRequestHandler<PromoteMemberCommand, ApiResponse<Member>>
 	{
 		private readonly IMemberRepository _memberRepository;
 
@@ -17,11 +17,10 @@ namespace Business.Handlers.Members
 			_memberRepository = memberRepository;
 		}
 
-		public async Task<ApiResponse<Member>> Handle(PromoteMemberCommand request,
-			CancellationToken cancellationToken, RequestHandlerDelegate<ApiResponse<Member>> next)
+		public Task<ApiResponse<Member>> Handle(PromoteMemberCommand request, CancellationToken cancellationToken)
 		{
-			return new ApiResponse<Member>(
-				await Task.FromResult(_memberRepository.Update(request.Member.BePromoted())));
+			var promotedMember = _memberRepository.Update(request.Member.BePromoted());
+			return Task.FromResult(new ApiResponse<Member>(promotedMember));
 		}
 	}
 }

@@ -1,14 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Business.Commands.Members;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
 
 namespace Business.Handlers.Members
 {
-	public class LeaveGuildHandler : IPipelineBehavior<LeaveGuildCommand, ApiResponse<Member>>
+	public class LeaveGuildHandler : IRequestHandler<LeaveGuildCommand, ApiResponse<Member>>
 	{
 		private readonly IMemberRepository _memberRepository;
 
@@ -17,11 +17,10 @@ namespace Business.Handlers.Members
 			_memberRepository = memberRepository;
 		}
 
-		public async Task<ApiResponse<Member>> Handle(LeaveGuildCommand request,
-			CancellationToken cancellationToken, RequestHandlerDelegate<ApiResponse<Member>> next)
+		public Task<ApiResponse<Member>> Handle(LeaveGuildCommand request, CancellationToken cancellationToken)
 		{
-			return new ApiResponse<Member>(
-				await Task.FromResult(_memberRepository.Update(request.Member.LeaveGuild())));
+			var leavingMember = _memberRepository.Update(request.Member.LeaveGuild());
+			return Task.FromResult(new ApiResponse<Member>(leavingMember));
 		}
 	}
 }

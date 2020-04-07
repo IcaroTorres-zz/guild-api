@@ -1,14 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Business.Commands.Guilds;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
 
 namespace Business.Handlers.Guilds
 {
-	public class CreateGuildHandler : IPipelineBehavior<CreateGuildCommand, ApiResponse<Guild>>
+	public class CreateGuildHandler : IRequestHandler<CreateGuildCommand, ApiResponse<Guild>>
 	{
 		private readonly IGuildRepository _guildRepository;
 		private readonly IMemberRepository _memberRepository;
@@ -19,12 +19,11 @@ namespace Business.Handlers.Guilds
 			_memberRepository = memberRepository;
 		}
 
-		public async Task<ApiResponse<Guild>> Handle(CreateGuildCommand request,
-			CancellationToken cancellationToken, RequestHandlerDelegate<ApiResponse<Guild>> next)
+		public async Task<ApiResponse<Guild>> Handle(CreateGuildCommand request, CancellationToken cancellationToken)
 		{
-			var master = await _memberRepository.GetForGuildOperationsAsync(request.MasterId);
-
-			return new ApiResponse<Guild>(await _guildRepository.InsertAsync(new Guild(request.Name, master)));
+			var master = await _memberRepository.GetForGuildOperationsAsync(request.MasterId, cancellationToken);
+			var createdGuild = await _guildRepository.InsertAsync(new Guild(request.Name, master), cancellationToken);
+			return new ApiResponse<Guild>(createdGuild);
 		}
 	}
 }
