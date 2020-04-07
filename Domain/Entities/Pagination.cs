@@ -6,18 +6,18 @@ namespace Domain.Entities
 	[Serializable]
 	public class Pagination<TEntity> where TEntity : class
 	{
-		public Pagination(IEnumerable<TEntity> items, long count, int pageSize, int page = 1)
+		public Pagination(IEnumerable<TEntity> data, long count, int pageSize, int page = 1)
 		{
-			Items = items;
+			Data = data;
 			Page = page;
 			PageSize = pageSize;
 			Count = count;
 		}
 
-		public int Page { get; private set; } = 1;
-		public int PageSize { get; private set; } = 10;
+		public IEnumerable<TEntity> Data { get; private set; }
+		public int Page { get; private set; }
+		public int PageSize { get; private set; }
 		public long Count { get; private set; }
 		public long Pages => Count == 0 ? 1 : (Count + PageSize - 1) / PageSize;
-		public IEnumerable<TEntity> Items { get; private set; }
 	}
 }
