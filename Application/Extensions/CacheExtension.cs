@@ -6,8 +6,7 @@ namespace Application.Extensions
 {
 	public static class CacheExtension
 	{
-		public static IServiceCollection BootstrapCacheService(this IServiceCollection services,
-			IConfiguration configuration)
+		public static IServiceCollection BootstrapCacheService(this IServiceCollection services, IConfiguration configuration)
 		{
 			var redisCacheSettings = new RedisCacheSettings();
 			configuration.GetSection(nameof(RedisCacheSettings)).Bind(redisCacheSettings);
