@@ -6,14 +6,10 @@ namespace Domain.Unities
 {
 	public interface IUnitOfWork : IDisposable
 	{
-		IUnitOfWork Begin();
-		
-		Task<int> CommitAsync(CancellationToken token = default);
-		
-		Task<int> SaveAsync(CancellationToken token = default);
-		
-		Task RollbackTransactionAsync(CancellationToken token = default);
-		
-		Task RollbackStatesAsync(CancellationToken token = default);
+		IUnitOfWork BeginTransaction();
+		Task<int> CommitAsync(CancellationToken cancellationToken = default);
+		Task<int> SaveAsync(CancellationToken cancellationToken = default);
+		Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
+		Task RollbackStatesAsync(CancellationToken cancellationToken = default);
 	}
 }

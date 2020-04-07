@@ -25,7 +25,7 @@ namespace DAL.Unities
 		private bool Disposed { get; set; }
 		private SafeHandle Handle { get; } = new SafeFileHandle(IntPtr.Zero, true);
 
-		public IUnitOfWork Begin()
+		public IUnitOfWork BeginTransaction()
 		{
 			_contextTransaction = _context.Database.BeginTransaction();
 			return this;
@@ -37,51 +37,51 @@ namespace DAL.Unities
 			GC.SuppressFinalize(this);
 		}
 
-		public async Task<int> CommitAsync(CancellationToken token = default)
+		public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
 		{
 			try
 			{
-				await SaveAsync(token);
-				if (_changes > 0) _contextTransaction?.CommitAsync(token);
+				await SaveAsync(cancellationToken);
+				if (_changes > 0) _contextTransaction?.CommitAsync(cancellationToken);
 				return _changes;
 			}
 			catch (Exception dbUpdateException)
 			{
-				await RollbackTransactionAsync(token);
+				await RollbackTransactionAsync(cancellationToken);
 				throw new DbUpdateException(
 					"Data constraint violation. Register is invalid or Already exists.", dbUpdateException);
 			}
 		}
 
-		public async Task<int> SaveAsync(CancellationToken token = default)
+		public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
 		{
 			try
 			{
-				var newChanges = await _context.SaveChangesAsync(token);
+				var newChanges = await _context.SaveChangesAsync(cancellationToken);
 				_changes += newChanges;
 				return newChanges;
 			}
 			catch (Exception exception)
 			{
-				await RollbackStatesAsync(token);
+				await RollbackStatesAsync(cancellationToken);
 				throw new DbUpdateException(
 					"Data constraint violation. Register is invalid or Already exists.", exception);
 			}
 		}
 
-		public async Task RollbackTransactionAsync(CancellationToken token = default)
+		public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
 		{
-			await RollbackStatesAsync(token);
-			if (_contextTransaction != null) await _contextTransaction?.RollbackAsync(token);
+			await RollbackStatesAsync(cancellationToken);
+			if (_contextTransaction != null) await _contextTransaction?.RollbackAsync(cancellationToken);
 		}
 
-		public async Task RollbackStatesAsync(CancellationToken token = default)
+		public async Task RollbackStatesAsync(CancellationToken cancellationToken = default)
 		{
 			await Task.Run(() => _context.ChangeTracker
 				.Entries()
 				.Where(e => e.State != EntityState.Added)
 				.ToList()
-				.ForEach(x => x.Reload()), token);
+				.ForEach(x => x.Reload()), cancellationToken);
 		}
 
 		private void Dispose(bool disposing)
