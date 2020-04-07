@@ -17,16 +17,16 @@ namespace Business.Validators.Requests.Members
 
 			RuleFor(x => x.Member.IsGuildMaster)
 				.Equal(true)
-				.WithMessage("Member are not a Guild Master and can not be demoted.");
+				.WithMessage("Member are not a Guild Master and cannot be demoted.");
 
 			RuleFor(x => x.Member)
-				.Must(x => x != null && x != new NullMember())
+				.NotEmpty().NotEqual(new NullMember())
 				.WithMessage("Member was null or empty.");
 
 			RuleFor(x => x.Member.GuildId)
 				.NotEmpty().WithMessage("Missing a guild key reference.");
 
-			var guildNotEmptyMessage = "Members out of a guild can not be demoted.";
+			var guildNotEmptyMessage = "Members out of a guild cannot be demoted.";
 			RuleFor(x => x.Member.Guild)
 				.NotEmpty().WithMessage(guildNotEmptyMessage)
 				.NotEqual(new NullGuild()).WithMessage(guildNotEmptyMessage);

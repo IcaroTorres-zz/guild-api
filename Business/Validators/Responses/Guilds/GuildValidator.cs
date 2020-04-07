@@ -1,6 +1,8 @@
-﻿using System.Linq;
-using Business.ResponseOutputs;
+﻿using System;
+using System.Linq;
+using Business.Responses;
 using Domain.Entities;
+using Domain.Entities.Nulls;
 using FluentValidation;
 
 namespace Business.Validators.Responses.Guilds
@@ -9,27 +11,25 @@ namespace Business.Validators.Responses.Guilds
 	{
 		public GuildValidator()
 		{
-			RuleFor(x => x.Value.Id).NotEmpty();
+			RuleFor(x => x.Data).NotEmpty().NotEqual(new NullGuild());
+			RuleFor(x => x.Data.Id).NotEmpty().NotEqual(Guid.Empty);
 
 			RuleFor(x => x)
 				.Must(x =>
 				{
-					var idsFromCurrentMembers = x.Value.Members.Select(m => m.Id);
-					var idsFromInvitedMembers = x.Value.Invites.Select(i => i.MemberId).Distinct();
-					return idsFromCurrentMembers.Intersect(idsFromInvitedMembers) == idsFromCurrentMembers;
-				})
-				.WithMessage("Guild having members with no related invite record.");
+					var members = x.Data.Members;
+					var inviteMembers = x.Data.Invites.Select(i => i.Member).Distinct();
+					return members.Intersect(inviteMembers).Count() == members.Count();
+				}).WithMessage("Guild having Members with no related Invite record.");
 
-			RuleFor(x => x.Value.Members)
-				.NotEmpty()
+			RuleFor(x => x.Data.Members)
 				.Must(x => x.Any(m => m.IsGuildMaster))
-				.When(x => x.Value.Members.Any());
+				.When(x => x.Data.Members.Any());
 
-			RuleFor(x => x.Value.Invites)
-				.NotEmpty()
-				.Must(invites => invites.Any(invites => invites.Status == InviteStatuses.Accepted))
-				.When(x => x.Value.Invites.Any())
-				.WithMessage("No matching accepted invite was found ");
+			RuleFor(x => x.Data.Invites)
+				.Must(invites => invites.Any(i => i.Status.Equals(InviteStatuses.Accepted)))
+				.When(x => x.Data.Invites.Any())
+				.WithMessage("No matching accepted Invite was found.");
 		}
 	}
 }

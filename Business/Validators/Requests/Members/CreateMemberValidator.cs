@@ -11,7 +11,8 @@ namespace Business.Validators.Requests.Members
 		{
 			RuleFor(x => x.Name)
 				.NotEmpty()
-				.MustAsync(async (name, _) => !await memberRepository.ExistsWithNameAsync(name))
+				.MustAsync(async (name, cancellationToken) =>
+					!await memberRepository.ExistsWithNameAsync(name, cancellationToken))
 				.WithMessage(x => CommonValidationMessages.ForConflictWithKey(nameof(Member), x.Name));
 		}
 	}

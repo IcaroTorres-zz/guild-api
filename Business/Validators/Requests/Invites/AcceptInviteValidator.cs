@@ -18,7 +18,7 @@ namespace Business.Validators.Requests.Invites
 				.WithMessage(x => CommonValidationMessages.ForRecordNotFound(nameof(Invite), x.Invite.Id));
 
 			RuleFor(x => x.Invite)
-				.Must(x => x != null && x != new NullInvite())
+				.NotEmpty().NotEqual(new NullInvite())
 				.WithMessage("Invite was null or empty.");
 
 			RuleFor(x => x.Invite.Status).IsInEnum().Equal(InviteStatuses.Pending);

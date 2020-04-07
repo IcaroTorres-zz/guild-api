@@ -6,29 +6,37 @@ using FluentValidation;
 
 namespace Business.Validators.Requests.Guilds
 {
-	public class UpdateGuildCommandValidator : AbstractValidator<UpdateGuildCommand>
+	public class UpdateGuildValidator : AbstractValidator<UpdateGuildCommand>
 	{
-		public UpdateGuildCommandValidator(IGuildRepository guildRepository, IMemberRepository memberRepository)
+		public UpdateGuildValidator(IGuildRepository guildRepository, IMemberRepository memberRepository)
 		{
 			RuleFor(x => x.Id)
 				.NotEmpty()
-				.MustAsync(async (id, _) => await guildRepository.ExistsWithIdAsync(id))
+				.MustAsync(async (id, cancellationToken) => await guildRepository.ExistsWithIdAsync(id, cancellationToken))
 				.WithMessage(x => CommonValidationMessages.ForRecordNotFound(nameof(Guild), x.Id));
 
 			RuleFor(x => x.Name)
 				.NotEmpty()
-				.MustAsync(async (name, _) => !await memberRepository.ExistsWithNameAsync(name))
+				.MustAsync(async (name, cancellationToken) =>
+					!await memberRepository.ExistsWithNameAsync(name, cancellationToken))
 				.WithMessage(x => CommonValidationMessages.ForConflictWithKey(nameof(Guild), x.Name))
-				.Unless(x => x.Id.Equals(memberRepository.Query().SingleOrDefault(y => y.Name.Equals(x.Name)).Id));
+				.UnlessAsync(async (x, cancellationToken) =>
+				{
+					var member = await memberRepository.GetByNameAsync(x.Name, true, cancellationToken);
+					return x.Id.Equals(member.Id);
+				});
 
 			RuleFor(x => x.MasterId)
 				.NotEmpty()
-				.MustAsync(async (masterId, _) => await memberRepository.ExistsWithIdAsync(masterId))
-				.WithMessage("Guild must have a valid member as guild master.");
+				.MustAsync(async (masterId, cancellationToken) =>
+					await memberRepository.ExistsWithIdAsync(masterId, cancellationToken))
+				.WithMessage("Member chosen for Guild Master not found.");
 
 			RuleFor(x => x)
-				.MustAsync(async (x, _) => (await memberRepository.GetByIdAsync(x.MasterId)).GuildId.Equals(x.Id))
-				.WithMessage("Guild Master must be a Member of target Guild.");
+				.MustAsync(async (x, cancellationToken) =>
+					(await memberRepository.GetByIdAsync(x.MasterId, true, cancellationToken))
+					.GuildId.Equals(x.Id))
+				.WithMessage("Member chosen for Guild Master must be a Member of target Guild.");
 		}
 	}
 }

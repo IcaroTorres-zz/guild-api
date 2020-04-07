@@ -16,7 +16,7 @@ namespace Business.Validators.Requests.Members
 				.WithMessage(x => CommonValidationMessages.ForRecordNotFound(nameof(Member), x.Id));
 
 			RuleFor(x => x.Member)
-				.Must(x => x != null && x != new NullMember())
+				.NotEmpty().NotEqual(new NullMember())
 				.WithMessage("Member was null or empty.");
 
 			RuleFor(x => x.Member.GuildId)

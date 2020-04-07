@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using FluentValidation;
 
@@ -9,20 +9,20 @@ namespace Business.Validators.Responses.Invites
 	{
 		public InviteValidator()
 		{
-			RuleFor(x => x.Value.Member.Id).Equal(x => x.Value.MemberId);
+			RuleFor(x => x.Data.Member.Id).Equal(x => x.Data.MemberId);
 
-			RuleFor(x => x.Value.Guild.Id).Equal(x => x.Value.GuildId);
+			RuleFor(x => x.Data.Guild.Id).Equal(x => x.Data.GuildId);
 
 			RuleFor(x => x)
 				.Must(x =>
 				{
-					return x.Value.Member.Memberships.Any(ms =>
-						ms.MemberId == x.Value.MemberId &&
-						ms.GuildId == x.Value.GuildId);
+					return x.Data.Member.Memberships.Any(ms =>
+						ms.MemberId == x.Data.MemberId &&
+						ms.GuildId == x.Data.GuildId);
 				})
-				.When(x => x.Value.Status == InviteStatuses.Accepted &&
-				           x.Value.Member != null &&
-				           x.Value.Member.Memberships != null)
+				.When(x => x.Data.Status.Equals(InviteStatuses.Accepted) &&
+				           x.Data.Member != null &&
+				           x.Data.Member.Memberships != null)
 				.WithErrorCode(CommonValidationMessages.ConflictCodeString)
 				.WithMessage(
 					$"The {nameof(Member)} should have a related {nameof(Membership)} representing an accepted invite.");
