@@ -1,23 +1,15 @@
 using System;
 using System.Collections.Generic;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Business.Commands.Guilds
 {
-	public class UpdateGuildCommand : IRequest<ApiResponse<Guild>>
+	public class UpdateGuildCommand : IRequest<ApiResponse<Guild>>, ITransactionalCommand
 	{
-		public UpdateGuildCommand([FromRoute(Name = "id")] Guid id, string name, Guid masterId, HashSet<Guid> memberIds)
-		{
-			Id = id;
-			Name = name;
-			MasterId = masterId;
-			MemberIds = memberIds;
-		}
-
-		public Guid Id { get; set; }
+		[FromRoute(Name = "id")] public Guid Id { get; set; }
 		public string Name { get; set; }
 		public Guid MasterId { get; set; }
 		public HashSet<Guid> MemberIds { get; set; } = new HashSet<Guid>();

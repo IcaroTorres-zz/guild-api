@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Business.Responses;
 using FluentValidation;
 using MediatR;
 
-namespace Business.Handlers
+namespace Business.Behaviors
 {
 	public class ResponseValidationBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> where TReq : IRequest<TRes>
 	{
@@ -17,21 +18,20 @@ namespace Business.Handlers
 			_responseValidators = responseValidators;
 		}
 
-		public async Task<TRes> Handle(TReq request, CancellationToken cancellationToken,
-			RequestHandlerDelegate<TRes> next)
+		public async Task<TRes> Handle(TReq request, CancellationToken cancellationToken, RequestHandlerDelegate<TRes> next)
 		{
 			var response = await next();
-
+			var responseValue = response.GetType().GetProperty(nameof(ApiResponse<object>.Data))?.GetValue(response);
+			
 			var responseContext = new ValidationContext(response);
 			var failures = _responseValidators
-				.Select(x => x.Validate(responseContext))
-				.SelectMany(x => x.Errors)
+				.Select(async x => await x.ValidateAsync(responseContext, cancellationToken))
+				.SelectMany(x => x.Result.Errors)
 				.Where(x => x != null)
 				.ToList();
-
+			
 			return failures.Any()
-				? (TRes) Activator.CreateInstance(typeof(TRes), failures)
-				: response;
+				? (TRes) Activator.CreateInstance(typeof(TRes), responseValue, failures) : response;
 		}
 	}
 }

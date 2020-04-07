@@ -1,12 +1,12 @@
 ﻿using System;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
 
 namespace Business.Commands.Members
 {
-	public class DemoteMemberCommand : IRequest<ApiResponse<Member>>
+	public class DemoteMemberCommand : IRequest<ApiResponse<Member>>, ITransactionalCommand
 	{
 		public DemoteMemberCommand(Guid id, IMemberRepository repository)
 		{
@@ -14,7 +14,7 @@ namespace Business.Commands.Members
 			Member = repository.GetForGuildOperationsAsync(id).Result;
 		}
 
-		public Guid Id { get; set; }
+		public Guid Id { get; private set; }
 		public Member Member { get; }
 	}
 }

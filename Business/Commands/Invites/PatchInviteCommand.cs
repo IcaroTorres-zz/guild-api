@@ -1,12 +1,12 @@
 ﻿using System;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
 
 namespace Business.Commands.Invites
 {
-	public abstract class PatchInviteCommand : IRequest<ApiResponse<Invite>>
+	public abstract class PatchInviteCommand : IRequest<ApiResponse<Invite>>, ITransactionalCommand
 	{
 		protected PatchInviteCommand(Guid id, IInviteRepository repository)
 		{

@@ -1,5 +1,5 @@
 using System;
-using Business.ResponseOutputs;
+using Business.Responses;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
