@@ -15,8 +15,13 @@ namespace Application.Hateoas
 		{
 			return (T) context.RequestServices.GetService(typeof(T));
 		}
+		
+		internal static T GetPropertyAsValue<T>(this object source, string propertyName)
+		{
+			return (T) source.GetType().GetProperty(propertyName)?.GetValue(source);
+		}
 
-		public static ResourceDTO AddRequiredLinks(this ResourceDTO resource, Type targetResourceType, HttpContext context)
+		internal static ResourceDto AddRequiredLinks(this ResourceDto resource, Type targetResourceType, HttpContext context)
 		{
 			var urlHelperFactory = context.GetService<IUrlHelperFactory>();
 			var actionContextAccessor = context.GetService<IActionContextAccessor>();
@@ -25,15 +30,18 @@ namespace Application.Hateoas
 			var urlHelper = urlHelperFactory.GetUrlHelper(actionContextAccessor.ActionContext);
 
 			foreach (var link in hateoasOptions.RequiredLinks.Where(r => r.ResourceType == targetResourceType))
-				if (actionDescriptorCollectionProvider.ActionDescriptors.Items.FirstOrDefault(
-					x => x.AttributeRouteInfo.Name == link.Name) is { } route)
-				{
-					var method = route.ActionConstraints.OfType<HttpMethodActionConstraint>().First().HttpMethods.First();
-					var routeValues = link.GetRouteValues(resource.Data);
-					var routeValuesToFormUrl = routeValues.Count > 0 ? routeValues : null;
-					var url = urlHelper.Link(link.Name, routeValuesToFormUrl).ToLower();
-					resource.Links.Add(new LinkDto(link.Name, url, method));
-				}
+			{
+				if (!link.CheckAvailability(resource.Data)) continue;
+
+				if (!(actionDescriptorCollectionProvider.ActionDescriptors.Items.FirstOrDefault(x =>
+					x.AttributeRouteInfo.Name == link.Name) is { } route)) continue;
+
+				var routeValues = link.GetRouteValues(resource.Data);
+				if (!(urlHelper.Link(link.Name, routeValues)?.ToLower() is { } url)) continue;
+					
+				var method = route.ActionConstraints.OfType<HttpMethodActionConstraint>().First().HttpMethods.First();
+				resource.Links.Add(new LinkDto(link.Name, url, method));
+			}
 
 			return resource;
 		}

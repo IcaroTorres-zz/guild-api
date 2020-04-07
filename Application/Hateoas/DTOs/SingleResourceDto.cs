@@ -1,8 +1,8 @@
 ﻿namespace Application.Hateoas.DTOs
 {
-	public class SingleResourceDTO : ResourceDTO
+	public class SingleResourceDto : ResourceDto
 	{
-		public SingleResourceDTO(object data) : base(data)
+		public SingleResourceDto(object data) : base(data)
 		{
 		}
 	}

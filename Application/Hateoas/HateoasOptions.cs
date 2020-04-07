@@ -10,12 +10,12 @@ namespace Application.Hateoas
 
 		public IEnumerable<IRequiredLink> RequiredLinks => _links.AsReadOnly();
 
-		public HateoasOptions AddLink<T>(string routeName, Func<T, object> getValues = null) where T : class
+		public HateoasOptions AddLink<T>(string routeName, Func<T, object> getValues = null, Func<T, bool> predicate = null) where T : class
 		{
 			Func<T, RouteValueDictionary> getRouteValuesFunc = r => new RouteValueDictionary();
 			if (getValues != null) getRouteValuesFunc = r => new RouteValueDictionary(getValues(r));
 
-			_links.Add(new ResourceLink<T>(typeof(T), routeName, getRouteValuesFunc));
+			_links.Add(new ResourceLink<T>(typeof(T), routeName, getRouteValuesFunc, predicate));
 
 			return this;
 		}

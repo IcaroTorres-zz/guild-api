@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace Application.Hateoas.DTOs
 {
-	public abstract class ResourceDTO
+	public abstract class ResourceDto
 	{
-		public ResourceDTO(object data)
+		protected ResourceDto(object data)
 		{
 			Data = data;
 		}

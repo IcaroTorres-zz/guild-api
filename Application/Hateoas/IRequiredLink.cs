@@ -8,5 +8,6 @@ namespace Application.Hateoas
 		Type ResourceType { get; }
 		string Name { get; }
 		RouteValueDictionary GetRouteValues(object input);
+		bool CheckAvailability(object input);
 	}
 }
