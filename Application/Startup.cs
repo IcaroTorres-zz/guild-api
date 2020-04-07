@@ -16,15 +16,13 @@ namespace Application
 {
 	public class Startup
 	{
-		private readonly OpenApiInfo _swaggerOpenApiInfo = new OpenApiInfo {Title = "Guild-api", Version = "v1"};
-		private readonly MySwaggerOptions _swaggerOptions = new MySwaggerOptions();
-
 		public Startup(IConfiguration configuration, IWebHostEnvironment env)
 		{
 			Configuration = configuration;
 			HostEnvironment = env;
 		}
 
+		private readonly OpenApiInfo _swaggerOpenApiInfo = new OpenApiInfo {Title = "Guild-api", Version = "v1"};
 		public IConfiguration Configuration { get; }
 		public IWebHostEnvironment HostEnvironment { get; }
 
@@ -35,7 +33,7 @@ namespace Application
 				.AddHttpContextAccessor()
 
 				// swagger
-				.AddSwaggerGen(c => c.SwaggerDoc("v1", _swaggerOpenApiInfo))
+				.AddSwaggerGen(c => c.SwaggerDoc(_swaggerOpenApiInfo.Version, _swaggerOpenApiInfo))
 
 				// register cache services DI
 				.BootstrapCacheService(Configuration)
@@ -46,15 +44,20 @@ namespace Application
 				// register MediatR Pipelines, Handlers and behaviors
 				.BootstrapPipelinesServices()
 
+				// register FluentValidators
+				.BootstrapValidators()
+
 				// enabling Mvc framework services and resources
 				.AddControllers() //options => options.EnableEndpointRouting = false)
 
 				// enabling validations
-				.AddFluentValidation(fv =>
-				{
-					fv.ImplicitlyValidateChildProperties = true;
-					fv.RegisterValidatorsFromAssemblyContaining<CreateGuildCommandValidator>();
-				})
+				// .AddFluentValidation(fv =>
+				// {
+				// 	fv.ConfigureClientsideValidation(enabled: false);
+				// 	fv.ImplicitlyValidateChildProperties = true;
+				// 	fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+				// 	fv.RegisterValidatorsFromAssemblyContaining<CreateGuildCommandValidator>();
+				// })
 
 				// new integration with newtonsoft json net for net core 3.0 +
 				.AddNewtonsoftJson(options =>
@@ -79,17 +82,19 @@ namespace Application
 			else
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
-			Configuration.GetSection(nameof(_swaggerOptions)).Bind(_swaggerOptions);
+			var swaggerOptions = new MySwaggerOptions();
+			Configuration.GetSection(nameof(swaggerOptions)).Bind(swaggerOptions);
+
 			app
-				// new .net core routing services required before using middlewares 
+				// new .net core routing services required before using middleware
 				.UseRouting()
 
 				// exception handling as Internal server error output
 				.UseMiddleware(typeof(ExceptionHandlingMiddleware))
 
 				// swagger
-				.UseSwagger(option => option.RouteTemplate = _swaggerOptions.JsonRoute)
-				.UseSwaggerUI(option => option.SwaggerEndpoint(_swaggerOptions.UiEndpoint, _swaggerOptions.Description))
+				.UseSwagger(option => option.RouteTemplate = swaggerOptions.JsonRoute)
+				.UseSwaggerUI(option => option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description))
 
 				// redirection
 				.UseHttpsRedirection()
