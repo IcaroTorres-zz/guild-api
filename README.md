@@ -11,6 +11,7 @@ A REST API with resources representing Guilds, Members, Invites and Memberships,
 - [x] **Domain-Driven Design**;
 - [x] **Repositories**;
 - [x] **Unit of Work**;
+- [x] **State Pattern controlling Domain workflows**;
 - [x] **Null Objects**;
 - [x] **FluentValidations**;
 - [x] **MediatR Request/Response Pipelines**;
