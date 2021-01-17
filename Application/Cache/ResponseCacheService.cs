@@ -6,7 +6,7 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Application.Cache
 {
-	public class ResponseCacheService : IResponseCacheService
+    public class ResponseCacheService : IResponseCacheService
 	{
 		private readonly IDistributedCache _distributedCache;
 

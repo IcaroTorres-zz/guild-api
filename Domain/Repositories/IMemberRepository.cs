@@ -1,23 +1,21 @@
+using Domain.Models;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities;
 
 namespace Domain.Repositories
 {
-	public interface IMemberRepository
+    public interface IMemberRepository
 	{
-		Task<bool> ExistsAsync(Expression<Func<Member, bool>> predicate, CancellationToken cancellationToken = default);
 		Task<bool> ExistsWithIdAsync(Guid id, CancellationToken cancellationToken = default);
 		Task<bool> ExistsWithNameAsync(string name, CancellationToken cancellationToken = default);
+		Task<bool> CanChangeNameAsync(Guid id, string name, CancellationToken cancellationToken = default);
+		Task<bool> IsGuildMemberAsync(Guid id, Guid guildId, CancellationToken cancellationToken = default);
 		Task<Member> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default);
-		Task<Member> GetByNameAsync(string name, bool readOnly = false, CancellationToken cancellationToken = default);
 		Task<Member> GetForGuildOperationsAsync(Guid id, CancellationToken cancellationToken = default);
-		IQueryable<Member> Query(Expression<Func<Member, bool>> predicate = null, bool readOnly = false);
-		Task<Member> InsertAsync(Member entity, CancellationToken cancellationToken = default);
-		Member Update(Member entity);
-		Member Remove(Member entity);
+		Task<Pagination<Member>> PaginateAsync(Expression<Func<Member, bool>> predicate = null, int top = 20, int page = 1, CancellationToken cancellationToken = default);
+		Task<Member> InsertAsync(Member model, CancellationToken cancellationToken = default);
+		Member Update(Member model);
 	}
 }

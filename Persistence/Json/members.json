@@ -1,0 +1,44 @@
+[
+    {
+      "Name": "Mari Makinami, EVA 05 Pilot",
+      "IsGuildLeader": false,
+      "GuildId": "0bf46ff3-42a8-4dbb-a037-009d831b3263",
+      "Id": "bf449ca7-5183-46ad-a2eb-edf804e20a0e"
+    },
+    {
+      "Name": "Asuka Langley Sohryu, EVA 02 Pilot",
+      "IsGuildLeader": false,
+      "GuildId": "0bf46ff3-42a8-4dbb-a037-009d831b3263",
+      "Id": "5cd3f816-6b0f-4ba6-aeb5-26d70281f7e1"
+    },
+    {
+      "Name": "Rei Ayanami, EVA 00 Pilot",
+      "IsGuildLeader": false,
+      "GuildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+      "Id": "3cb0ba50-03d9-48db-93ca-692cb9d68131"
+    },
+    {
+      "Name": "Shinji Ikari, EVA 01 Pilot",
+      "IsGuildLeader": false,
+      "GuildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+      "Id": "18234e65-8cb1-42e8-9cf4-e4d37980752a"
+    },
+    {
+      "Name": "Gendo Ikari, NERV Comander",
+      "IsGuildLeader": true,
+      "GuildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+      "Id": "e3f46444-78f3-4b94-b703-bc056121fc16"
+    },
+    {
+      "Name": "Kozo Fuyutsuk, NERV Deputy Comander",
+      "IsGuildLeader": false,
+      "GuildId": "96685bc4-dcb7-4b22-90cc-ca83baff8186",
+      "Id": "84a7896c-264e-44de-9d36-e2edc3d201e7"
+    },
+    {
+      "Name": "Misato Katsuragi, WILE Comander",
+      "IsGuildLeader": true,
+      "GuildId": "0bf46ff3-42a8-4dbb-a037-009d831b3263",
+      "Id": "9fad438a-3555-4583-9621-2c065ad93084"
+    }
+  ]

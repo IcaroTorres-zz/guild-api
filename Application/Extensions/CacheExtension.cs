@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Extensions
 {
-	public static class CacheExtension
+    public static class CacheExtension
 	{
 		public static IServiceCollection BootstrapCacheService(this IServiceCollection services, IConfiguration configuration)
 		{
