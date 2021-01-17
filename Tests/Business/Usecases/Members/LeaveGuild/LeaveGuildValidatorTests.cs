@@ -18,7 +18,7 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
             var member = MemberFake.GuildMember().Generate();
             var command = PatchMemberCommandFake.LeaveGuildValid(member.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsSuccess(member.Id, member).Build();
+                .GetByIdSuccess(member.Id, member).Build();
             var sut = new LeaveGuildValidator(memberRepository)
             {
                 CascadeMode = FluentValidation.CascadeMode.Stop
@@ -57,7 +57,7 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
             var member = MemberFake.GuildMember().Generate();
             var command = PatchMemberCommandFake.LeaveGuildValid(member.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsFail(command.Id).Build();
+                .GetByIdFail(command.Id).Build();
             var sut = new LeaveGuildValidator(memberRepository)
             {
                 CascadeMode = FluentValidation.CascadeMode.Stop
@@ -77,7 +77,7 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
             var member = MemberFake.WithoutGuild().Generate();
             var command = PatchMemberCommandFake.LeaveGuildValid(member.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsSuccess(member.Id, member).Build();
+                .GetByIdSuccess(member.Id, member).Build();
             var sut = new LeaveGuildValidator(memberRepository)
             {
                 CascadeMode = FluentValidation.CascadeMode.Stop
