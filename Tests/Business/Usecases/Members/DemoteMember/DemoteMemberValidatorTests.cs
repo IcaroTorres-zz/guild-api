@@ -18,7 +18,7 @@ namespace Tests.Business.Usecases.Members.DemoteMember
             var member = MemberFake.GuildLeader().Generate();
             var command = PatchMemberCommandFake.DemoteMemberValid(member.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsSuccess(member.Id, member).Build();
+                .GetByIdSuccess(member.Id, member).Build();
             var sut = new DemoteMemberValidator(memberRepository)
             {
                 CascadeMode = FluentValidation.CascadeMode.Stop
@@ -57,7 +57,7 @@ namespace Tests.Business.Usecases.Members.DemoteMember
             var member = MemberFake.GuildLeader().Generate();
             var command = PatchMemberCommandFake.DemoteMemberValid(member.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsFail(member.Id).Build();
+                .GetByIdFail(member.Id).Build();
             var sut = new DemoteMemberValidator(memberRepository)
             {
                 CascadeMode = FluentValidation.CascadeMode.Stop
@@ -77,7 +77,7 @@ namespace Tests.Business.Usecases.Members.DemoteMember
             var member = MemberFake.WithoutGuild().Generate();
             var command = PatchMemberCommandFake.DemoteMemberValid(member.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsSuccess(member.Id, member).Build();
+                .GetByIdSuccess(member.Id, member).Build();
             var sut = new DemoteMemberValidator(memberRepository)
             {
                 CascadeMode = FluentValidation.CascadeMode.Stop
@@ -97,7 +97,7 @@ namespace Tests.Business.Usecases.Members.DemoteMember
             var member = MemberFake.GuildMember().Generate();
             var command = PatchMemberCommandFake.DemoteMemberValid(member.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsSuccess(member.Id, member).Build();
+                .GetByIdSuccess(member.Id, member).Build();
             var sut = new DemoteMemberValidator(memberRepository)
             {
                 CascadeMode = FluentValidation.CascadeMode.Stop
