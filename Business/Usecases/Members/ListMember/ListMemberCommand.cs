@@ -6,6 +6,7 @@ using System;
 
 namespace Business.Usecases.Members.ListMember
 {
+    [Serializable]
     public class ListMemberCommand : IRequest<IApiResult>, IQueryListCommand
     {
         [FromQuery(Name = "name")] public string Name { get; set; } = string.Empty;

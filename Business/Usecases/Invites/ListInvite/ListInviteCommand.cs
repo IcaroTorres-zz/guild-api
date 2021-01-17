@@ -6,6 +6,7 @@ using System;
 
 namespace Business.Usecases.Invites.ListInvite
 {
+    [Serializable]
     public class ListInviteCommand : IRequest<IApiResult>, IQueryListCommand
     {
         [FromQuery(Name = "guildId")] public Guid? GuildId { get; set; }

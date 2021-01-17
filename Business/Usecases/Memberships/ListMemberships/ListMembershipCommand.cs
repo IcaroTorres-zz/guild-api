@@ -6,6 +6,7 @@ using System;
 
 namespace Business.Usecases.Memberships.ListMemberships
 {
+    [Serializable]
     public class ListMembershipCommand : IRequest<IApiResult>, IQueryListCommand
     {
         [FromQuery(Name = "guildId")] public Guid? GuildId { get; set; }
