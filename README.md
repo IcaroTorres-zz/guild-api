@@ -16,7 +16,6 @@ A REST API with resources representing Guilds, Members, Invites and Memberships,
 - [x] **MediatR Request/Response Pipelines**;
 - [x] **HATEOAS**;
 - [x] **Cache**.
-- [x] **Hateoas**;
 - [x] **Distributed Cache (Redis)**.
 
 # Table of Contents
