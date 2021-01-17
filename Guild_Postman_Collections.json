@@ -1,0 +1,782 @@
+{
+	"info": {
+		"_postman_id": "d62f2553-7b3f-4b06-8fbe-a2cf028d8fbb",
+		"name": "guild api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "register user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (responseCode.code === 200) {\r",
+									"    var response = JSON.parse(responseBody);\r",
+									"    postman.setEnvironmentVariable('userid', response.data.id);\r",
+									"    postman.setEnvironmentVariable('username', response.data.name);\r",
+									"    postman.setEnvironmentVariable('useremail', response.data.email);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json+hateoas",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"teste2\",\n\t\"email\": \"teste2@api-guild-sample.com\",\n    \"password\": \"5bf168aa\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/users/v1/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"v1",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "authenticate user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (responseCode.code === 200) {\r",
+									"    var response = JSON.parse(responseBody);\r",
+									"    postman.setEnvironmentVariable('token', response.data.token);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json+hateoas",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"stuart\",\n    \"password\": \"aa861fb5\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/users/v1/authenticate",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"v1",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/users/v1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"v1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user by name",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/users/v1/{{username}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"v1",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"name\": \"test2\",\r\n\t\"email\": \"teste1@updated-domain.com\",\r\n    \"password\": \"123456789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/users/v1/{{userid}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"v1",
+								"{{userid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/users/v1/{{userid}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"v1",
+								"{{userid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Guilds",
+			"item": [
+				{
+					"name": "list guilds",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json+hateoas",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{host}}/guilds/v1/?pageSize=15&page=1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"guilds",
+								"v1",
+								""
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "15"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get guild",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/guilds/v1/0bf46ff3-42a8-4dbb-a037-009d831b3263",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"guilds",
+								"v1",
+								"0bf46ff3-42a8-4dbb-a037-009d831b3263"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create guild",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (responseCode.code === 201) {\r",
+									"    var response = JSON.parse(responseBody);\r",
+									"    postman.setEnvironmentVariable('guildId', response.data.id);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"EVA Angels\",\n\t\"masterId\": \"48a017d6-9171-4855-98d4-6ee18953d318\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/guilds/v1/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"guilds",
+								"v1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update guild",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"EVA Angels\",\n\t\"masterId\": \"48a017d6-9171-4855-98d4-6ee18953d318\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/guilds/v1/10205075-c00d-4879-8005-fb5a84506c6d",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"guilds",
+								"v1",
+								"10205075-c00d-4879-8005-fb5a84506c6d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Members",
+			"item": [
+				{
+					"name": "list members",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json+hateoas",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{host}}/members/v1/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"members",
+								"v1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/members/v1/99f9f16c-017a-45af-9c1f-676bf207466c",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"members",
+								"v1",
+								"99f9f16c-017a-45af-9c1f-676bf207466c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create member",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json+hateoas",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Angel Ramiel\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/members/v1/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"members",
+								"v1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change member name",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json+hateoas",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Angel Sachiel\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/members/v1/e6d43fcb-1b5c-4b50-b75c-390b83a9c0bd/name",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"members",
+								"v1",
+								"e6d43fcb-1b5c-4b50-b75c-390b83a9c0bd",
+								"name"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "promote member",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/members/v1/99f9f16c-017a-45af-9c1f-676bf207466c/promote",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"members",
+								"v1",
+								"99f9f16c-017a-45af-9c1f-676bf207466c",
+								"promote"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "demote member",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/members/v1/9fad438a-3555-4583-9621-2c065ad93084/demote",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"members",
+								"v1",
+								"9fad438a-3555-4583-9621-2c065ad93084",
+								"demote"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "leave guild",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/members/v1/55cbac8d-47f1-4c8a-826a-415abdfd7037/leave",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"members",
+								"v1",
+								"55cbac8d-47f1-4c8a-826a-415abdfd7037",
+								"leave"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invites",
+			"item": [
+				{
+					"name": "get invite",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/invites/v1/f80360cd-c31e-48d7-b9bb-8dd09b6693d5",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"invites",
+								"v1",
+								"f80360cd-c31e-48d7-b9bb-8dd09b6693d5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all invites",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json+hateoas",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{host}}/invites/v1/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"invites",
+								"v1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invite member",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json+hateoas",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"guildId\": \"10205075-c00d-4879-8005-fb5a84506c6d\",\n\t\"memberId\": \"99f9f16c-017a-45af-9c1f-676bf207466c\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/invites/v1/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"invites",
+								"v1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "accept invite",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/invites/v1/773476ff-0d5e-49ae-8c5b-a57d971e1003/accept",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"invites",
+								"v1",
+								"773476ff-0d5e-49ae-8c5b-a57d971e1003",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "decline invite",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/invites/v1/c1a34487-4a96-4780-a795-24b0548d0d92/decline",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"invites",
+								"v1",
+								"c1a34487-4a96-4780-a795-24b0548d0d92",
+								"decline"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cancel invite",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/invites/v1/f80360cd-c31e-48d7-b9bb-8dd09b6693d5/cancel",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"invites",
+								"v1",
+								"f80360cd-c31e-48d7-b9bb-8dd09b6693d5",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

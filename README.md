@@ -7,6 +7,7 @@ A REST API with resources representing Guilds, Members, Invites and Memberships,
 - [x] **.Net Core 3.1.3**;
 - [x] **Microsoft.EntityFrameworkCore**;
 - [x] **Microsoft.EntityFrameworkCore.SQLite** package;
+- [x] **Authentication and JWT**;
 - [x] **Domain-Driven Design**;
 - [x] **Repositories**;
 - [x] **Unit of Work**;
@@ -15,6 +16,8 @@ A REST API with resources representing Guilds, Members, Invites and Memberships,
 - [x] **MediatR Request/Response Pipelines**;
 - [x] **HATEOAS**;
 - [x] **Cache**.
+- [x] **Hateoas**;
+- [x] **Distributed Cache (Redis)**.
 
 # Table of Contents
 
@@ -44,8 +47,6 @@ This project require installation of some other tools. You need to have **[GIT](
 
 The restore command will provide installations for needed packages.
 
-    $ git clone https://github.com/IcaroTorres/guild-api.git
-    $ cd guild-api
     $ dotnet restore Application
 
 ## Redis Installation (Non Windows)
