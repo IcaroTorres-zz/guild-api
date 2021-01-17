@@ -42,10 +42,10 @@ namespace Business.Responses
             return new ApiCreatedResult().SetCreated(result, creationCommand);
         }
 
-        public IApiResult SetExecutionError(HttpStatusCode? httpStatusCode = null, params DomainMessage[] errors)
+        public IApiResult SetExecutionError(HttpStatusCode httpStatusCode = HttpStatusCode.Conflict, params DomainMessage[] errors)
         {
             Data = null;
-            Status = httpStatusCode ?? HttpStatusCode.Conflict;
+            Status = httpStatusCode;
             Errors = errors;
             Success = false;
 
@@ -55,9 +55,11 @@ namespace Business.Responses
         public IApiResult SetValidationError(params ValidationFailure[] validationFailures)
         {
             Data = null;
-            Errors = ExtractAsDomainMessages(validationFailures);
-            Status = HttpStatusCode.BadRequest;
             Success = false;
+            Errors = ExtractAsDomainMessages(validationFailures);
+            Status = Enum.TryParse<HttpStatusCode>(validationFailures.FirstOrDefault()?.ErrorCode, true, out var statusFromValidation)
+                ? statusFromValidation
+                : HttpStatusCode.BadRequest;
 
             return UpdateResultValue();
         }

@@ -16,7 +16,7 @@ namespace Domain.Responses
         IDictionary<string, Link> Links { get; }
         IApiResult SetResult(object result, HttpStatusCode status = HttpStatusCode.OK);
         IApiResult SetCreated(object result, ICreationCommand creationCommand);
-        IApiResult SetExecutionError(HttpStatusCode? httpStatusCode = null, params DomainMessage[] errors);
+        IApiResult SetExecutionError(HttpStatusCode httpStatusCode = HttpStatusCode.Conflict, params DomainMessage[] errors);
         IApiResult SetValidationError(params ValidationFailure[] validationFailures);
         IApiResult IncludeHateoas(IApiHateoasFactory hateoas);
     }

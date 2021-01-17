@@ -20,11 +20,14 @@ namespace Business.Responses
             Data = data,
             Success = true
         })
-        { Data = data; }
+        {
+            Data = data;
+            Errors = new List<DomainMessage>();
+        }
 
         public object Data { get; private set; }
         public bool Success => true;
-        public IEnumerable<DomainMessage> Errors => new List<DomainMessage>();
+        public IEnumerable<DomainMessage> Errors { get; }
         public IDictionary<string, Link> Links { get; private set; } = new Dictionary<string, Link>(StringComparer.InvariantCultureIgnoreCase);
 
         public IApiResult SetCreated(object result, ICreationCommand creationCommand)
@@ -44,7 +47,7 @@ namespace Business.Responses
             return new ApiResult().SetResult(result, status);
         }
 
-        public IApiResult SetExecutionError(HttpStatusCode? httpStatusCode = null, params DomainMessage[] errors)
+        public IApiResult SetExecutionError(HttpStatusCode httpStatusCode = HttpStatusCode.Conflict, params DomainMessage[] errors)
         {
             return new ApiResult().SetExecutionError(httpStatusCode, errors);
         }
