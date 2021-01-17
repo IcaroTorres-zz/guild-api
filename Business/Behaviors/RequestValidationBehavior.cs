@@ -28,7 +28,7 @@ namespace Business.Behaviors
             var validations = await Task.WhenAll(validationTasks);
             var failures = validations.SelectMany(x => x.Errors).Where(x => x != null).ToList();
 
-            return failures.Any()
+            return failures.Count > 0
                 ? (TResponse)new ApiResult().SetValidationError(failures.ToArray())
                 : await next();
         }
