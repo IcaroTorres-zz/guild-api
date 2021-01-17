@@ -2,6 +2,7 @@ using Domain.Models;
 using Domain.Models.Nulls;
 using Domain.Repositories;
 using FluentValidation;
+using System.Net;
 
 namespace Business.Usecases.Members.PromoteMember
 {
@@ -13,20 +14,25 @@ namespace Business.Usecases.Members.PromoteMember
             {
                 Member member = Member.Null;
 
-                RuleFor(x => x.Id)
-                    .MustAsync(async (id, ct) =>
+                RuleFor(x => x)
+                    .MustAsync(async (x, ct) =>
                     {
-                        member = await memberRepository.GetForGuildOperationsAsync(id, ct);
+                        member = await memberRepository.GetByIdAsync(x.Id, true, ct);
                         return !(member is INullObject);
                     })
                     .WithMessage(x => $"Record not found for member with given id {x.Id}.")
                     .WithName(nameof(Member.Id))
+                    .WithErrorCode(nameof(HttpStatusCode.NotFound))
+
                     .Must(_ => !(member.Guild is INullObject))
                     .WithMessage("Member do not heave a guild to leave from.")
                     .WithName(nameof(Member.Guild))
+                    .WithErrorCode(nameof(HttpStatusCode.UnprocessableEntity))
+
                     .Must(_ => !member.IsGuildLeader)
                     .WithMessage("A Guild Master cannot be promoted.")
-                    .WithName(nameof(Member.IsGuildLeader));
+                    .WithName(nameof(Member.IsGuildLeader))
+                    .WithErrorCode(nameof(HttpStatusCode.UnprocessableEntity));
             });
         }
     }

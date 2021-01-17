@@ -1,6 +1,7 @@
 ﻿using Domain.Repositories;
 using FluentValidation;
 using System;
+using System.Net;
 
 namespace Business.Usecases.Guilds.CreateGuild
 {
@@ -13,13 +14,16 @@ namespace Business.Usecases.Guilds.CreateGuild
 
             When(x => x.Name != string.Empty && x.MasterId != Guid.Empty, () =>
             {
-                RuleFor(x => x.Name)
-                    .MustAsync(async (name, ct) => !await guildRepository.ExistsWithNameAsync(name, ct))
-                    .WithMessage(x => $"Record already exists for guild with given name {x.Name}.");
+                RuleFor(x => x)
+                    .MustAsync(async (x, ct) => !await guildRepository.ExistsWithNameAsync(x.Name, ct))
+                    .WithMessage(x => $"Record already exists for guild with given name {x.Name}.")
+                    .WithName(x => nameof(x.Name))
+                    .WithErrorCode(nameof(HttpStatusCode.Conflict))
 
-                RuleFor(x => x.MasterId)
-                    .MustAsync((masterId, ct) => memberRepository.ExistsWithIdAsync(masterId, ct))
-                    .WithMessage(x => $"Record not found for master with given id {x.MasterId}.");
+                    .MustAsync((x, ct) => memberRepository.ExistsWithIdAsync(x.MasterId, ct))
+                    .WithMessage(x => $"Record not found for master with given id {x.MasterId}.")
+                    .WithName(x => nameof(x.MasterId))
+                    .WithErrorCode(nameof(HttpStatusCode.NotFound));
             });
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Domain.Repositories;
 using FluentValidation;
+using System.Net;
 
 namespace Business.Usecases.Members.CreateMember
 {
@@ -10,7 +11,8 @@ namespace Business.Usecases.Members.CreateMember
             RuleFor(x => x.Name)
                 .NotEmpty()
                 .MustAsync(async (name, ct) => !await memberRepository.ExistsWithNameAsync(name, ct))
-                .WithMessage(x => $"Record already exist for member with given name {x.Name}.");
+                .WithMessage(x => $"Record already exist for member with given name {x.Name}.")
+                .WithErrorCode(nameof(HttpStatusCode.Conflict));
         }
     }
 }
