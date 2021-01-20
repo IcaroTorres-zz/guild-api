@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Nulls;
 using Domain.Models.States.Memberships;
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 
@@ -17,9 +18,7 @@ namespace Domain.Models
         private Member _member;
         private MembershipState _state;
 
-        public Membership()
-        {
-        }
+        [JsonConstructor] protected Membership() { }
 
         internal Membership(Guild guild, Member member)
         {

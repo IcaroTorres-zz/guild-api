@@ -1,5 +1,6 @@
 using Domain.Models.Nulls;
 using Domain.Models.States.Members;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -20,7 +21,7 @@ namespace Domain.Models
         private Guild _guild;
         private MemberState _state;
 
-        public Member() { }
+        [JsonConstructor] protected Member() { }
 
         public Member(string name)
         {

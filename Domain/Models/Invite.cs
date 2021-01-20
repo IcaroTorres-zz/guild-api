@@ -1,6 +1,7 @@
 ﻿using Domain.Enums;
 using Domain.Models.Nulls;
 using Domain.Models.States.Invites;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +21,7 @@ namespace Domain.Models
         private Member _member;
         private InviteState _state;
 
-        public Invite() { }
+        [JsonConstructor] protected Invite() { }
 
         internal Invite(Guild guild, Member member)
         {
