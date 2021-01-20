@@ -22,9 +22,9 @@ namespace Business.Usecases.Guilds.GetGuild
 
         public async Task<IApiResult> Handle(GetGuildCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
             var guild = await _guildRepository.GetByIdAsync(command.Id, true, cancellationToken);
-            return response.SetResult(_mapper.Map<GuildDto>(guild));
+            return result.SetResult(_mapper.Map<GuildDto>(guild));
         }
     }
 }

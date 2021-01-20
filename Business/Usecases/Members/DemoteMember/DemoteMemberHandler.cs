@@ -22,7 +22,7 @@ namespace Business.Usecases.Members.DemoteMember
 
         public async Task<IApiResult> Handle(DemoteMemberCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var masterToDemote = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
             var guild = masterToDemote.Guild.DemoteLeader();
@@ -33,7 +33,7 @@ namespace Business.Usecases.Members.DemoteMember
 
             var updateResult = _mapper.Map<MemberDto>(masterToDemote);
 
-            return response.SetResult(updateResult);
+            return result.SetResult(updateResult);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Business.Usecases.Guilds.CreateGuild
 
         public async Task<IApiResult> Handle(CreateGuildCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var master = await _unit.Members.GetForGuildOperationsAsync(command.MasterId, cancellationToken);
             var guild = new Guild(command.Name, master);
@@ -38,7 +38,7 @@ namespace Business.Usecases.Guilds.CreateGuild
 
             var creationResult = _mapper.Map<GuildDto>(guild);
 
-            return response.SetCreated(creationResult, command);
+            return result.SetCreated(creationResult, command);
         }
     }
 }

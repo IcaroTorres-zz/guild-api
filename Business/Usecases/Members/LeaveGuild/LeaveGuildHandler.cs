@@ -24,7 +24,7 @@ namespace Business.Usecases.Members.LeaveGuild
 
         public async Task<IApiResult> Handle(LeaveGuildCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var leavingMember = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
             leavingMember.LeaveGuild();
@@ -36,7 +36,7 @@ namespace Business.Usecases.Members.LeaveGuild
 
             var updateResult = _mapper.Map<MemberDto>(leavingMember);
 
-            return response.SetResult(updateResult);
+            return result.SetResult(updateResult);
         }
     }
 }

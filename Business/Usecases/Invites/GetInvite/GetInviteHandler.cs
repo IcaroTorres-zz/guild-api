@@ -22,9 +22,9 @@ namespace Business.Usecases.Invites.GetInvite
 
         public async Task<IApiResult> Handle(GetInviteCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
             var inviteModel = await _inviteRepository.GetByIdAsync(command.Id, true, cancellationToken);
-            return response.SetResult(_mapper.Map<InviteDto>(inviteModel));
+            return result.SetResult(_mapper.Map<InviteDto>(inviteModel));
         }
     }
 }

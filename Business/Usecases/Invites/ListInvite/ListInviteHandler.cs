@@ -23,7 +23,7 @@ namespace Business.Usecases.Invites.ListInvite
 
         public async Task<IApiResult> Handle(ListInviteCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var pagedInvites = await _inviteRepository.PaginateAsync(
                 predicate: x =>
@@ -35,7 +35,7 @@ namespace Business.Usecases.Invites.ListInvite
 
             var pagedResult = _mapper.Map<Pagination<InviteDto>>(pagedInvites);
             pagedResult.SetAppliedCommand(command);
-            return response.SetResult(pagedResult);
+            return result.SetResult(pagedResult);
         }
     }
 }

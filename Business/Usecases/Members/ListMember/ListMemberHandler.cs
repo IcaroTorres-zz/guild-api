@@ -23,7 +23,7 @@ namespace Business.Usecases.Members.ListMember
 
         public async Task<IApiResult> Handle(ListMemberCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var pagedMembers = await _memberRepository.PaginateAsync(
                 top: command.PageSize,
@@ -32,7 +32,7 @@ namespace Business.Usecases.Members.ListMember
 
             var pagedResult = _mapper.Map<Pagination<MemberDto>>(pagedMembers);
             pagedResult.SetAppliedCommand(command);
-            return response.SetResult(pagedResult);
+            return result.SetResult(pagedResult);
         }
     }
 }

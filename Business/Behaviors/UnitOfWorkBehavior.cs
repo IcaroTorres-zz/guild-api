@@ -2,15 +2,14 @@
 using Domain.Responses;
 using Domain.Unities;
 using MediatR;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Business.Behaviors
 {
-    public class UnitOfWorkBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
-        where TCommand : IRequest<TResponse>
-        where TResponse : IApiResult
+    public class UnitOfWorkBehavior<TCommand, TResult> : IPipelineBehavior<TCommand, TResult>
+        where TCommand : IRequest<TResult>
+        where TResult : IApiResult
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -19,21 +18,29 @@ namespace Business.Behaviors
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<TResponse> Handle(TCommand command, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResult> Handle(TCommand command, CancellationToken cancellationToken, RequestHandlerDelegate<TResult> next)
         {
+            TResult result;
+
             if (command is ITransactionalCommand)
             {
                 _unitOfWork.BeginTransaction();
-
-                var response = await next();
-
-                if (!response.Errors.Any()) await _unitOfWork.CommitAsync(cancellationToken);
-                else await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-
-                return response;
+                result = await next();
+                if (result.Success)
+                {
+                    result = (TResult)await _unitOfWork.CommitAsync(result, cancellationToken);
+                }
+                else
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                }
+            }
+            else
+            {
+                result = await next();
             }
 
-            return await next();
+            return result;
         }
     }
 }

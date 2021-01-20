@@ -22,13 +22,13 @@ namespace Business.Usecases.Invites.DenyInvite
 
         public async Task<IApiResult> Handle(DenyInviteCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var invite = await _inviteRepository.GetByIdAsync(command.Id, readOnly: false, cancellationToken);
             _inviteRepository.Update(invite.BeDenied());
             var inviteResult = _mapper.Map<InviteDto>(invite);
 
-            return response.SetResult(inviteResult);
+            return result.SetResult(inviteResult);
         }
     }
 }

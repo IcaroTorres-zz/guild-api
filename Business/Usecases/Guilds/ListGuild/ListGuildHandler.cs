@@ -23,7 +23,7 @@ namespace Business.Usecases.Guilds.ListGuild
 
         public async Task<IApiResult> Handle(ListGuildCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var pagedGuilds = await _guildRepository.PaginateAsync(
                 top: command.PageSize,
@@ -32,7 +32,7 @@ namespace Business.Usecases.Guilds.ListGuild
 
             var pagedResult = _mapper.Map<Pagination<GuildDto>>(pagedGuilds);
             pagedResult.SetAppliedCommand(command);
-            return response.SetResult(pagedResult);
+            return result.SetResult(pagedResult);
         }
     }
 }

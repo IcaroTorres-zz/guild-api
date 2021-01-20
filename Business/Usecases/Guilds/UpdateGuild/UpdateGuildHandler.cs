@@ -25,7 +25,7 @@ namespace Business.Usecases.Guilds.UpdateGuild
 
         public async Task<IApiResult> Handle(UpdateGuildCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var guild = await _guildRepository.GetByIdAsync(command.Id, readOnly: false, cancellationToken);
             var newLeader = guild.Members.Single(x => x.Id.Equals(command.MasterId));
@@ -40,7 +40,7 @@ namespace Business.Usecases.Guilds.UpdateGuild
 
             var updateResult = _mapper.Map<GuildDto>(guild);
 
-            return response.SetResult(updateResult);
+            return result.SetResult(updateResult);
         }
     }
 }

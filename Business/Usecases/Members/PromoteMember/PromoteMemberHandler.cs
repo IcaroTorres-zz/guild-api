@@ -22,7 +22,7 @@ namespace Business.Usecases.Members.PromoteMember
 
         public async Task<IApiResult> Handle(PromoteMemberCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var promotionMember = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
             var guild = promotionMember.Guild;
@@ -34,7 +34,7 @@ namespace Business.Usecases.Members.PromoteMember
 
             var updateResult = _mapper.Map<MemberDto>(promotionMember);
 
-            return response.SetResult(updateResult);
+            return result.SetResult(updateResult);
         }
     }
 }

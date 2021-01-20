@@ -22,7 +22,7 @@ namespace Business.Usecases.Invites.AcceptInvite
 
         public async Task<IApiResult> Handle(AcceptInviteCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var invite = await _unit.Invites.GetForAcceptOperationAsync(command.Id, cancellationToken);
 
@@ -39,7 +39,7 @@ namespace Business.Usecases.Invites.AcceptInvite
 
             var inviteResult = _mapper.Map<InviteDto>(invite);
 
-            return response.SetResult(inviteResult);
+            return result.SetResult(inviteResult);
         }
     }
 }

@@ -23,13 +23,13 @@ namespace Business.Usecases.Members.CreateMember
 
         public async Task<IApiResult> Handle(CreateMemberCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var member = new Member(command.Name);
             member = await _memberRepository.InsertAsync(member, cancellationToken);
             var creationResult = _mapper.Map<MemberDto>(member);
 
-            return response.SetCreated(creationResult, command);
+            return result.SetCreated(creationResult, command);
         }
     }
 }

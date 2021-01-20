@@ -23,7 +23,7 @@ namespace Business.Usecases.Memberships.ListMemberships
 
         public async Task<IApiResult> Handle(ListMembershipCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var pagedMemberships = await _membershipRepository.PaginateAsync(
             predicate: x =>
@@ -35,7 +35,7 @@ namespace Business.Usecases.Memberships.ListMemberships
 
             var pagedResult = _mapper.Map<Pagination<MembershipDto>>(pagedMemberships);
             pagedResult.SetAppliedCommand(command);
-            return response.SetResult(pagedResult);
+            return result.SetResult(pagedResult);
         }
     }
 }

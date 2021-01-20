@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Business.Behaviors
 {
-    public class IncludeHateoasBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
-        where TCommand : IRequest<TResponse>
-        where TResponse : IApiResult
+    public class IncludeHateoasBehavior<TCommand, TResult> : IPipelineBehavior<TCommand, TResult>
+        where TCommand : IRequest<TResult>
+        where TResult : IApiResult
     {
         private readonly IApiHateoasFactory _hateoasFactory;
 
@@ -17,13 +17,13 @@ namespace Business.Behaviors
             _hateoasFactory = hateoasFactory;
         }
 
-        public async Task<TResponse> Handle(TCommand request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResult> Handle(TCommand request, CancellationToken cancellationToken, RequestHandlerDelegate<TResult> next)
         {
-            var response = await next();
+            var result = await next();
 
-            if (response.Success) response.IncludeHateoas(_hateoasFactory);
+            if (result.Success) result.IncludeHateoas(_hateoasFactory);
 
-            return response;
+            return result;
         }
     }
 }

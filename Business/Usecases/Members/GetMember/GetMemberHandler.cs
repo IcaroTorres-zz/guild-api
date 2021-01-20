@@ -22,9 +22,9 @@ namespace Business.Usecases.Members.GetMember
 
         public async Task<IApiResult> Handle(GetMemberCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
             var member = await _memberRepository.GetByIdAsync(command.Id, readOnly: true, cancellationToken);
-            return response.SetResult(_mapper.Map<MemberDto>(member));
+            return result.SetResult(_mapper.Map<MemberDto>(member));
         }
     }
 }

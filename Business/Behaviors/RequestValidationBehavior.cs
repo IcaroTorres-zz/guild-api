@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Business.Behaviors
 {
-    public class RequestValidationBehavior<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse>
-        where TCommand : IRequest<TResponse>
-        where TResponse : IApiResult
+    public class RequestValidationBehavior<TCommand, TResult> : IPipelineBehavior<TCommand, TResult>
+        where TCommand : IRequest<TResult>
+        where TResult : IApiResult
     {
         private readonly IEnumerable<IValidator<TCommand>> _requestValidators;
 
@@ -20,7 +20,7 @@ namespace Business.Behaviors
             _requestValidators = requestValidators;
         }
 
-        public async Task<TResponse> Handle(TCommand command, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResult> Handle(TCommand command, CancellationToken cancellationToken, RequestHandlerDelegate<TResult> next)
         {
             var requestContext = new ValidationContext<TCommand>(command);
 
@@ -29,7 +29,7 @@ namespace Business.Behaviors
             var failures = validations.SelectMany(x => x.Errors).Where(x => x != null).ToList();
 
             return failures.Count > 0
-                ? (TResponse)new ApiResult().SetValidationError(failures.ToArray())
+                ? (TResult)new ApiResult().SetValidationError(failures.ToArray())
                 : await next();
         }
     }

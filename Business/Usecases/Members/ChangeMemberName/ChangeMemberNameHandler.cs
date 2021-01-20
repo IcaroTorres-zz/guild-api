@@ -22,14 +22,14 @@ namespace Business.Usecases.Members.ChangeMemberName
 
         public async Task<IApiResult> Handle(ChangeMemberNameCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var member = await _memberRepository.GetByIdAsync(command.Id);
             member = _memberRepository.Update(member.ChangeName(command.Name));
 
             var updateResult = _mapper.Map<MemberDto>(member);
 
-            return response.SetResult(updateResult);
+            return result.SetResult(updateResult);
         }
     }
 }

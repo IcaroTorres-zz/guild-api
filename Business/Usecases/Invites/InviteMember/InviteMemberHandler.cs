@@ -22,7 +22,7 @@ namespace Business.Usecases.Invites.InviteMember
 
         public async Task<IApiResult> Handle(InviteMemberCommand command, CancellationToken cancellationToken)
         {
-            var response = new ApiResult();
+            var result = new ApiResult();
 
             var invitingGuild = await _unit.Guilds.GetForMemberHandlingAsync(command.GuildId, cancellationToken);
             var invitedMember = await _unit.Members.GetForGuildOperationsAsync(command.MemberId, cancellationToken);
@@ -31,7 +31,7 @@ namespace Business.Usecases.Invites.InviteMember
             invite = await _unit.Invites.InsertAsync(invite, cancellationToken);
             var inviteResult = _mapper.Map<InviteDto>(invite);
 
-            return response.SetCreated(inviteResult, command);
+            return result.SetCreated(inviteResult, command);
         }
     }
 }
