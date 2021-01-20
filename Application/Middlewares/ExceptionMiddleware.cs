@@ -62,7 +62,7 @@ namespace Application.Middlewares
             var errorOutput = new ApiResult();
             var errors = new List<DomainMessage>() { new DomainMessage(title, message) };
 
-            if (!isProduction) errors.AddRange(ExtractExceptionMessages(ex));
+            if (!isProduction) errors.AddRange(ex.ToDomainMessages());
 
             errorOutput.SetExecutionError(code, errors.ToArray());
             return WriteErrorAsync(errorOutput, context);
@@ -80,18 +80,6 @@ namespace Application.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = apiResponse.StatusCode ?? 500;
             return context.Response.WriteAsync(stringResult);
-        }
-
-        private static List<DomainMessage> ExtractExceptionMessages(Exception ex)
-        {
-            var messages = new List<DomainMessage>();
-
-            if (ex is null) return messages;
-
-            messages.Add(new DomainMessage(ex.GetType().Name, ex.Message));
-            messages.AddRange(ExtractExceptionMessages(ex.InnerException));
-
-            return messages;
         }
     }
 }

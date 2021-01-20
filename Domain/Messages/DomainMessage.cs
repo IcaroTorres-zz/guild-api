@@ -7,8 +7,8 @@ namespace Domain.Messages
     [ExcludeFromCodeCoverage]
     public class DomainMessage
     {
-        public string Title { get; set; }
-        public string Message { get; set; }
+        public string Title { get; }
+        public string Message { get; }
 
         public DomainMessage(string title, string message)
         {
