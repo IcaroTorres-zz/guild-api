@@ -1,4 +1,6 @@
-﻿using Domain.Repositories;
+﻿using Domain.Messages;
+using Domain.Repositories;
+using Domain.Responses;
 using Domain.Unities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -6,6 +8,7 @@ using Microsoft.Win32.SafeHandles;
 using Persistence.Context;
 using System;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,33 +55,28 @@ namespace Persistence.Unities
             GC.SuppressFinalize(this);
         }
 
-        public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        public async Task<IApiResult> CommitAsync(IApiResult result, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var changes = await SaveAsync(cancellationToken);
-                if (changes > 0) _contextTransaction?.CommitAsync(cancellationToken);
-                HasOpenTransaction = false;
-                return changes;
-            }
-            catch (Exception dbUpdateException)
-            {
-                await RollbackTransactionAsync(cancellationToken);
-                throw new DbUpdateException(
-                    "Data constraint violation. Register is invalid or Already exists.", dbUpdateException);
-            }
+            result = await SaveAsync(result, cancellationToken);
+            if (result.Success) _contextTransaction?.CommitAsync(cancellationToken);
+            HasOpenTransaction = false;
+            return result;
         }
 
-        public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
+        public async Task<IApiResult> SaveAsync(IApiResult result, CancellationToken cancellationToken = default)
         {
             try
             {
-                return await _context.SaveChangesAsync(cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+                return result;
             }
             catch (Exception exception)
             {
                 await RollbackStatesAsync(cancellationToken);
-                throw exception;
+                var errors = exception.ToDomainMessages()
+                                      .Prepend(new DomainMessage("database", "Data constraint violation. Register is invalid or already exists."))
+                                      .ToArray();
+                return result.SetExecutionError(HttpStatusCode.Conflict, errors);
             }
         }
 

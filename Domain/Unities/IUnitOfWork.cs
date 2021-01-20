@@ -1,4 +1,5 @@
 ﻿using Domain.Repositories;
+using Domain.Responses;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,8 +14,8 @@ namespace Domain.Unities
 		public IMembershipRepository Memberships { get; }
 		bool HasOpenTransaction { get; }
 		IUnitOfWork BeginTransaction();
-		Task<int> CommitAsync(CancellationToken cancellationToken = default);
-		Task<int> SaveAsync(CancellationToken cancellationToken = default);
+		Task<IApiResult> CommitAsync(IApiResult result, CancellationToken cancellationToken = default);
+		Task<IApiResult> SaveAsync(IApiResult result, CancellationToken cancellationToken = default);
 		Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
 		Task RollbackStatesAsync(CancellationToken cancellationToken = default);
 	}
