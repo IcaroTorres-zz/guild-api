@@ -16,6 +16,19 @@ namespace Application.Hateoas.Invites
                 {
                     var queryBy = x.GetCommandAs<ListInviteCommand>() ?? new ListInviteCommand
                     {
+                        PageSize = x.PageSize
+                    };
+                    queryBy.Page = 1;
+                    return queryBy;
+                })
+                .When(x => x.Pages > 1 && x.Page > 1)
+                .PresentedAs("first");
+
+            source.AddLink("get-invites")
+                .HasRouteData(x =>
+                {
+                    var queryBy = x.GetCommandAs<ListInviteCommand>() ?? new ListInviteCommand
+                    {
                         PageSize = x.PageSize,
                         Page = x.Page
                     };
@@ -38,6 +51,19 @@ namespace Application.Hateoas.Invites
                 })
                 .When(x => x.Page > 1)
                 .PresentedAs("previous");
+
+            source.AddLink("get-invites")
+                .HasRouteData(x =>
+                {
+                    var queryBy = x.GetCommandAs<ListInviteCommand>() ?? new ListInviteCommand
+                    {
+                        PageSize = x.PageSize
+                    };
+                    queryBy.Page = x.Pages;
+                    return queryBy;
+                })
+                .When(x => x.Page < x.Pages && x.Pages > 1)
+                .PresentedAs("last");
         }
     }
 }
