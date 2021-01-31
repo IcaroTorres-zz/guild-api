@@ -2,7 +2,7 @@
 
 namespace Domain.Commands
 {
-    public interface IQueryItemCommand : IQueryCommand
+    public interface IQueryItemCommand
 	{
         Guid Id { get; }
     }
