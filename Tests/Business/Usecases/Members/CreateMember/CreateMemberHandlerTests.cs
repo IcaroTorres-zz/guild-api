@@ -1,12 +1,11 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Members.CreateMember;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Business.Usecases.Members.CreateMember;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -22,8 +21,7 @@ namespace Tests.Business.Usecases.Guilds.CreateGuild
             var command = CreateMemberCommandFake.Valid();
             var member = MemberFake.WithoutGuild().Generate();
             var repository = MemberRepositoryMockBuilder.Create().Insert(output: member).Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new CreateMemberHandler(repository, mapper);
+            var sut = new CreateMemberHandler(repository);
 
             // act
             var response = await sut.Handle(command, default);
@@ -33,9 +31,9 @@ namespace Tests.Business.Usecases.Guilds.CreateGuild
             response.Success.Should().BeTrue();
             response.Errors.Should().BeEmpty();
             response.As<ApiCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
-            response.Data.Should().NotBeNull().And.BeOfType<MemberDto>();
-            response.Data.As<MemberDto>().Id.Should().Be(member.Id);
-            response.Data.As<MemberDto>().Name.Should().Be(member.Name);
+            response.Data.Should().NotBeNull().And.BeOfType<Member>();
+            response.Data.As<Member>().Id.Should().Be(member.Id);
+            response.Data.As<Member>().Name.Should().Be(member.Name);
         }
     }
 }

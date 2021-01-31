@@ -1,13 +1,12 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Invites.InviteMember;
 using Domain.Enums;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Business.Usecases.Invites.InviteMember;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -30,8 +29,7 @@ namespace Tests.Business.Usecases.Guilds.InviteMember
                 .SetupGuilds(x => x.GetForMemberHandlingSuccess(command.GuildId, guild).Build())
                 .SetupInvites(x => x.Insert(output: expectedInvite).Build())
                 .Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new InviteMemberHandler(unit, mapper);
+            var sut = new InviteMemberHandler(unit);
 
             // act
             var result = await sut.Handle(command, default);
@@ -41,10 +39,10 @@ namespace Tests.Business.Usecases.Guilds.InviteMember
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
-            result.Data.Should().NotBeNull().And.BeOfType<InviteDto>();
-            result.Data.As<InviteDto>().Id.Should().Be(expectedInvite.Id);
-            result.Data.As<InviteDto>().Guild.Id.Should().Be(expectedInvite.GuildId.Value).And.Be(guild.Id);
-            result.Data.As<InviteDto>().Member.Id.Should().Be(expectedInvite.MemberId.Value).And.Be(member.Id);
+            result.Data.Should().NotBeNull().And.BeOfType<Invite>();
+            result.Data.As<Invite>().Id.Should().Be(expectedInvite.Id);
+            result.Data.As<Invite>().Guild.Id.Should().Be(expectedInvite.GuildId.Value).And.Be(guild.Id);
+            result.Data.As<Invite>().Member.Id.Should().Be(expectedInvite.MemberId.Value).And.Be(member.Id);
         }
     }
 }

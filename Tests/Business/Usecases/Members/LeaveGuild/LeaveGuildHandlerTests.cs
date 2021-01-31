@@ -1,12 +1,11 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Members.LeaveGuild;
+using Domain.Models;
 using Domain.Models.Nulls;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -30,8 +29,7 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
                 .Build();
             var membershipRepository = MembershipRepositoryMockBuilder.Create()
                 .Update(expectedFinishedMembership, expectedFinishedMembership).Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new LeaveGuildHandler(memberRepository, membershipRepository, mapper);
+            var sut = new LeaveGuildHandler(memberRepository, membershipRepository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -41,11 +39,11 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<MemberDto>();
-            result.Data.As<MemberDto>().Id.Should().Be(leavingMaster.Id);
-            result.Data.As<MemberDto>().IsGuildLeader.Should().BeFalse()
+            result.Data.Should().NotBeNull().And.BeOfType<Member>();
+            result.Data.As<Member>().Id.Should().Be(leavingMaster.Id);
+            result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedNewLeader.IsGuildLeader);
-            result.Data.As<MemberDto>().Guild.Should().BeNull();
+            result.Data.As<Member>().Guild.Should().BeOfType<NullGuild>();
             expectedFinishedMembership.Should().NotBeOfType<NullMembership>();
             expectedFinishedMembership.Id.Should().Be(leavingMaster.LastFinishedMembership.Id);
             expectedFinishedMembership.ModifiedDate.Should().NotBeNull()
@@ -67,8 +65,7 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
                 .Build();
             var membershipRepository = MembershipRepositoryMockBuilder.Create()
                 .Update(expectedFinishedMembership, expectedFinishedMembership).Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new LeaveGuildHandler(memberRepository, membershipRepository, mapper);
+            var sut = new LeaveGuildHandler(memberRepository, membershipRepository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -78,11 +75,11 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<MemberDto>();
-            result.Data.As<MemberDto>().Id.Should().Be(leavingMember.Id);
-            result.Data.As<MemberDto>().IsGuildLeader.Should().BeFalse()
+            result.Data.Should().NotBeNull().And.BeOfType<Member>();
+            result.Data.As<Member>().Id.Should().Be(leavingMember.Id);
+            result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedUnchangedLeader.IsGuildLeader);
-            result.Data.As<MemberDto>().Guild.Should().BeNull();
+            result.Data.As<Member>().Guild.Should().BeOfType<NullGuild>();
             expectedFinishedMembership.Should().NotBeOfType<NullMembership>();
             expectedFinishedMembership.Id.Should().Be(leavingMember.LastFinishedMembership.Id);
             expectedFinishedMembership.ModifiedDate.Should().NotBeNull()

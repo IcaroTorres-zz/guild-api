@@ -1,7 +1,7 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Invites.AcceptInvite;
 using Domain.Enums;
+using Domain.Models;
 using Domain.Models.Nulls;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using Tests.Business.Usecases.Invites;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -44,8 +43,7 @@ namespace Tests.Business.Usecases.Guilds.AcceptInvite
 
                     return x.Build();
                 }).Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new AcceptInviteHandler(unit, mapper);
+            var sut = new AcceptInviteHandler(unit);
 
             // act
             var result = await sut.Handle(command, default);
@@ -55,9 +53,9 @@ namespace Tests.Business.Usecases.Guilds.AcceptInvite
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<InviteDto>();
-            result.Data.As<InviteDto>().Id.Should().Be(acceptedInvite.Id);
-            result.Data.As<InviteDto>().Status.Should().Be(InviteStatuses.Accepted)
+            result.Data.Should().NotBeNull().And.BeOfType<Invite>();
+            result.Data.As<Invite>().Id.Should().Be(acceptedInvite.Id);
+            result.Data.As<Invite>().Status.Should().Be(InviteStatuses.Accepted)
                 .And.Be(acceptedInvite.Status);
 
             invitedMember.Should().NotBeOfType<NullMember>();

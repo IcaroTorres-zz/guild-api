@@ -1,5 +1,4 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Members.ListMember;
 using Domain.Models;
 using FluentAssertions;
@@ -29,7 +28,7 @@ namespace Tests.Business.Usecases.Members.GetMember
                 page: command.Page,
                 totalItems: command.PageSize * expectedPages).Build();
             var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new ListMemberHandler(repository, mapper);
+            var sut = new ListMemberHandler(repository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -39,16 +38,16 @@ namespace Tests.Business.Usecases.Members.GetMember
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Pagination<MemberDto>>();
-            result.Data.As<Pagination<MemberDto>>().Items.Should().NotBeEmpty()
-                .And.AllBeAssignableTo<MemberDto>()
+            result.Data.Should().NotBeNull().And.BeOfType<Pagination<Member>>();
+            result.Data.As<Pagination<Member>>().Items.Should().NotBeEmpty()
+                .And.AllBeAssignableTo<Member>()
                 .And.HaveCount(expectedPageSize)
                 .And.HaveCount(command.PageSize);
-            result.Data.As<Pagination<MemberDto>>().PageSize.Should().Be(expectedPageSize)
+            result.Data.As<Pagination<Member>>().PageSize.Should().Be(expectedPageSize)
                 .And.Be(command.PageSize);
-            result.Data.As<Pagination<MemberDto>>().Page.Should().Be(expectedPage)
+            result.Data.As<Pagination<Member>>().Page.Should().Be(expectedPage)
                 .And.Be(command.Page);
-            result.Data.As<Pagination<MemberDto>>().Pages.Should().Be(expectedPages);
+            result.Data.As<Pagination<Member>>().Pages.Should().Be(expectedPages);
         }
     }
 }

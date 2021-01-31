@@ -1,13 +1,12 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Guilds.UpdateGuild;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 using Tests.Business.Usecases.Guilds.UpdateGuild;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -35,8 +34,7 @@ namespace Tests.Business.Usecases.Members.UpdateGuild
                 .Update(expectedLeader, expectedLeader)
                 .Update(expectedVice, expectedVice)
                 .Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new UpdateGuildHandler(guildRepository, memberRepository, mapper);
+            var sut = new UpdateGuildHandler(guildRepository, memberRepository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -46,11 +44,11 @@ namespace Tests.Business.Usecases.Members.UpdateGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<GuildDto>();
-            result.Data.As<GuildDto>().Name.Should().Be(expectedGuild.Name);
-            result.Data.As<GuildDto>().Id.Should().Be(expectedGuild.Id);
-            result.Data.As<GuildDto>().Leader.Id.Should().Be(expectedLeader.Id);
-            result.Data.As<GuildDto>().Members.Should().NotBeEmpty()
+            result.Data.Should().NotBeNull().And.BeOfType<Guild>();
+            result.Data.As<Guild>().Name.Should().Be(expectedGuild.Name);
+            result.Data.As<Guild>().Id.Should().Be(expectedGuild.Id);
+            result.Data.As<Guild>().Leader.Id.Should().Be(expectedLeader.Id);
+            result.Data.As<Guild>().Members.Should().NotBeEmpty()
                 .And.HaveCount(otherMembersCount + 1)
                 .And.Contain(x => x.Id == expectedLeader.Id)
                 .And.Contain(x => x.Id == expectedVice.Id);
