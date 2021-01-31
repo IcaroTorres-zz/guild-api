@@ -26,6 +26,7 @@ namespace Business.Responses
         internal HttpStatusCode Status { get; private set; } = HttpStatusCode.OK;
         public IEnumerable<DomainMessage> Errors { get; private set; } = new List<DomainMessage>();
         public IDictionary<string, Link> Links { get; private set; } = new Dictionary<string, Link>(StringComparer.InvariantCultureIgnoreCase);
+        public HttpStatusCode GetStatus() => Status;
 
         public IApiResult SetResult(object result, HttpStatusCode status = HttpStatusCode.OK)
         {

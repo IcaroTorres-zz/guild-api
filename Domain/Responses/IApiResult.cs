@@ -14,6 +14,7 @@ namespace Domain.Responses
         bool Success { get; }
         IEnumerable<DomainMessage> Errors { get; }
         IDictionary<string, Link> Links { get; }
+        HttpStatusCode GetStatus();
         IApiResult SetResult(object result, HttpStatusCode status = HttpStatusCode.OK);
         IApiResult SetCreated(object result, ICreationCommand creationCommand);
         IApiResult SetExecutionError(HttpStatusCode httpStatusCode = HttpStatusCode.Conflict, params DomainMessage[] errors);
