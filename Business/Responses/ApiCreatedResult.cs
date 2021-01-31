@@ -29,6 +29,7 @@ namespace Business.Responses
         public bool Success => true;
         public IEnumerable<DomainMessage> Errors { get; }
         public IDictionary<string, Link> Links { get; private set; } = new Dictionary<string, Link>(StringComparer.InvariantCultureIgnoreCase);
+        public HttpStatusCode GetStatus() => HttpStatusCode.Created;
 
         public IApiResult SetCreated(object result, ICreationCommand creationCommand)
         {
@@ -44,7 +45,12 @@ namespace Business.Responses
 
         public IApiResult SetResult(object result, HttpStatusCode status = HttpStatusCode.OK)
         {
-            return new ApiResult().SetResult(result, status);
+            if (status != HttpStatusCode.Created) return new ApiResult().SetResult(result, status);
+
+            Data = result;
+            ((Result)Value).Data = Data;
+
+            return this;
         }
 
         public IApiResult SetExecutionError(HttpStatusCode httpStatusCode = HttpStatusCode.Conflict, params DomainMessage[] errors)
