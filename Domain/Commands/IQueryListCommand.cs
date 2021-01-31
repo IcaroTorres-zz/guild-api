@@ -1,6 +1,6 @@
 ﻿namespace Domain.Commands
 {
-    public interface IQueryListCommand : IQueryCommand
+    public interface IQueryListCommand
 	{
 		int Page { get; }
 		int PageSize { get; }
