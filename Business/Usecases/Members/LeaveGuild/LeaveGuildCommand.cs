@@ -1,6 +1,10 @@
-﻿namespace Business.Usecases.Members.LeaveGuild
+﻿using Business.Commands;
+using Business.Dtos;
+using Domain.Models;
+
+namespace Business.Usecases.Members.LeaveGuild
 {
-    public class LeaveGuildCommand : PatchMemberCommand
+    public class LeaveGuildCommand : UpdateCommand<Member, MemberDto>
     {
     }
 }

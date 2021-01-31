@@ -1,15 +1,12 @@
-﻿using Domain.Commands;
-using Domain.Responses;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Business.Commands;
+using Business.Dtos;
+using Domain.Models;
 using System;
 
 namespace Business.Usecases.Guilds.ListGuild
 {
     [Serializable]
-    public class ListGuildCommand : IRequest<IApiResult>, IQueryListCommand
+    public class ListGuildCommand : QueryListCommand<Pagination<Guild>, Pagination<GuildDto>>
     {
-        [FromQuery(Name = "pageSize")] public int PageSize { get; set; } = 20;
-        [FromQuery(Name = "page")] public int Page { get; set; } = 1;
     }
 }

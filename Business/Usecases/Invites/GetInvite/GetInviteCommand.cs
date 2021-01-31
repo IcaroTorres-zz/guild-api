@@ -1,13 +1,10 @@
-using Domain.Commands;
-using Domain.Responses;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using System;
+using Business.Commands;
+using Business.Dtos;
+using Domain.Models;
 
 namespace Business.Usecases.Invites.GetInvite
 {
-    public class GetInviteCommand : IRequest<IApiResult>, IQueryItemCommand
+    public class GetInviteCommand : QueryItemCommand<Invite, InviteDto>
     {
-        [FromRoute] public Guid Id { get; set; }
     }
 }
