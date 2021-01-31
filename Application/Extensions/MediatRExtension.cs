@@ -16,6 +16,7 @@ namespace Application.Extensions
 
                 // mediatR pre-request open-type pipeline behaviors
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(IncludeHateoasBehavior<,>))
+                .AddScoped(typeof(IPipelineBehavior<,>), typeof(MapperBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(NotFoundResponseBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
