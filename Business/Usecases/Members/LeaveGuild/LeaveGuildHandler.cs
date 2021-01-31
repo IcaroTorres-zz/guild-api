@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -13,13 +11,11 @@ namespace Business.Usecases.Members.LeaveGuild
     {
         private readonly IMemberRepository _memberRepository;
         private readonly IMembershipRepository _membershipRepository;
-        private readonly IMapper _mapper;
 
-        public LeaveGuildHandler(IMemberRepository memberRepository, IMembershipRepository membershipRepository, IMapper mapper)
+        public LeaveGuildHandler(IMemberRepository memberRepository, IMembershipRepository membershipRepository)
         {
             _memberRepository = memberRepository;
             _membershipRepository = membershipRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(LeaveGuildCommand command, CancellationToken cancellationToken)
@@ -34,9 +30,7 @@ namespace Business.Usecases.Members.LeaveGuild
             _memberRepository.Update(promotedNewLeader);
             _membershipRepository.Update(leavingMember.LastFinishedMembership);
 
-            var updateResult = _mapper.Map<MemberDto>(leavingMember);
-
-            return result.SetResult(updateResult);
+            return result.SetResult(leavingMember);
         }
     }
 }

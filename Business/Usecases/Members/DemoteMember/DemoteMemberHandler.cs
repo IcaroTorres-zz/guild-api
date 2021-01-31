@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -12,12 +10,10 @@ namespace Business.Usecases.Members.DemoteMember
     public class DemoteMemberHandler : IRequestHandler<DemoteMemberCommand, IApiResult>
     {
         private readonly IMemberRepository _memberRepository;
-        private readonly IMapper _mapper;
 
-        public DemoteMemberHandler(IMemberRepository memberRepository, IMapper mapper)
+        public DemoteMemberHandler(IMemberRepository memberRepository)
         {
             _memberRepository = memberRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(DemoteMemberCommand command, CancellationToken cancellationToken)
@@ -31,9 +27,7 @@ namespace Business.Usecases.Members.DemoteMember
             masterToDemote = _memberRepository.Update(masterToDemote);
             _memberRepository.Update(promotedNewLeader);
 
-            var updateResult = _mapper.Map<MemberDto>(masterToDemote);
-
-            return result.SetResult(updateResult);
+            return result.SetResult(masterToDemote);
         }
     }
 }

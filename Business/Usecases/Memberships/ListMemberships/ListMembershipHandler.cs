@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
-using Domain.Models;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -13,12 +10,10 @@ namespace Business.Usecases.Memberships.ListMemberships
     public class ListMembershipHandler : IRequestHandler<ListMembershipCommand, IApiResult>
     {
         private readonly IMembershipRepository _membershipRepository;
-        private readonly IMapper _mapper;
 
-        public ListMembershipHandler(IMembershipRepository membershipRepository, IMapper mapper)
+        public ListMembershipHandler(IMembershipRepository membershipRepository)
         {
             _membershipRepository = membershipRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(ListMembershipCommand command, CancellationToken cancellationToken)
@@ -33,9 +28,8 @@ namespace Business.Usecases.Memberships.ListMemberships
                 page: command.Page,
                 cancellationToken);
 
-            var pagedResult = _mapper.Map<Pagination<MembershipDto>>(pagedMemberships);
-            pagedResult.SetAppliedCommand(command);
-            return result.SetResult(pagedResult);
+            pagedMemberships.SetAppliedCommand(command);
+            return result.SetResult(pagedMemberships);
         }
     }
 }

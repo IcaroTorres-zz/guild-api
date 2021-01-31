@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Models;
 using Domain.Repositories;
 using Domain.Responses;
@@ -13,12 +11,10 @@ namespace Business.Usecases.Members.CreateMember
     public class CreateMemberHandler : IRequestHandler<CreateMemberCommand, IApiResult>
     {
         private readonly IMemberRepository _memberRepository;
-        private readonly IMapper _mapper;
 
-        public CreateMemberHandler(IMemberRepository memberRepository, IMapper mapper)
+        public CreateMemberHandler(IMemberRepository memberRepository)
         {
             _memberRepository = memberRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(CreateMemberCommand command, CancellationToken cancellationToken)
@@ -27,9 +23,8 @@ namespace Business.Usecases.Members.CreateMember
 
             var member = new Member(command.Name);
             member = await _memberRepository.InsertAsync(member, cancellationToken);
-            var creationResult = _mapper.Map<MemberDto>(member);
 
-            return result.SetCreated(creationResult, command);
+            return result.SetCreated(member, command);
         }
     }
 }

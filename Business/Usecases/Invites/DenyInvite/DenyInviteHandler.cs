@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -12,12 +10,10 @@ namespace Business.Usecases.Invites.DenyInvite
     public class DenyInviteHandler : IRequestHandler<DenyInviteCommand, IApiResult>
     {
         private readonly IInviteRepository _inviteRepository;
-        private readonly IMapper _mapper;
 
-        public DenyInviteHandler(IInviteRepository inviteRepository, IMapper mapper)
+        public DenyInviteHandler(IInviteRepository inviteRepository)
         {
             _inviteRepository = inviteRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(DenyInviteCommand command, CancellationToken cancellationToken)
@@ -25,10 +21,9 @@ namespace Business.Usecases.Invites.DenyInvite
             var result = new ApiResult();
 
             var invite = await _inviteRepository.GetByIdAsync(command.Id, readOnly: false, cancellationToken);
-            _inviteRepository.Update(invite.BeDenied());
-            var inviteResult = _mapper.Map<InviteDto>(invite);
+            invite = _inviteRepository.Update(invite.BeDenied());
 
-            return result.SetResult(inviteResult);
+            return result.SetResult(invite);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -12,19 +10,17 @@ namespace Business.Usecases.Invites.GetInvite
     public class GetInviteHandler : IRequestHandler<GetInviteCommand, IApiResult>
     {
         private readonly IInviteRepository _inviteRepository;
-        private readonly IMapper _mapper;
 
-        public GetInviteHandler(IInviteRepository inviteRepository, IMapper mapper)
+        public GetInviteHandler(IInviteRepository inviteRepository)
         {
             _inviteRepository = inviteRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(GetInviteCommand command, CancellationToken cancellationToken)
         {
             var result = new ApiResult();
-            var inviteModel = await _inviteRepository.GetByIdAsync(command.Id, true, cancellationToken);
-            return result.SetResult(_mapper.Map<InviteDto>(inviteModel));
+            var invite = await _inviteRepository.GetByIdAsync(command.Id, true, cancellationToken);
+            return result.SetResult(invite);
         }
     }
 }
