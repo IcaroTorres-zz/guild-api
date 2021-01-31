@@ -1,13 +1,10 @@
-using Domain.Commands;
-using Domain.Responses;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using System;
+using Business.Commands;
+using Business.Dtos;
+using Domain.Models;
 
 namespace Business.Usecases.Guilds.GetGuild
 {
-    public class GetGuildCommand : IRequest<IApiResult>, IQueryItemCommand
+    public class GetGuildCommand : QueryItemCommand<Guild, GuildDto>
     {
-        [FromRoute] public Guid Id { get; set; }
     }
 }

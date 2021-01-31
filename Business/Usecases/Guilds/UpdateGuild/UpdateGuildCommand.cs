@@ -1,13 +1,12 @@
-using Domain.Commands;
-using Domain.Responses;
-using MediatR;
+using Business.Commands;
+using Business.Dtos;
+using Domain.Models;
 using System;
 
 namespace Business.Usecases.Guilds.UpdateGuild
 {
-    public class UpdateGuildCommand : IRequest<IApiResult>, ITransactionalCommand
+    public class UpdateGuildCommand : UpdateCommand<Guild, GuildDto>
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public Guid MasterId { get; set; }
     }
