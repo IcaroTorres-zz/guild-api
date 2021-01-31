@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -12,12 +10,10 @@ namespace Business.Usecases.Members.PromoteMember
     public class PromoteMemberHandler : IRequestHandler<PromoteMemberCommand, IApiResult>
     {
         private readonly IMemberRepository _memberRepository;
-        private readonly IMapper _mapper;
 
-        public PromoteMemberHandler(IMemberRepository memberRepository, IMapper mapper)
+        public PromoteMemberHandler(IMemberRepository memberRepository)
         {
             _memberRepository = memberRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(PromoteMemberCommand command, CancellationToken cancellationToken)
@@ -29,12 +25,10 @@ namespace Business.Usecases.Members.PromoteMember
             var previousGuildLeader = guild.Leader;
 
             guild.Promote(promotionMember);
-            _memberRepository.Update(promotionMember);
+            promotionMember = _memberRepository.Update(promotionMember);
             _memberRepository.Update(previousGuildLeader);
 
-            var updateResult = _mapper.Map<MemberDto>(promotionMember);
-
-            return result.SetResult(updateResult);
+            return result.SetResult(promotionMember);
         }
     }
 }

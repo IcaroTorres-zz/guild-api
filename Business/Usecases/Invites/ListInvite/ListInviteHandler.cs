@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
-using Domain.Models;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -13,12 +10,10 @@ namespace Business.Usecases.Invites.ListInvite
     public class ListInviteHandler : IRequestHandler<ListInviteCommand, IApiResult>
     {
         private readonly IInviteRepository _inviteRepository;
-        private readonly IMapper _mapper;
 
-        public ListInviteHandler(IInviteRepository inviteRepository, IMapper mapper)
+        public ListInviteHandler(IInviteRepository inviteRepository)
         {
             _inviteRepository = inviteRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(ListInviteCommand command, CancellationToken cancellationToken)
@@ -33,9 +28,8 @@ namespace Business.Usecases.Invites.ListInvite
                 page: command.Page,
                 cancellationToken);
 
-            var pagedResult = _mapper.Map<Pagination<InviteDto>>(pagedInvites);
-            pagedResult.SetAppliedCommand(command);
-            return result.SetResult(pagedResult);
+            pagedInvites.SetAppliedCommand(command);
+            return result.SetResult(pagedInvites);
         }
     }
 }

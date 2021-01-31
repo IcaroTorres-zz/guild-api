@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Repositories;
 using Domain.Responses;
 using MediatR;
@@ -14,13 +12,11 @@ namespace Business.Usecases.Guilds.UpdateGuild
     {
         private readonly IGuildRepository _guildRepository;
         private readonly IMemberRepository _memberRepository;
-        private readonly IMapper _mapper;
 
-        public UpdateGuildHandler(IGuildRepository guildRepository, IMemberRepository memberRepository, IMapper mapper)
+        public UpdateGuildHandler(IGuildRepository guildRepository, IMemberRepository memberRepository)
         {
             _guildRepository = guildRepository;
             _memberRepository = memberRepository;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(UpdateGuildCommand command, CancellationToken cancellationToken)
@@ -38,9 +34,7 @@ namespace Business.Usecases.Guilds.UpdateGuild
             _memberRepository.Update(newLeader);
             _memberRepository.Update(previousLeader);
 
-            var updateResult = _mapper.Map<GuildDto>(guild);
-
-            return result.SetResult(updateResult);
+            return result.SetResult(guild);
         }
     }
 }

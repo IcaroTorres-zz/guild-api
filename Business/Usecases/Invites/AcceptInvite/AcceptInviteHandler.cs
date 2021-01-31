@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Responses;
 using Domain.Unities;
 using MediatR;
@@ -12,12 +10,10 @@ namespace Business.Usecases.Invites.AcceptInvite
     public class AcceptInviteHandler : IRequestHandler<AcceptInviteCommand, IApiResult>
     {
         private readonly IUnitOfWork _unit;
-        private readonly IMapper _mapper;
 
-        public AcceptInviteHandler(IUnitOfWork unit, IMapper mapper)
+        public AcceptInviteHandler(IUnitOfWork unit)
         {
             _unit = unit;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(AcceptInviteCommand command, CancellationToken cancellationToken)
@@ -37,9 +33,7 @@ namespace Business.Usecases.Invites.AcceptInvite
             _unit.Memberships.Update(invite.Member.LastFinishedMembership);
             await _unit.Memberships.InsertAsync(invite.Member.ActiveMembership);
 
-            var inviteResult = _mapper.Map<InviteDto>(invite);
-
-            return result.SetResult(inviteResult);
+            return result.SetResult(invite);
         }
     }
 }

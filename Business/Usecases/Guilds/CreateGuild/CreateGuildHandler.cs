@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Domain.Models;
 using Domain.Responses;
 using Domain.Unities;
@@ -13,12 +11,10 @@ namespace Business.Usecases.Guilds.CreateGuild
     public class CreateGuildHandler : IRequestHandler<CreateGuildCommand, IApiResult>
     {
         private readonly IUnitOfWork _unit;
-        private readonly IMapper _mapper;
 
-        public CreateGuildHandler(IUnitOfWork unit, IMapper mapper)
+        public CreateGuildHandler(IUnitOfWork unit)
         {
             _unit = unit;
-            _mapper = mapper;
         }
 
         public async Task<IApiResult> Handle(CreateGuildCommand command, CancellationToken cancellationToken)
@@ -36,9 +32,7 @@ namespace Business.Usecases.Guilds.CreateGuild
             _unit.Members.Update(master);
             _unit.Memberships.Update(master.LastFinishedMembership);
 
-            var creationResult = _mapper.Map<GuildDto>(guild);
-
-            return result.SetCreated(creationResult, command);
+            return result.SetCreated(guild, command);
         }
     }
 }
