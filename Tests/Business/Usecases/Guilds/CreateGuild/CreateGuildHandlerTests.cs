@@ -1,11 +1,10 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Guilds.CreateGuild;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -32,8 +31,7 @@ namespace Tests.Business.Usecases.Guilds.CreateGuild
                 .SetupGuilds(x => x.Insert(output: master.Guild).Build())
                 .SetupInvites(x => x.Insert(output: master.Guild.LatestInvite).Build())
                 .Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new CreateGuildHandler(unit, mapper);
+            var sut = new CreateGuildHandler(unit);
 
             // act
             var result = await sut.Handle(command, default);
@@ -43,9 +41,9 @@ namespace Tests.Business.Usecases.Guilds.CreateGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
-            result.Data.Should().NotBeNull().And.BeOfType<GuildDto>();
-            result.Data.As<GuildDto>().Id.Should().Be(master.Guild.Id);
-            result.Data.As<GuildDto>().Name.Should().Be(master.Guild.Name);
+            result.Data.Should().NotBeNull().And.BeOfType<Guild>();
+            result.Data.As<Guild>().Id.Should().Be(master.Guild.Id);
+            result.Data.As<Guild>().Name.Should().Be(master.Guild.Name);
         }
     }
 }

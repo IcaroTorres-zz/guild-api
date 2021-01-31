@@ -1,5 +1,4 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Invites.ListInvite;
 using Domain.Models;
 using FluentAssertions;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 using Tests.Business.Usecases.Invites.ListInvite;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -28,8 +26,7 @@ namespace Tests.Business.Usecases.Invites.GetInvite
                 pageSize: command.PageSize,
                 page: command.Page,
                 totalItems: command.PageSize * expectedPages).Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new ListInviteHandler(repository, mapper);
+            var sut = new ListInviteHandler(repository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -39,16 +36,16 @@ namespace Tests.Business.Usecases.Invites.GetInvite
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Pagination<InviteDto>>();
-            result.Data.As<Pagination<InviteDto>>().Items.Should().NotBeEmpty()
-                .And.AllBeAssignableTo<InviteDto>()
+            result.Data.Should().NotBeNull().And.BeOfType<Pagination<Invite>>();
+            result.Data.As<Pagination<Invite>>().Items.Should().NotBeEmpty()
+                .And.AllBeAssignableTo<Invite>()
                 .And.HaveCount(expectedPageSize)
                 .And.HaveCount(command.PageSize);
-            result.Data.As<Pagination<InviteDto>>().PageSize.Should().Be(expectedPageSize)
+            result.Data.As<Pagination<Invite>>().PageSize.Should().Be(expectedPageSize)
                 .And.Be(command.PageSize);
-            result.Data.As<Pagination<InviteDto>>().Page.Should().Be(expectedPage)
+            result.Data.As<Pagination<Invite>>().Page.Should().Be(expectedPage)
                 .And.Be(command.Page);
-            result.Data.As<Pagination<InviteDto>>().Pages.Should().Be(expectedPages);
+            result.Data.As<Pagination<Invite>>().Pages.Should().Be(expectedPages);
         }
     }
 }

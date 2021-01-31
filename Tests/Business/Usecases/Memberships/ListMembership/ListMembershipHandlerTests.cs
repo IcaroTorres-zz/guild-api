@@ -1,5 +1,4 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Memberships.ListMemberships;
 using Domain.Models;
 using FluentAssertions;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 using Tests.Business.Usecases.Memberships.ListMembership;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -28,8 +26,7 @@ namespace Tests.Business.Usecases.Memberships.GetMembership
                 pageSize: command.PageSize,
                 page: command.Page,
                 totalItems: command.PageSize * expectedPages).Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new ListMembershipHandler(repository, mapper);
+            var sut = new ListMembershipHandler(repository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -39,16 +36,16 @@ namespace Tests.Business.Usecases.Memberships.GetMembership
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Pagination<MembershipDto>>();
-            result.Data.As<Pagination<MembershipDto>>().Items.Should().NotBeEmpty()
-                .And.AllBeAssignableTo<MembershipDto>()
+            result.Data.Should().NotBeNull().And.BeOfType<Pagination<Membership>>();
+            result.Data.As<Pagination<Membership>>().Items.Should().NotBeEmpty()
+                .And.AllBeAssignableTo<Membership>()
                 .And.HaveCount(expectedPageSize)
                 .And.HaveCount(command.PageSize);
-            result.Data.As<Pagination<MembershipDto>>().PageSize.Should().Be(expectedPageSize)
+            result.Data.As<Pagination<Membership>>().PageSize.Should().Be(expectedPageSize)
                 .And.Be(command.PageSize);
-            result.Data.As<Pagination<MembershipDto>>().Page.Should().Be(expectedPage)
+            result.Data.As<Pagination<Membership>>().Page.Should().Be(expectedPage)
                 .And.Be(command.Page);
-            result.Data.As<Pagination<MembershipDto>>().Pages.Should().Be(expectedPages);
+            result.Data.As<Pagination<Membership>>().Pages.Should().Be(expectedPages);
         }
     }
 }

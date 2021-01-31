@@ -1,11 +1,10 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Members.DemoteMember;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -27,8 +26,7 @@ namespace Tests.Business.Usecases.Members.DemoteMember
                 .Update(demotedMember, demotedMember)
                 .Update(expectedLeader, expectedLeader)
                 .Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new DemoteMemberHandler(memberRepository, mapper);
+            var sut = new DemoteMemberHandler(memberRepository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -38,12 +36,12 @@ namespace Tests.Business.Usecases.Members.DemoteMember
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<MemberDto>();
-            result.Data.As<MemberDto>().Id.Should().Be(demotedMember.Id);
-            result.Data.As<MemberDto>().IsGuildLeader.Should().BeFalse()
+            result.Data.Should().NotBeNull().And.BeOfType<Member>();
+            result.Data.As<Member>().Id.Should().Be(demotedMember.Id);
+            result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedLeader.IsGuildLeader);
-            result.Data.As<MemberDto>().Guild.Should().NotBeNull();
-            result.Data.As<MemberDto>().Guild.Id.Should().Be(guild.Id);
+            result.Data.As<Member>().Guild.Should().NotBeNull();
+            result.Data.As<Member>().Guild.Id.Should().Be(guild.Id);
         }
     }
 }

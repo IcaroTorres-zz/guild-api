@@ -1,12 +1,11 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Guilds.GetGuild;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -24,8 +23,7 @@ namespace Tests.Business.Usecases.Guilds.GetGuild
             var command = GetGuildCommandFake.Valid(expectedGuild.Id).Generate();
             var repository = GuildRepositoryMockBuilder.Create()
                 .GetByIdSuccess(input: command.Id, output: expectedGuild).Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new GetGuildHandler(repository, mapper);
+            var sut = new GetGuildHandler(repository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -35,10 +33,10 @@ namespace Tests.Business.Usecases.Guilds.GetGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<GuildDto>();
-            result.Data.As<GuildDto>().Id.Should().Be(expectedGuild.Id);
-            result.Data.As<GuildDto>().Leader.Id.Should().Be(expectedGuild.Leader.Id);
-            result.Data.As<GuildDto>().Members.Should().NotBeEmpty().And.HaveCount(otherMembersCount + 1);
+            result.Data.Should().NotBeNull().And.BeOfType<Guild>();
+            result.Data.As<Guild>().Id.Should().Be(expectedGuild.Id);
+            result.Data.As<Guild>().Leader.Id.Should().Be(expectedGuild.Leader.Id);
+            result.Data.As<Guild>().Members.Should().NotBeEmpty().And.HaveCount(otherMembersCount + 1);
         }
     }
 }

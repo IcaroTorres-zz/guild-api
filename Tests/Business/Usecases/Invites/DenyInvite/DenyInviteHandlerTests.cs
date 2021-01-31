@@ -1,12 +1,11 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Invites.DenyInvite;
 using Domain.Enums;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -25,8 +24,7 @@ namespace Tests.Business.Usecases.Invites.DenyInvite
                 .GetByIdSuccess(command.Id, deniedInvite)
                 .Update(deniedInvite, deniedInvite)
                 .Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new DenyInviteHandler(inviteRepository, mapper);
+            var sut = new DenyInviteHandler(inviteRepository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -36,9 +34,9 @@ namespace Tests.Business.Usecases.Invites.DenyInvite
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<InviteDto>();
-            result.Data.As<InviteDto>().Id.Should().Be(deniedInvite.Id);
-            result.Data.As<InviteDto>().Status.Should().Be(InviteStatuses.Denied)
+            result.Data.Should().NotBeNull().And.BeOfType<Invite>();
+            result.Data.As<Invite>().Id.Should().Be(deniedInvite.Id);
+            result.Data.As<Invite>().Status.Should().Be(InviteStatuses.Denied)
                 .And.Be(deniedInvite.Status);
         }
     }

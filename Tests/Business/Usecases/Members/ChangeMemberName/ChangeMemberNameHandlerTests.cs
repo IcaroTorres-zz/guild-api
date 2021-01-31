@@ -1,11 +1,10 @@
-﻿using Business.Dtos;
-using Business.Responses;
+﻿using Business.Responses;
 using Business.Usecases.Members.ChangeMemberName;
+using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -26,8 +25,7 @@ namespace Tests.Business.Usecases.Members.ChangeMemberName
                 .GetByIdSuccess(command.Id, expectedMember)
                 .Update(expectedMember, expectedMember)
                 .Build();
-            var mapper = MapperConfig.Configuration.CreateMapper();
-            var sut = new ChangeMemberNameHandler(memberRepository, mapper);
+            var sut = new ChangeMemberNameHandler(memberRepository);
 
             // act
             var result = await sut.Handle(command, default);
@@ -37,9 +35,9 @@ namespace Tests.Business.Usecases.Members.ChangeMemberName
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<MemberDto>();
-            result.Data.As<MemberDto>().Name.Should().Be(expectedMember.Name);
-            result.Data.As<MemberDto>().Id.Should().Be(expectedMember.Id);
+            result.Data.Should().NotBeNull().And.BeOfType<Member>();
+            result.Data.As<Member>().Name.Should().Be(expectedMember.Name);
+            result.Data.As<Member>().Id.Should().Be(expectedMember.Id);
         }
     }
 }
