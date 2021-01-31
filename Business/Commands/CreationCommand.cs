@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Domain.Commands;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Domain.Commands
+namespace Business.Commands
 {
     [ExcludeFromCodeCoverage]
-    public abstract class CreationCommand : ICreationCommand
+    public abstract class CreationCommand<TIn, TOut> : MappedResultCommand<TIn, TOut>, ICreationCommand
     {
         private IUrlHelper _urlHelper;
         private string _routeName;
