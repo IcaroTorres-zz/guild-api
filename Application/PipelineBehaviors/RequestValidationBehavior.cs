@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Business.Behaviors
+namespace Application.PipelineBehaviors
 {
     public class RequestValidationBehavior<TCommand, TResult> : IPipelineBehavior<TCommand, TResult>
         where TCommand : IRequest<TResult>

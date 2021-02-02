@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Business.Behaviors
+namespace Application.PipelineBehaviors
 {
     public class NotFoundResponseBehavior<TCommand, TResult> : IPipelineBehavior<TCommand, TResult>
         where TCommand : IRequest<TResult>

@@ -5,7 +5,7 @@ using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Business.Behaviors
+namespace Application.PipelineBehaviors
 {
     public class MapperBehavior<TCommand, TResult> : IPipelineBehavior<TCommand, TResult>
         where TCommand : IMappedResultCommand

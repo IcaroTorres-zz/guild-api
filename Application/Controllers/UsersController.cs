@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace WebApi.Controllers
+namespace Application.Controllers
 {
     [Authorize]
     [ApiController]

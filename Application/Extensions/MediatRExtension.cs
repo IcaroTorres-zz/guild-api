@@ -1,4 +1,4 @@
-using Business.Behaviors;
+using Application.PipelineBehaviors;
 using Business.Usecases.Guilds.CreateGuild;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

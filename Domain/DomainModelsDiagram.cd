@@ -1,0 +1,364 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Domain.Models.EntityModel&lt;T&gt;" Collapsed="true">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAACAAAAAAgAAAIAAAgAAAAAAAAA=</HashCode>
+      <FileName>Models\EntityModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Models.Guild">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Events" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <InheritanceLine Type="Domain.Models.EntityModel&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="7" Y="0.75" />
+        <Point X="3" Y="0.75" />
+        <Point X="3" Y="1.5" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="Members" Type="Domain.Models.Member" FixedFromPoint="true">
+      <Path>
+        <Point X="3.75" Y="2.875" />
+        <Point X="5.667" Y="2.875" Type="JumpStart" />
+        <Point X="5.833" Y="2.875" Type="JumpEnd" />
+        <Point X="9.604" Y="2.875" Type="JumpStart" />
+        <Point X="9.771" Y="2.875" Type="JumpEnd" />
+        <Point X="11.75" Y="2.875" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAEAAAAgEQAgQAgpAQAAAIkCEAAAAA=</HashCode>
+      <FileName>Models\Guild.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Members" />
+      <Property Name="Invites" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.Invite">
+    <Position X="5" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <InheritanceLine Type="Domain.Models.EntityModel&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="7" Y="0.75" />
+        <Point X="5.75" Y="0.75" />
+        <Point X="5.75" Y="3.5" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="State" Type="Domain.Models.States.Invites.InviteState" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="6" Y="6.857" />
+        <Point X="6" Y="7.054" />
+        <Point X="6" Y="7.054" />
+        <Point X="6" Y="7.75" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.409" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status" Type="Domain.Enums.InviteStatuses" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="6.5" Y="5.5" />
+        <Point X="7.812" Y="5.5" />
+        <Point X="7.812" Y="6" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AEAAAAAEAACABAQAABAACYIAhAAIAgAAAAISBAAAAAA=</HashCode>
+      <FileName>Models\Invite.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Guild" />
+      <Property Name="Member" />
+      <Property Name="State" />
+      <Property Name="Status" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.Member">
+    <Position X="11.75" Y="2.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <InheritanceLine Type="Domain.Models.EntityModel&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.5" Y="0.75" />
+        <Point X="12.562" Y="0.75" />
+        <Point X="12.562" Y="2.5" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="Guild" Type="Domain.Models.Guild" FixedToPoint="true">
+      <Path>
+        <Point X="11.75" Y="2.562" />
+        <Point X="9.771" Y="2.562" Type="JumpStart" />
+        <Point X="9.604" Y="2.562" Type="JumpEnd" />
+        <Point X="5.833" Y="2.562" Type="JumpStart" />
+        <Point X="5.667" Y="2.562" Type="JumpEnd" />
+        <Point X="3.75" Y="2.562" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Memberships" Type="Domain.Models.Membership" FixedToPoint="true">
+      <Path>
+        <Point X="11.75" Y="6.125" />
+        <Point X="10.5" Y="6.125" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAYAACAACABiQAAgQAiAQghAAAAAAAAAIUBEEAAIA=</HashCode>
+      <FileName>Models\Member.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Guild" />
+      <Property Name="State" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Memberships" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.Membership">
+    <Position X="9" Y="5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <InheritanceLine Type="Domain.Models.EntityModel&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.5" Y="0.75" />
+        <Point X="9.688" Y="0.75" />
+        <Point X="9.688" Y="5" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="Member" Type="Domain.Models.Member" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.5" Y="5.562" />
+        <Point X="11.125" Y="5.562" />
+        <Point X="11.125" Y="5.562" />
+        <Point X="11.75" Y="5.562" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Guild" Type="Domain.Models.Guild" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="9" Y="7.313" />
+        <Point X="7.833" Y="7.312" Type="JumpStart" />
+        <Point X="7.667" Y="7.313" Type="JumpEnd" />
+        <Point X="6.083" Y="7.312" Type="JumpStart" />
+        <Point X="5.917" Y="7.313" Type="JumpEnd" />
+        <Point X="5.583" Y="7.312" Type="JumpStart" />
+        <Point X="5.417" Y="7.313" Type="JumpEnd" />
+        <Point X="3.312" Y="7.313" />
+        <Point X="3.312" Y="5.626" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="State" Type="Domain.Models.States.Memberships.MembershipState" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="9.562" Y="8.357" />
+        <Point X="9.562" Y="9" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAACABAQAABAACQAAhgAIAgIAAgIQBABAAAA=</HashCode>
+      <FileName>Models\Membership.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Member" />
+      <Property Name="Guild" />
+      <Property Name="State" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.Nulls.NullGuild" Collapsed="true">
+    <Position X="1.5" Y="6.75" Width="1.5" />
+    <InheritanceLine Type="Domain.Models.Guild" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.625" Y="5.626" />
+        <Point X="2.625" Y="6.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAAAAAQAAQAgBAAAAAAgCEAAAAA=</HashCode>
+      <FileName>Models\Nulls\NullGuild.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.Nulls.NullInvite" Collapsed="true">
+    <Position X="7" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAAAAQAAAAAAYAABAAIAAAAAgACAAAAAAA=</HashCode>
+      <FileName>Models\Nulls\NullInvite.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.Nulls.NullMember" Collapsed="true">
+    <Position X="14.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACQAAAAAAAAgQAAAQAAAQgBAAAAAAAAAAEAEEAAIA=</HashCode>
+      <FileName>Models\Nulls\NullMember.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.Nulls.NullMembership" Collapsed="true">
+    <Position X="11.25" Y="7.75" Width="1.5" />
+    <InheritanceLine Type="Domain.Models.Membership" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.5" Y="8" />
+        <Point X="11.5" Y="8" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAgAAAAAAQAAAAAAQAABgAIAAAAAgIAAAAAAAA=</HashCode>
+      <FileName>Models\Nulls\NullMembership.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Domain.Models.States.Invites.InviteState">
+    <Position X="5" Y="7.75" Width="1.5" />
+    <AssociationLine Name="Status" Type="Domain.Enums.InviteStatuses" ManuallyRouted="true" FixedFromPoint="true">
+      <Path>
+        <Point X="6.5" Y="8.5" />
+        <Point X="7.75" Y="8.5" />
+        <Point X="7.75" Y="6.562" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Context" Type="Domain.Models.Invite" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="5.5" Y="7.75" />
+        <Point X="5.5" Y="6.857" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAgAAAAAAAAAAAIAAAIAIAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Models\States\Invites\InviteState.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Status" />
+      <Property Name="Context" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Domain.Models.States.Invites.ClosedInviteState" Collapsed="true">
+    <Position X="4" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAIAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Models\States\Invites\ClosedInviteState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Models.States.Invites.OpenInviteState" Collapsed="true">
+    <Position X="6" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAIAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Models\States\Invites\OpenInviteState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Models.States.Memberships.MembershipState">
+    <Position X="9" Y="9" Width="1.5" />
+    <AssociationLine Name="Context" Type="Domain.Models.Membership" FixedToPoint="true">
+      <Path>
+        <Point X="10" Y="9" />
+        <Point X="10" Y="8.357" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.756" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Models\States\Memberships\MembershipState.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Context" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Domain.Models.States.Memberships.OpenMembershipState" Collapsed="true">
+    <Position X="10" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Models\States\Memberships\OpenMembershipState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Models.States.Memberships.ClosedMembershipState" Collapsed="true">
+    <Position X="8" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Models\States\Memberships\ClosedMembershipState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Models.States.Members.MemberState">
+    <Position X="14.25" Y="3.5" Width="1.5" />
+    <AssociationLine Name="Guild" Type="Domain.Models.Guild" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="15.75" Y="3.812" />
+        <Point X="16" Y="3.812" />
+        <Point X="16" Y="1.812" />
+        <Point X="12.646" Y="1.812" Type="JumpStart" />
+        <Point X="12.479" Y="1.812" Type="JumpEnd" />
+        <Point X="9.771" Y="1.812" Type="JumpStart" />
+        <Point X="9.604" Y="1.812" Type="JumpEnd" />
+        <Point X="5.833" Y="1.812" Type="JumpStart" />
+        <Point X="5.667" Y="1.812" Type="JumpEnd" />
+        <Point X="3.75" Y="1.812" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAwAAAAAAAAAAIEEAAAAAAAACAAAAIA=</HashCode>
+      <FileName>Models\States\Members\MemberState.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Context" />
+      <Property Name="Guild" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Domain.Models.States.Members.GuildLeaderState" Collapsed="true">
+    <Position X="15.25" Y="7.25" Width="1.5" />
+    <InheritanceLine Type="Domain.Models.States.Members.MemberState" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="15" Y="6.017" />
+        <Point X="15" Y="6.875" />
+        <Point X="15.938" Y="6.875" />
+        <Point X="15.938" Y="7.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAACAAAAIA=</HashCode>
+      <FileName>Models\States\Members\GuildLeaderState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Models.States.Members.GuildMemberState" Collapsed="true">
+    <Position X="14.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\States\Members\GuildMemberState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Models.States.Members.NoGuildMemberState" Collapsed="true">
+    <Position X="13.25" Y="7.25" Width="1.5" />
+    <InheritanceLine Type="Domain.Models.States.Members.MemberState" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="15" Y="6.017" />
+        <Point X="15" Y="6.875" />
+        <Point X="14" Y="6.875" />
+        <Point X="14" Y="7.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAEEAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Models\States\Members\NoGuildMemberState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Domain.Enums.InviteStatuses" Collapsed="true">
+    <Position X="7" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAAAgAAAAAIAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Enums\InviteStatuses.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
