@@ -2,7 +2,6 @@
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,31 +33,25 @@ namespace Persistence.Repositories
             return !isNameAlreadyTaken;
         }
 
-        public Task<Guild> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default)
+        public async Task<Guild> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() =>
-            {
-                var entity = _baseRepository.Query(x => x.Id.Equals(id), readOnly)
-                    .Include(x => x.Members)
-                    .SingleOrDefault();
+            var entity = await _baseRepository.Query(readOnly: readOnly)
+                .Include(x => x.Members)
+                .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
-                return entity ?? Guild.Null;
-            });
+            return entity ?? Guild.Null;
         }
 
-        public Task<Guild> GetForMemberHandlingAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<Guild> GetForMemberHandlingAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() =>
-            {
-                var guild = _baseRepository.Query(x => x.Id.Equals(id), readOnly: false)
-                    .Include(x => x.Members)
-                    .ThenInclude(x => x.Memberships)
-                    .Include(x => x.Invites)
-                    .ThenInclude(x => x.Member)
-                    .SingleOrDefault();
+            var guild = await _baseRepository.Query(readOnly: false)
+                .Include(x => x.Members)
+                .ThenInclude(x => x.Memberships)
+                .Include(x => x.Invites)
+                .ThenInclude(x => x.Member)
+                .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
-                return guild ?? Guild.Null;
-            }, cancellationToken);
+            return guild ?? Guild.Null;
         }
 
         public async Task<Pagination<Guild>> PaginateAsync(int top = 20, int page = 1, CancellationToken cancellationToken = default)
