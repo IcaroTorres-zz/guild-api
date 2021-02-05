@@ -4,7 +4,6 @@ using Domain.Models.Nulls;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,39 +19,26 @@ namespace Persistence.Repositories
             _baseRepository = baseRepository;
         }
 
-        public Task<Invite> GetForAcceptOperationAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<Invite> GetForAcceptOperationAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() =>
-            {
-                var model = _baseRepository.Query(x => x.Id.Equals(id), readOnly: false)
-                    .Include(x => x.Guild)
-                    .ThenInclude(g => g.Members)
-                    .Include(x => x.Member)
-                    .ThenInclude(m => m.Memberships)
-                    .SingleOrDefault();
+            var model = await _baseRepository.Query(readOnly: false)
+                .Include(x => x.Guild)
+                .ThenInclude(g => g.Members)
+                .Include(x => x.Member)
+                .ThenInclude(m => m.Memberships)
+                .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
-                return model ?? Invite.Null;
-            }, cancellationToken);
+            return model ?? Invite.Null;
         }
 
-        public Task<Invite> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default)
+        public async Task<Invite> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() =>
-            {
-                var entity = _baseRepository.Query(x => x.Id.Equals(id), readOnly)
-                    .Include(x => x.Member)
-                    .Include(x => x.Guild)
-                    .SingleOrDefault();
+            var entity = await _baseRepository.Query(readOnly: readOnly)
+                .Include(x => x.Member)
+                .Include(x => x.Guild)
+                .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
-                return entity ?? Invite.Null;
-            }, cancellationToken);
-        }
-
-        public async Task<bool> IsPendingAsync(Guid id, CancellationToken cancellationToken = default)
-        {
-            var invite = await GetByIdAsync(id, readOnly: true, cancellationToken);
-
-            return !(invite is INullObject) && invite.Status == InviteStatuses.Pending;
+            return entity ?? Invite.Null;
         }
 
         public async Task<Pagination<Invite>> PaginateAsync(Expression<Func<Invite, bool>> predicate = null,

@@ -8,7 +8,6 @@ namespace Domain.Repositories
 {
     public interface IInviteRepository
 	{
-		Task<bool> IsPendingAsync(Guid id, CancellationToken cancellationToken = default);
 		Task<Invite> GetForAcceptOperationAsync(Guid id, CancellationToken cancellationToken = default);
 		Task<Invite> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default);
 		Task<Pagination<Invite>> PaginateAsync(Expression<Func<Invite, bool>> predicate = null, int top = 20, int page = 1, CancellationToken cancellationToken = default);

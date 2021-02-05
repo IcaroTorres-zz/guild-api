@@ -52,9 +52,9 @@ namespace Persistence.Repositories
 
 		public async Task<Member> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default)
 		{
-			var entity = await _baseRepository.Query(x => x.Id.Equals(id), readOnly)
+			var entity = await _baseRepository.Query(readOnly: readOnly)
 				.Include(x => x.Guild)
-				.SingleOrDefaultAsync(cancellationToken);
+				.SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
 			return entity ?? Member.Null;
 		}
