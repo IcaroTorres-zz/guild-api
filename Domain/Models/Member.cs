@@ -1,5 +1,6 @@
-using Domain.Models.Nulls;
-using Domain.Models.States.Members;
+using Domain.Common;
+using Domain.Nulls;
+using Domain.States.Members;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

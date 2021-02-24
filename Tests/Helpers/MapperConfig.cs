@@ -1,4 +1,4 @@
-﻿using Application.MapperProfiles;
+﻿using Application.Common.MapperProfiles;
 using AutoMapper;
 
 namespace Tests.Helpers

@@ -1,4 +1,5 @@
-﻿using Bogus;
+﻿using Application.Common.Responses;
+using Bogus;
 using Domain.Enums;
 using Domain.Models;
 using System.Collections.Generic;
@@ -6,16 +7,16 @@ using System.Linq;
 
 namespace Tests.Domain.Models.Fakes
 {
-    public static class PaginationFake
+    public static class PagedResponseFake
     {
-        public static Faker<Pagination<Guild>> PaginateGuilds(int pageSize = 10, int page = 1, int totalItems = 20)
+        public static Faker<PagedResponse<Guild>> PaginateGuilds(int pageSize = 10, int page = 1, int totalItems = 20)
         {
             var items = GuildFake.WithGuildLeaderAndMembers(otherMembersCount:2).Generate(totalItems);
 
-            return new Faker<Pagination<Guild>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
+            return new Faker<PagedResponse<Guild>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
         }
 
-        public static Faker<Pagination<Member>> PaginateMembers(int pageSize = 10, int page = 1, int totalItems = 20)
+        public static Faker<PagedResponse<Member>> PaginateMembers(int pageSize = 10, int page = 1, int totalItems = 20)
         {
             var items = new List<Member>();
             var guild = GuildFake.WithGuildLeader().Generate();
@@ -30,10 +31,10 @@ namespace Tests.Domain.Models.Fakes
                 items.Add(member);
             }
 
-            return new Faker<Pagination<Member>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
+            return new Faker<PagedResponse<Member>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
         }
 
-        public static Faker<Pagination<Invite>> PaginateInvites(int pageSize = 10, int page = 1, int totalItems = 20)
+        public static Faker<PagedResponse<Invite>> PaginateInvites(int pageSize = 10, int page = 1, int totalItems = 20)
         {
             var items = new List<Invite>();
             for (int i = 0; i < totalItems; i++)
@@ -48,10 +49,10 @@ namespace Tests.Domain.Models.Fakes
                 items.Add(InviteFake.ValidWithStatus(status).Generate());
             }
 
-            return new Faker<Pagination<Invite>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
+            return new Faker<PagedResponse<Invite>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
         }
 
-        public static Faker<Pagination<Membership>> PaginateMemberships(int pageSize = 10, int page = 1, int totalItems = 20)
+        public static Faker<PagedResponse<Membership>> PaginateMemberships(int pageSize = 10, int page = 1, int totalItems = 20)
         {
             var items = new List<Membership>();
             for (int i = 0; i < totalItems; i++)
@@ -60,14 +61,14 @@ namespace Tests.Domain.Models.Fakes
                 else items.Add(MembershipFake.Active().Generate());
             }
 
-            return new Faker<Pagination<Membership>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
+            return new Faker<PagedResponse<Membership>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
         }
 
-        private static Faker<Pagination<T>> Paginate<T>(List<T> items, int pageSize = 10, int page = 1) where T : class
+        private static Faker<PagedResponse<T>> Paginate<T>(List<T> items, int pageSize = 10, int page = 1) where T : class
         {
-            var paginationItems = items.Take(pageSize).ToList();
+            var PagedResponseItems = items.Take(pageSize).ToList();
 
-            return new Faker<Pagination<T>>().CustomInstantiator(_ => new Pagination<T>(paginationItems, items.Count, pageSize, page));
+            return new Faker<PagedResponse<T>>().CustomInstantiator(_ => new PagedResponse<T>(PagedResponseItems, items.Count, pageSize, page));
         }
     }
 }

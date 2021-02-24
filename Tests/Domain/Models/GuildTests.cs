@@ -1,5 +1,5 @@
 ﻿using Domain.Models;
-using Domain.Models.Nulls;
+using Domain.Nulls;
 using FluentAssertions;
 using System.Linq;
 using Tests.Domain.Models.Fakes;
@@ -101,18 +101,18 @@ namespace Tests.Domain.Models
 			const int otherMembersCount = 10;
 			var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
 			var monitor = sut.Monitor();
-			var master = sut.GetLeader();
-			var memberMonitor = master.Monitor();
+			var leader = sut.GetLeader();
+			var memberMonitor = leader.Monitor();
 
 			// act
-			sut = sut.RemoveMember(master);
+			sut = sut.RemoveMember(leader);
 
 			// assert
 			sut.Should().NotBeNull()
 				.And.BeOfType<Guild>();
 			sut.Members.Should().NotBeEmpty()
 				.And.HaveCount(otherMembersCount)
-				.And.NotContain(master);
+				.And.NotContain(leader);
 			sut.Invites.Should().NotBeEmpty()
 				.And.HaveCount(otherMembersCount + 1);
 
@@ -122,11 +122,11 @@ namespace Tests.Domain.Models
 				nameof(Guild.Name));
 			monitor.AssertCollectionNotChanged(sut.Invites);
 
-			master.Should().NotBeNull()
+			leader.Should().NotBeNull()
 				.And.BeOfType<Member>();
-			master.IsGuildLeader.Should().BeFalse();
-			master.GuildId.Should().BeNull();
-			master.Guild.Should().BeOfType<NullGuild>();
+			leader.IsGuildLeader.Should().BeFalse();
+			leader.GuildId.Should().BeNull();
+			leader.Guild.Should().BeOfType<NullGuild>();
 
 			memberMonitor.AssertPropertyChanged(
 				nameof(Member.IsGuildLeader),
@@ -135,7 +135,7 @@ namespace Tests.Domain.Models
 			memberMonitor.AssertPropertyNotChanged(
 				nameof(Member.Id),
 				nameof(Member.Name));
-			memberMonitor.AssertCollectionNotChanged(master.Memberships);
+			memberMonitor.AssertCollectionNotChanged(leader.Memberships);
 		}
 
 		[Fact]

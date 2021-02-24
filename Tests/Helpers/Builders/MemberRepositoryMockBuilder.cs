@@ -1,5 +1,5 @@
-﻿using Domain.Models;
-using Domain.Repositories;
+﻿using Application.Common.Abstractions;
+using Domain.Models;
 using Moq;
 using System;
 using System.Linq.Expressions;
@@ -183,10 +183,10 @@ namespace Tests.Helpers.Builders
 
         public MemberRepositoryMockBuilder Paginate(int pageSize = 10, int page = 1, int totalItems = 20)
         {
-            var pagination = PaginationFake.PaginateMembers(pageSize, page, totalItems);
+            var PagedResponse = PagedResponseFake.PaginateMembers(pageSize, page, totalItems);
 
             _mock.Setup(x => x.PaginateAsync(It.IsAny<Expression<Func<Member, bool>>>(), pageSize, page, default))
-                 .ReturnsAsync(pagination);
+                 .ReturnsAsync(PagedResponse);
 
             return this;
         }

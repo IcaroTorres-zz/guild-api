@@ -1,6 +1,6 @@
 ﻿using Domain.Enums;
 using Domain.Models;
-using Domain.Models.Nulls;
+using Domain.Nulls;
 using FluentAssertions;
 using Tests.Domain.Models.Fakes;
 using Tests.Helpers;

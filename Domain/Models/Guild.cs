@@ -1,4 +1,5 @@
-using Domain.Models.Nulls;
+using Domain.Common;
+using Domain.Nulls;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

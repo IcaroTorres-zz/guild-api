@@ -10,20 +10,20 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Guild>().CustomInstantiator(_ => Guild.Null);
         }
 
-        public static Faker<Guild> WithGuildLeader(Member master = null)
+        public static Faker<Guild> WithGuildLeader(Member leader = null)
         {
             return new Faker<Guild>().CustomInstantiator(x =>
             {
-                master ??= MemberFake.WithoutGuild().Generate();
-                return new Guild(x.Company.CatchPhrase(), master);
+                leader ??= MemberFake.WithoutGuild().Generate();
+                return new Guild(x.Company.CatchPhrase(), leader);
             });
         }
 
-        public static Faker<Guild> WithGuildLeaderAndMembers(Member master = null, int otherMembersCount = 5)
+        public static Faker<Guild> WithGuildLeaderAndMembers(Member leader = null, int otherMembersCount = 5)
         {
             return new Faker<Guild>().CustomInstantiator(_ =>
             {
-                var guild = WithGuildLeader(master).Generate();
+                var guild = WithGuildLeader(leader).Generate();
                 foreach (var member in MemberFake.WithoutGuild().Generate(otherMembersCount))
                 {
                     guild.InviteMember(member);

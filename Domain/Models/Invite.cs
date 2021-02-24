@@ -1,6 +1,7 @@
-﻿using Domain.Enums;
-using Domain.Models.Nulls;
-using Domain.Models.States.Invites;
+﻿using Domain.Common;
+using Domain.Enums;
+using Domain.Nulls;
+using Domain.States.Invites;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

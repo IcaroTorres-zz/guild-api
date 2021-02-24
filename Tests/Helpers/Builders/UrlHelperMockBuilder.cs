@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace Tests.Business.Usecases.Guilds.CreateGuild
+namespace Tests.Helpers.Builders
 {
     public sealed class UrlHelperMockBuilder
     {

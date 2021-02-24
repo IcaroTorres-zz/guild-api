@@ -1,6 +1,6 @@
-﻿using Domain.Enums;
+﻿using Application.Common.Abstractions;
+using Domain.Enums;
 using Domain.Models;
-using Domain.Repositories;
 using Moq;
 using System;
 using System.Linq.Expressions;
@@ -119,10 +119,10 @@ namespace Tests.Helpers.Builders
 
         public InviteRepositoryMockBuilder Paginate(int pageSize = 10, int page = 1, int totalItems = 20)
         {
-            var pagination = PaginationFake.PaginateInvites(pageSize, page, totalItems);
+            var PagedResponse = PagedResponseFake.PaginateInvites(pageSize, page, totalItems);
 
             _mock.Setup(x => x.PaginateAsync(It.IsAny<Expression<Func<Invite, bool>>>(), pageSize, page, default))
-                 .ReturnsAsync(pagination);
+                 .ReturnsAsync(PagedResponse);
 
             return this;
         }

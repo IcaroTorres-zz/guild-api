@@ -1,6 +1,6 @@
 using Bogus;
 using Domain.Models;
-using Domain.Models.Nulls;
+using Domain.Nulls;
 using FluentAssertions;
 using System.Linq;
 using Tests.Domain.Models.Fakes;

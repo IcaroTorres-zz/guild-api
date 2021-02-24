@@ -1,5 +1,5 @@
-﻿using Domain.Models;
-using Domain.Repositories;
+﻿using Application.Common.Abstractions;
+using Domain.Models;
 using Moq;
 using System;
 using Tests.Domain.Models.Fakes;
@@ -164,9 +164,9 @@ namespace Tests.Helpers.Builders
 
         public GuildRepositoryMockBuilder Paginate(int pageSize = 10, int page = 1, int totalItems = 20)
         {
-            var pagination = PaginationFake.PaginateGuilds(pageSize, page, totalItems);
+            var PagedResponse = PagedResponseFake.PaginateGuilds(pageSize, page, totalItems);
 
-            _mock.Setup(x => x.PaginateAsync(pageSize, page, default)).ReturnsAsync(pagination);
+            _mock.Setup(x => x.PaginateAsync(pageSize, page, default)).ReturnsAsync(PagedResponse);
 
             return this;
         }
