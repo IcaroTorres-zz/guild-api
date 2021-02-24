@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace Domain.Models
@@ -23,7 +22,7 @@ namespace Domain.Models
             Id = Guid.NewGuid();
             Name = name;
             InviteMember(member);
-            LatestInvite.BeAccepted();
+            GetLatestInvite().BeAccepted();
         }
 
         public static readonly NullGuild Null = new NullGuild();
@@ -49,7 +48,7 @@ namespace Domain.Models
         {
             if (Members.Contains(member))
             {
-                if (member.IsGuildLeader) member.TransferLeadership(Vice);
+                if (member.IsGuildLeader) member.TransferLeadership(GetVice());
                 Members.Remove(member);
                 CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, member));
 				member.LeaveGuild();
@@ -69,7 +68,7 @@ namespace Domain.Models
 
         public virtual Guild Promote(Member member)
         {
-			Members.SingleOrDefault(x => x.Id == member.Id)?.ReceiveLeadership(Leader);
+			Members.SingleOrDefault(x => x.Id == member.Id)?.ReceiveLeadership(GetLeader());
 
 			return this;
 		}
@@ -78,7 +77,7 @@ namespace Domain.Models
 		{
 			if (Members.Count > 1)
 			{
-                Leader.TransferLeadership(Vice);
+                GetLeader().TransferLeadership(GetVice());
             }
 
 			return this;
@@ -103,13 +102,14 @@ namespace Domain.Models
         public virtual ICollection<Member> Members { get; protected set; } = new List<Member>();
         public virtual ICollection<Invite> Invites { get; protected set; } = new List<Invite>();
 
-        [NotMapped]
-        public Member Leader => Members.SingleOrDefault(x => x.IsGuildLeader) ?? Member.Null;
+        private static bool FilterGuildLeader(Member x) => x.IsGuildLeader;
+        public Member GetLeader() => Members.SingleOrDefault(FilterGuildLeader) ?? Member.Null;
 
-        [NotMapped]
-        public Member Vice => Members.OrderByDescending(x => x.ActiveMembership.GetDuration())
-                                     .FirstOrDefault(x => x.Id != Leader?.Id && !x.IsGuildLeader) ?? Member.Null;
-        [NotMapped]
-        public Invite LatestInvite => Invites.OrderByDescending(x => x.CreatedDate).FirstOrDefault() ?? Invite.Null;
+        private static TimeSpan OrderActiveMembershipByDuration(Member x) => x.ActiveMembership.GetDuration();
+        public Member GetVice() => Members.OrderByDescending(OrderActiveMembershipByDuration)
+                                          .FirstOrDefault(x => x.Id != GetLeader()?.Id && !x.IsGuildLeader) ?? Member.Null;
+
+        private static DateTime OrderInviteByCreation(Invite x) => x.CreatedDate;
+        public Invite GetLatestInvite() => Invites.OrderByDescending(OrderInviteByCreation).FirstOrDefault() ?? Invite.Null;
     }
 }

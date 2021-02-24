@@ -19,7 +19,7 @@ namespace Tests.Business.Usecases.Members.DemoteMember
             // arrange
             var demotedMember = MemberFake.GuildLeader().Generate();
             var guild = demotedMember.Guild;
-            var expectedLeader = demotedMember.Guild.Vice;
+            var expectedLeader = demotedMember.Guild.GetVice();
             var command = PatchMemberCommandFake.DemoteMemberValid(demotedMember.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
                 .GetForGuildOperationsSuccess(command.Id, demotedMember)

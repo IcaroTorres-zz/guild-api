@@ -24,7 +24,7 @@ namespace Business.Usecases.Members.LeaveGuild
 
             var leavingMember = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
             leavingMember.LeaveGuild();
-            var promotedNewLeader = leavingMember.Guild.Leader;
+            var promotedNewLeader = leavingMember.Guild.GetLeader();
 
             leavingMember = _memberRepository.Update(leavingMember);
             _memberRepository.Update(promotedNewLeader);

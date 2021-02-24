@@ -19,7 +19,7 @@ namespace Tests.Business.Usecases.Members.PromoteMember
             // arrange
             var promotedMember = MemberFake.GuildMember().Generate();
             var guild = promotedMember.Guild;
-            var expectedDemotedMember = promotedMember.Guild.Leader;
+            var expectedDemotedMember = promotedMember.Guild.GetLeader();
             var command = PatchMemberCommandFake.PromoteMemberValid(promotedMember.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
                 .GetForGuildOperationsSuccess(command.Id, promotedMember)

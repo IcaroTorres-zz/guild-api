@@ -22,7 +22,7 @@ namespace Business.Usecases.Members.PromoteMember
 
             var promotionMember = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
             var guild = promotionMember.Guild;
-            var previousGuildLeader = guild.Leader;
+            var previousGuildLeader = guild.GetLeader();
 
             guild.Promote(promotionMember);
             promotionMember = _memberRepository.Update(promotionMember);

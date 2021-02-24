@@ -29,7 +29,7 @@ namespace Tests.Business.Usecases.Guilds.CreateGuild
                           .Update(output: master.LastFinishedMembership)
                           .Build())
                 .SetupGuilds(x => x.Insert(output: master.Guild).Build())
-                .SetupInvites(x => x.Insert(output: master.Guild.LatestInvite).Build())
+                .SetupInvites(x => x.Insert(output: master.Guild.GetLatestInvite()).Build())
                 .Build();
             var sut = new CreateGuildHandler(unit);
 

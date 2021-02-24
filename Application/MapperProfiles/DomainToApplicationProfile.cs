@@ -11,8 +11,11 @@ namespace Application.MapperProfiles
         {
             CreateMap<Guild, GuildDto>()
                 .ForMember(dest => dest.Leader,
-                    opt => opt.PreCondition(
-                        src => !(src.Leader is INullObject)));
+                    opt =>
+                    {
+                        opt.PreCondition(src => !(src.GetLeader() is INullObject));
+                        opt.MapFrom(src => src.GetLeader());
+                    });
             CreateMap<Guild, MemberGuildDto>();
 
             CreateMap<Member, MemberDto>()

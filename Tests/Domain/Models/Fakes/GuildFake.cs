@@ -27,7 +27,7 @@ namespace Tests.Domain.Models.Fakes
                 foreach (var member in MemberFake.WithoutGuild().Generate(otherMembersCount))
                 {
                     guild.InviteMember(member);
-                    guild.LatestInvite.BeAccepted();
+                    guild.GetLatestInvite().BeAccepted();
                 }
                 return guild;
             });

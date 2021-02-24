@@ -22,7 +22,7 @@ namespace Tests.Domain.Models.Fakes
                 var member = WithoutGuild().Generate();
                 guild ??= GuildFake.WithGuildLeader().Generate();
                 guild.InviteMember(member);
-                guild.LatestInvite.BeAccepted();
+                guild.GetLatestInvite().BeAccepted();
                 return member;
             });
         }
@@ -32,7 +32,7 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Member>().CustomInstantiator(_ =>
             {
                 guild ??= GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
-                return guild.Leader;
+                return guild.GetLeader();
             });
         }
     }

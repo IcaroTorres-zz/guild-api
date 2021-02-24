@@ -21,8 +21,8 @@ namespace Tests.Business.Usecases.Members.UpdateGuild
             // arrange
             var otherMembersCount = new Random().Next(1, 5);
             var expectedGuild = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
-            var expectedLeader = expectedGuild.Vice;
-            var expectedVice = expectedGuild.Leader;
+            var expectedLeader = expectedGuild.GetVice();
+            var expectedVice = expectedGuild.GetLeader();
             var command = UpdateGuildCommandFake.Valid(
                 id: expectedGuild.Id,
                 masterId: expectedLeader.Id,
@@ -47,7 +47,7 @@ namespace Tests.Business.Usecases.Members.UpdateGuild
             result.Data.Should().NotBeNull().And.BeOfType<Guild>();
             result.Data.As<Guild>().Name.Should().Be(expectedGuild.Name);
             result.Data.As<Guild>().Id.Should().Be(expectedGuild.Id);
-            result.Data.As<Guild>().Leader.Id.Should().Be(expectedLeader.Id);
+            result.Data.As<Guild>().GetLeader().Id.Should().Be(expectedLeader.Id);
             result.Data.As<Guild>().Members.Should().NotBeEmpty()
                 .And.HaveCount(otherMembersCount + 1)
                 .And.Contain(x => x.Id == expectedLeader.Id)

@@ -58,7 +58,7 @@ namespace Tests.Domain.Models
 			const int otherMembersCount = 10;
 			var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
 			var monitor = sut.Monitor();
-			var member = sut.Vice;
+			var member = sut.GetVice();
 			var memberMonitor = member.Monitor();
 
 			// act
@@ -101,7 +101,7 @@ namespace Tests.Domain.Models
 			const int otherMembersCount = 10;
 			var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
 			var monitor = sut.Monitor();
-			var master = sut.Leader;
+			var master = sut.GetLeader();
 			var memberMonitor = master.Monitor();
 
 			// act
@@ -345,7 +345,7 @@ namespace Tests.Domain.Models
 
 			// assert
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
-			sut.LatestInvite.Should().NotBeNull().And.BeOfType<NullInvite>();
+			sut.GetLatestInvite().Should().NotBeNull().And.BeOfType<NullInvite>();
 			sut.Members.Should().NotBeEmpty().And.HaveCount(otherMembersCount + 1);
 			sut.Invites.Should().NotBeEmpty().And.HaveCount(otherMembersCount + 2);
 
@@ -389,9 +389,8 @@ namespace Tests.Domain.Models
 			sut = sut.InviteMember(member);
 
 			// assert
-			
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
-			sut.LatestInvite.Should().NotBeNull().And.BeOfType<Invite>();
+			sut.GetLatestInvite().Should().NotBeNull().And.BeOfType<Invite>();
 			sut.Members.Should().NotBeEmpty().And.HaveCount(2);
 			sut.Invites.Should().NotBeEmpty().And.HaveCount(3);
 
@@ -408,21 +407,20 @@ namespace Tests.Domain.Models
 			// arrange
 			var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
 			var monitor = sut.Monitor();
-			var newLeader = sut.Vice;
-			var perviousLeader = sut.Leader;
+			var newLeader = sut.GetVice();
+			var perviousLeader = sut.GetLeader();
 
 			// act
 			sut = sut.Promote(newLeader);
 
 			// assert
-
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
 			sut.Members.Should().Contain(new[] { newLeader, perviousLeader });
-			sut.Leader.Should().NotBeNull()
+			sut.GetLeader().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.Be(newLeader)
 				.And.NotBe(perviousLeader);
-			sut.Vice.Should().NotBeNull()
+			sut.GetVice().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.Be(perviousLeader)
 				.And.NotBe(newLeader);
@@ -441,8 +439,8 @@ namespace Tests.Domain.Models
 			// arrange
 			var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
 			var monitor = sut.Monitor();
-			var leader = sut.Leader;
-			var vice = sut.Vice;
+			var leader = sut.GetLeader();
+			var vice = sut.GetVice();
 
 			// act
 			sut = sut.Promote(leader);
@@ -450,11 +448,11 @@ namespace Tests.Domain.Models
 			// assert
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
 			sut.Members.Should().Contain(new []{ leader, vice });
-			sut.Leader.Should().NotBeNull()
+			sut.GetLeader().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.Be(leader)
 				.And.NotBe(vice);
-			sut.Vice.Should().NotBeNull()
+			sut.GetVice().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.Be(vice)
 				.And.NotBe(leader);
@@ -474,7 +472,7 @@ namespace Tests.Domain.Models
 			var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
 			var monitor = sut.Monitor();
 			var notMember = MemberFake.WithoutGuild().Generate();
-			var currentLeader = sut.Leader;
+			var currentLeader = sut.GetLeader();
 
 			// act
 			sut = sut.Promote(notMember);
@@ -482,11 +480,11 @@ namespace Tests.Domain.Models
 			// assert
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
 			sut.Members.Should().Contain(currentLeader).And.NotContain(notMember);
-			sut.Leader.Should().NotBeNull()
+			sut.GetLeader().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.Be(currentLeader)
 				.And.NotBe(notMember);
-			sut.Vice.Should().NotBeNull()
+			sut.GetVice().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.NotBe(currentLeader)
 				.And.NotBe(notMember);
@@ -505,8 +503,8 @@ namespace Tests.Domain.Models
 			// arrange
 			var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
 			var monitor = sut.Monitor();
-			var newLeader = sut.Vice;
-			var perviousLeader = sut.Leader;
+			var newLeader = sut.GetVice();
+			var perviousLeader = sut.GetLeader();
 
 			// act
 			sut = sut.DemoteLeader();
@@ -514,11 +512,11 @@ namespace Tests.Domain.Models
 			// assert
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
 			sut.Members.Should().Contain(new[] { newLeader, perviousLeader });
-			sut.Leader.Should().NotBeNull()
+			sut.GetLeader().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.Be(newLeader)
 				.And.NotBe(perviousLeader);
-			sut.Vice.Should().NotBeNull()
+			sut.GetVice().Should().NotBeNull()
 				.And.NotBeOfType<NullMember>()
 				.And.Be(perviousLeader)
 				.And.NotBe(newLeader);
@@ -537,8 +535,8 @@ namespace Tests.Domain.Models
 			// arrange
 			var sut = GuildFake.WithGuildLeader().Generate();
 			var monitor = sut.Monitor();
-			var leader = sut.Leader;
-			var nullVice = sut.Vice;
+			var leader = sut.GetLeader();
+			var nullVice = sut.GetVice();
 
 			// act
 			sut = sut.DemoteLeader();
@@ -546,11 +544,11 @@ namespace Tests.Domain.Models
 			// assert
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
 			sut.Members.Should().Contain(leader).And.NotContain(nullVice);
-			sut.Leader.Should().NotBeNull()
+			sut.GetLeader().Should().NotBeNull()
 				.And.BeOfType<Member>()
 				.And.Be(leader)
 				.And.NotBe(nullVice);
-			sut.Vice.Should().NotBeNull()
+			sut.GetVice().Should().NotBeNull()
 				.And.BeOfType<NullMember>()
 				.And.Be(nullVice)
 				.And.NotBe(leader);
@@ -568,10 +566,10 @@ namespace Tests.Domain.Models
 		{
 			// arrange
 			var sut = GuildFake.WithGuildLeader().Generate();
-			sut.RemoveMember(sut.Leader);
+			sut.RemoveMember(sut.GetLeader());
 			var monitor = sut.Monitor();
-			var nullLeader = sut.Leader;
-			var nullVice = sut.Vice;
+			var nullLeader = sut.GetLeader();
+			var nullVice = sut.GetVice();
 
 			// act
 			sut = sut.DemoteLeader();
@@ -579,11 +577,11 @@ namespace Tests.Domain.Models
 			// assert
 			sut.Should().NotBeNull().And.BeOfType<Guild>();
 			sut.Members.Should().HaveCount(0).And.NotContain(new []{nullLeader, nullVice});
-			sut.Leader.Should().NotBeNull()
+			sut.GetLeader().Should().NotBeNull()
 				.And.BeOfType<NullMember>()
 				.And.Be(nullVice)
 				.And.Be(nullLeader);
-			sut.Vice.Should().NotBeNull()
+			sut.GetVice().Should().NotBeNull()
 				.And.BeOfType<NullMember>()
 				.And.Be(nullVice)
 				.And.Be(nullLeader);

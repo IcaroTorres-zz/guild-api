@@ -9,9 +9,9 @@ namespace Persistence.MapperProfiles
         public NullObjectToDataFilterProfile()
         {
             CreateMap<Guild, Entities.Guild>()
-                .ForMember(dest => dest.Leader,
+                .ForMember(dest => dest.GetLeader(),
                     opt => opt.PreCondition(
-                        src => !(src.Leader is INullObject)));
+                        src => !(src.GetLeader() is INullObject)));
 
             CreateMap<Member, Entities.Member>()
                 .ForMember(dest => dest.Guild,

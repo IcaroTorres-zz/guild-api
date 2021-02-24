@@ -26,7 +26,7 @@ namespace Business.Usecases.Guilds.CreateGuild
 
             await Task.WhenAll(
                 _unit.Guilds.InsertAsync(guild),
-                _unit.Invites.InsertAsync(guild.LatestInvite),
+                _unit.Invites.InsertAsync(guild.GetLatestInvite()),
                 _unit.Memberships.InsertAsync(master.ActiveMembership));
 
             _unit.Members.Update(master);

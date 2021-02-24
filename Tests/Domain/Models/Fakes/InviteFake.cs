@@ -33,7 +33,7 @@ namespace Tests.Domain.Models.Fakes
                 member ??= MemberFake.GuildMember().Generate();
                 guild ??= GuildFake.WithGuildLeader().Generate();
                 guild.InviteMember(member);
-                var invite = guild.LatestInvite;
+                var invite = guild.GetLatestInvite();
                 return status switch
                 {
                     InviteStatuses.Accepted => invite.BeAccepted(),

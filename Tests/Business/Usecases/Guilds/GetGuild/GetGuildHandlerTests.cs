@@ -35,7 +35,7 @@ namespace Tests.Business.Usecases.Guilds.GetGuild
             result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<Guild>();
             result.Data.As<Guild>().Id.Should().Be(expectedGuild.Id);
-            result.Data.As<Guild>().Leader.Id.Should().Be(expectedGuild.Leader.Id);
+            result.Data.As<Guild>().GetLeader().Id.Should().Be(expectedGuild.GetLeader().Id);
             result.Data.As<Guild>().Members.Should().NotBeEmpty().And.HaveCount(otherMembersCount + 1);
         }
     }

@@ -22,7 +22,7 @@ namespace Business.Usecases.Invites.InviteMember
 
             var invitingGuild = await _unit.Guilds.GetForMemberHandlingAsync(command.GuildId, cancellationToken);
             var invitedMember = await _unit.Members.GetForGuildOperationsAsync(command.MemberId, cancellationToken);
-            var invite = invitingGuild.InviteMember(invitedMember).LatestInvite;
+            var invite = invitingGuild.InviteMember(invitedMember).GetLatestInvite();
 
             invite = await _unit.Invites.InsertAsync(invite, cancellationToken);
 

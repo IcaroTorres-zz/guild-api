@@ -22,7 +22,7 @@ namespace Business.Usecases.Members.DemoteMember
 
             var masterToDemote = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
             var guild = masterToDemote.Guild.DemoteLeader();
-            var promotedNewLeader = guild.Leader;
+            var promotedNewLeader = guild.GetLeader();
 
             masterToDemote = _memberRepository.Update(masterToDemote);
             _memberRepository.Update(promotedNewLeader);

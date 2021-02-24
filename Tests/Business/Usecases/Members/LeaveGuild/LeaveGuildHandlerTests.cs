@@ -19,7 +19,7 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
         {
             // arrange
             var leavingMaster = MemberFake.GuildLeader().Generate();
-            var expectedNewLeader = leavingMaster.Guild.Vice;
+            var expectedNewLeader = leavingMaster.Guild.GetVice();
             var expectedFinishedMembership = leavingMaster.ActiveMembership;
             var command = PatchMemberCommandFake.LeaveGuildValid(leavingMaster.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
@@ -55,7 +55,7 @@ namespace Tests.Business.Usecases.Members.LeaveGuild
         {
             // arrange
             var leavingMember = MemberFake.GuildMember().Generate();
-            var expectedUnchangedLeader = leavingMember.Guild.Leader;
+            var expectedUnchangedLeader = leavingMember.Guild.GetLeader();
             var expectedFinishedMembership = leavingMember.ActiveMembership;
             var command = PatchMemberCommandFake.LeaveGuildValid(leavingMember.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()

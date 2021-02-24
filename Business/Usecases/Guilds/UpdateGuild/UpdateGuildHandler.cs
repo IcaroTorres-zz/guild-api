@@ -25,7 +25,7 @@ namespace Business.Usecases.Guilds.UpdateGuild
 
             var guild = await _guildRepository.GetByIdAsync(command.Id, readOnly: false, cancellationToken);
             var newLeader = guild.Members.Single(x => x.Id.Equals(command.MasterId));
-            var previousLeader = guild.Leader;
+            var previousLeader = guild.GetLeader();
 
             guild.ChangeName(command.Name)
                  .Promote(newLeader);
