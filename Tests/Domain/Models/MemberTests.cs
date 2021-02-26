@@ -353,7 +353,7 @@ namespace Tests.Domain.Models
                 nameof(Member.Id),
                 nameof(Member.Name),
                 nameof(Member.IsGuildLeader));
-            
+
             membershipMonitor.AssertPropertyChanged(nameof(Membership.ModifiedDate));
         }
 

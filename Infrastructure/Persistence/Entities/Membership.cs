@@ -6,7 +6,7 @@ namespace Infrastructure.Persistence.Entities
     /// Represents a relationship between a <see cref="Member"/> and a <see cref="Guild"/> expressing its beginning and end.
     /// </summary>
     public class Membership : Domain.Models.Membership
-  {
+    {
         public override DateTime CreatedDate { get; protected set; }
         public override DateTime? ModifiedDate { get; protected set; }
         public override Guid? MemberId { get; protected set; }

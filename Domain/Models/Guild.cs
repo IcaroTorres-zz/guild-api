@@ -14,9 +14,9 @@ namespace Domain.Models
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-		private string _name;
+        private string _name;
 
-		[JsonConstructor] protected Guild() { }
+        [JsonConstructor] protected Guild() { }
 
         public Guild(string name, Member member)
         {
@@ -52,8 +52,8 @@ namespace Domain.Models
                 if (member.IsGuildLeader) member.TransferLeadership(GetVice());
                 Members.Remove(member);
                 CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, member));
-				member.LeaveGuild();
-			}
+                member.LeaveGuild();
+            }
             return this;
         }
 
@@ -62,27 +62,27 @@ namespace Domain.Models
             if (!Members.Contains(newMember))
             {
                 Members.Add(newMember);
-				CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newMember));
+                CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newMember));
             }
             return this;
         }
 
         public virtual Guild Promote(Member member)
         {
-			Members.SingleOrDefault(x => x.Id == member.Id)?.ReceiveLeadership(GetLeader());
+            Members.SingleOrDefault(x => x.Id == member.Id)?.ReceiveLeadership(GetLeader());
 
-			return this;
-		}
+            return this;
+        }
 
         public virtual Guild DemoteLeader()
-		{
-			if (Members.Count > 1)
-			{
+        {
+            if (Members.Count > 1)
+            {
                 GetLeader().TransferLeadership(GetVice());
             }
 
-			return this;
-		}
+            return this;
+        }
 
         internal virtual Membership ConfirmMembership(Member member)
         {

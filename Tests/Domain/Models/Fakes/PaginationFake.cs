@@ -11,7 +11,7 @@ namespace Tests.Domain.Models.Fakes
     {
         public static Faker<PagedResponse<Guild>> PaginateGuilds(int pageSize = 10, int page = 1, int totalItems = 20)
         {
-            var items = GuildFake.WithGuildLeaderAndMembers(otherMembersCount:2).Generate(totalItems);
+            var items = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 2).Generate(totalItems);
 
             return new Faker<PagedResponse<Guild>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
         }
@@ -25,7 +25,7 @@ namespace Tests.Domain.Models.Fakes
                 var member = i switch
                 {
                     int count when count % 3 == 0 => MemberFake.WithoutGuild().Generate(),
-                    int count when count == totalItems -1 => MemberFake.GuildLeader(guild: guild).Generate(),
+                    int count when count == totalItems - 1 => MemberFake.GuildLeader(guild: guild).Generate(),
                     _ => MemberFake.GuildMember(guild: guild).Generate(),
                 };
                 items.Add(member);

@@ -217,7 +217,7 @@ namespace Tests.Domain.Models
         {
             // arrange
             var sut = InviteFake.InvalidWithoutGuild().Generate();
-						var expectedStatus = sut.Status;
+            var expectedStatus = sut.Status;
             var monitor = sut.Monitor();
 
             // act

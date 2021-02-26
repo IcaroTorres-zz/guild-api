@@ -1,7 +1,7 @@
 using Domain.Models;
 using Domain.Nulls;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence.Maps;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Infrastructure.Persistence

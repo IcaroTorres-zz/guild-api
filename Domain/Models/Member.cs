@@ -30,15 +30,15 @@ namespace Domain.Models
             Name = name;
         }
 
-		public static readonly NullMember Null = new NullMember();
+        public static readonly NullMember Null = new NullMember();
 
-		internal virtual Member ChangeState(MemberState state)
+        internal virtual Member ChangeState(MemberState state)
         {
             State = state;
             IsGuildLeader = State.IsGuildLeader;
             Guild = State.Guild;
-			if (Guild is NullGuild) GuildId = null;
-			else GuildId = State.Guild.Id;
+            if (Guild is NullGuild) GuildId = null;
+            else GuildId = State.Guild.Id;
 
             return this;
         }
@@ -56,7 +56,7 @@ namespace Domain.Models
 
         internal virtual Member ReceiveLeadership(Member currentLeader)
         {
-			currentLeader.State.BeDemoted();
+            currentLeader.State.BeDemoted();
             return State.BePromoted();
         }
 
@@ -128,7 +128,7 @@ namespace Domain.Models
             }
         }
 
-		protected virtual MemberState State
+        protected virtual MemberState State
         {
             get => _state ??= MemberState.NewState(this, Guild, IsGuildLeader);
             set => _state = value;

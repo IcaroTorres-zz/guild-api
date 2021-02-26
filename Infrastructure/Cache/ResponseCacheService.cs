@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Application.Common.Abstractions;
+using Microsoft.Extensions.Caching.Distributed;
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
-using Application.Common.Abstractions;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Infrastructure.Cache
 {
