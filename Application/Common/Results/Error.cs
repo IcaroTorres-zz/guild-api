@@ -5,12 +5,12 @@ namespace Application.Common.Results
 {
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class ApiError
+    public class Error
     {
         public string Title { get; }
         public string Message { get; }
 
-        public ApiError(string title, string message)
+        public Error(string title, string message)
         {
             Title = title;
             Message = message;

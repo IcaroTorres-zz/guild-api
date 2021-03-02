@@ -1,6 +1,4 @@
-﻿using Application.Common.Responses;
-using Application.Common.Results;
-using FluentValidation.Results;
+﻿using Application.Common.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
@@ -11,13 +9,9 @@ namespace Application.Common.Abstractions
     {
         object Data { get; }
         bool Success { get; }
-        IEnumerable<ApiError> Errors { get; }
-        IDictionary<string, LinkResponse> Links { get; }
+        IEnumerable<Error> Errors { get; }
         HttpStatusCode GetStatus();
-        IApiResult SetResult(object result, HttpStatusCode status = HttpStatusCode.OK);
-        IApiResult SetCreated(object result, ICreationCommand creationCommand);
-        IApiResult SetExecutionError(HttpStatusCode httpStatusCode = HttpStatusCode.Conflict, params ApiError[] errors);
-        IApiResult SetValidationError(params ValidationFailure[] validationFailures);
         IApiResult IncludeHateoas(IApiHateoasFactory hateoas);
+        IApiResult SetData(object newData);
     }
 }

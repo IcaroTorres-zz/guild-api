@@ -7,21 +7,21 @@ namespace Application.Common.Results
 {
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class Result
+    public class Output
     {
         public object Data { get; set; }
         public bool Success { get; set; } = true;
-        public IEnumerable<ApiError> Errors { get; set; } = new List<ApiError>();
+        public IEnumerable<Error> Errors { get; set; } = new List<Error>();
         public IDictionary<string, LinkResponse> Links { get; set; } = new Dictionary<string, LinkResponse>(StringComparer.InvariantCultureIgnoreCase);
     }
 
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public class Result<T>
+    public class Output<T>
     {
         public T Data { get; }
         public bool Success { get; }
-        public IEnumerable<ApiError> Errors { get; }
+        public IEnumerable<Error> Errors { get; }
         public IDictionary<string, LinkResponse> Links { get; }
     }
 }
