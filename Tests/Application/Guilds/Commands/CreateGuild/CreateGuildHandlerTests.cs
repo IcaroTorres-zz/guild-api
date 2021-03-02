@@ -25,8 +25,8 @@ namespace Tests.Application.Guilds.Commands.CreateGuild
                           .Update(output: leader)
                           .Build())
                 .SetupMemberships(
-                    x => x.Insert(output: leader.ActiveMembership)
-                          .Update(output: leader.LastFinishedMembership)
+                    x => x.Insert(output: leader.GetActiveMembership())
+                          .Update(output: leader.GetLastFinishedMembership())
                           .Build())
                 .SetupGuilds(x => x.Insert(output: leader.Guild).Build())
                 .SetupInvites(x => x.Insert(output: leader.Guild.GetLatestInvite()).Build())
@@ -37,10 +37,10 @@ namespace Tests.Application.Guilds.Commands.CreateGuild
             var result = await sut.Handle(command, default);
 
             // assert
-            result.Should().NotBeNull().And.BeOfType<ApiCreatedResult>();
+            result.Should().NotBeNull().And.BeOfType<SuccessCreatedResult>();
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
-            result.As<ApiCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
+            result.As<SuccessCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
             result.Data.Should().NotBeNull().And.BeOfType<Guild>();
             result.Data.As<Guild>().Id.Should().Be(leader.Guild.Id);
             result.Data.As<Guild>().Name.Should().Be(leader.Guild.Name);

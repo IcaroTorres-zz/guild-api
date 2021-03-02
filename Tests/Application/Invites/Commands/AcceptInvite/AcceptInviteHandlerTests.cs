@@ -23,12 +23,12 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
             var canceledCount = new Random().Next(1, 5);
             var acceptedInvite = InviteFake.ValidToAcceptWithInvitesToCancel(canceledCount).Generate();
             var command = PatchInviteCommandFake.AcceptValid(acceptedInvite.Id).Generate();
-            var canceledInvites = acceptedInvite.InvitesToCancel;
+            var canceledInvites = acceptedInvite.GetInvitesToCancel();
 
             var invitedMember = acceptedInvite.Member;
             var invitingGuild = acceptedInvite.Guild;
             var startedMembership = MembershipFake.Active().Generate();
-            var finishedMembership = invitedMember.ActiveMembership;
+            var finishedMembership = invitedMember.GetActiveMembership();
 
             var unit = UnitOfWorkMockBuilder.Create()
                 .SetupMembers(x => x.Update(input: invitedMember, output: invitedMember).Build())
@@ -48,10 +48,10 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
             var result = await sut.Handle(command, default);
 
             // assert
-            result.Should().NotBeNull().And.BeOfType<ApiResult>();
+            result.Should().NotBeNull().And.BeOfType<SuccessResult>();
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
-            result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
+            result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<Invite>();
             result.Data.As<Invite>().Id.Should().Be(acceptedInvite.Id);
             result.Data.As<Invite>().Status.Should().Be(InviteStatuses.Accepted)
@@ -65,7 +65,7 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
             invitingGuild.Members.Should().Contain(invitedMember);
 
             finishedMembership.ModifiedDate.Should().NotBeNull()
-                .And.Be(invitedMember.LastFinishedMembership.ModifiedDate);
+                .And.Be(invitedMember.GetLastFinishedMembership().ModifiedDate);
             canceledInvites.Should().HaveCount(canceledCount)
                 .And.OnlyContain(x => x.Status == InviteStatuses.Canceled);
         }

@@ -28,10 +28,10 @@ namespace Tests.Application.Invites.Queries.GetInvite
             var result = await sut.Handle(command, default);
 
             // assert
-            result.Should().NotBeNull().And.BeOfType<ApiResult>();
+            result.Should().NotBeNull().And.BeOfType<SuccessResult>();
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
-            result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
+            result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<Invite>();
             result.Data.As<Invite>().Id.Should().Be(expectedInvite.Id);
             result.Data.As<Invite>().Guild.Id.Should().Be(expectedInvite.GuildId.Value);

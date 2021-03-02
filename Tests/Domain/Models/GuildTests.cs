@@ -34,7 +34,7 @@ namespace Tests.Domain.Models
         {
             // arrange
             const string expectedNane = "new name";
-            var sut = GuildFake.WithGuildLeader().Generate();
+            var sut = GuildFake.Valid().Generate();
             var monitor = sut.Monitor();
 
             // act
@@ -55,8 +55,9 @@ namespace Tests.Domain.Models
         public void RemoveMember_GuildMember_Should_Change_Guild()
         {
             // arrange
-            const int otherMembersCount = 10;
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count - 1;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
             var member = sut.GetVice();
             var memberMonitor = member.Monitor();
@@ -68,10 +69,10 @@ namespace Tests.Domain.Models
             sut.Should().NotBeNull()
                 .And.BeOfType<Guild>();
             sut.Members.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount)
+                .And.HaveCount(expectedMembersCount)
                 .And.NotContain(member);
             sut.Invites.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1);
+                .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertCollectionChanged(sut.Members);
             monitor.AssertPropertyNotChanged(
@@ -95,11 +96,12 @@ namespace Tests.Domain.Models
         }
 
         [Fact]
-        public void RemoveMember_GuildLeader_Should_Change_Guild_Member()
+        public void RemoveMember_GuildLeader_Should_Change_Guild_Members()
         {
             // arrange
-            const int otherMembersCount = 10;
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count - 1;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
             var leader = sut.GetLeader();
             var memberMonitor = leader.Monitor();
@@ -111,10 +113,10 @@ namespace Tests.Domain.Models
             sut.Should().NotBeNull()
                 .And.BeOfType<Guild>();
             sut.Members.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount)
+                .And.HaveCount(expectedMembersCount)
                 .And.NotContain(leader);
             sut.Invites.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1);
+                .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertCollectionChanged(sut.Members);
             monitor.AssertPropertyNotChanged(
@@ -141,9 +143,9 @@ namespace Tests.Domain.Models
         [Fact]
         public void RemoveMember_WithoutGuild_Should_Change_Nothing()
         {
-            // arrange
-            const int otherMembersCount = 10;
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
             var member = MemberFake.WithoutGuild().Generate();
             var memberMonitor = member.Monitor();
@@ -155,10 +157,10 @@ namespace Tests.Domain.Models
             sut.Should().NotBeNull()
                 .And.BeOfType<Guild>();
             sut.Members.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1)
+                .And.HaveCount(expectedMembersCount)
                 .And.NotContain(member);
             sut.Invites.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1);
+                .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
@@ -185,10 +187,11 @@ namespace Tests.Domain.Models
         public void RemoveMember_OtherGuildMember_Should_Change_Nothing()
         {
             // arrange
-            const int otherMembersCount = 10;
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
-            var otherGuild = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var otherGuild = GuildFake.Valid(membersCount: 1).Generate();
             var member = otherGuild.Members.Single(x => !x.IsGuildLeader);
             var memberMonitor = member.Monitor();
 
@@ -199,10 +202,10 @@ namespace Tests.Domain.Models
             sut.Should().NotBeNull()
                 .And.BeOfType<Guild>();
             sut.Members.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1)
+                .And.HaveCount(expectedMembersCount)
                 .And.NotContain(member);
             sut.Invites.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1);
+                .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
@@ -226,10 +229,11 @@ namespace Tests.Domain.Models
         public void RemoveMember_OtherGuildLeader_Should_Change_Nothing()
         {
             // arrange
-            const int otherMembersCount = 10;
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
-            var otherGuild = GuildFake.WithGuildLeader().Generate();
+            var otherGuild = GuildFake.Valid().Generate();
             var member = otherGuild.Members.First();
             var memberMonitor = member.Monitor();
 
@@ -240,10 +244,10 @@ namespace Tests.Domain.Models
             sut.Should().NotBeNull()
                 .And.BeOfType<Guild>();
             sut.Members.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1)
+                .And.HaveCount(expectedMembersCount)
                 .And.NotContain(member);
             sut.Invites.Should().NotBeEmpty()
-                .And.HaveCount(otherMembersCount + 1);
+                .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
@@ -263,21 +267,62 @@ namespace Tests.Domain.Models
         }
 
         [Fact]
+        public void RemoveMember_NullMember_Should_Change_Nothing()
+        {
+            // arrange
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
+            var monitor = sut.Monitor();
+            var member = Member.Null;
+            var memberMonitor = member.Monitor();
+
+            // act
+            sut = sut.RemoveMember(member);
+
+            // assert
+            sut.Should().NotBeNull()
+                .And.BeOfType<Guild>();
+            sut.Members.Should().NotBeEmpty()
+                .And.HaveCount(expectedMembersCount)
+                .And.NotContain(member);
+            sut.Invites.Should().NotBeEmpty()
+                .And.HaveCount(expectedInvitesCount);
+
+            monitor.AssertPropertyNotChanged(
+                nameof(Guild.Id),
+                nameof(Guild.Name),
+                nameof(Guild.Members),
+                nameof(Guild.Invites));
+
+            member.Should().NotBeNull().And.BeOfType<NullMember>();
+
+            memberMonitor.AssertPropertyNotChanged(
+                nameof(Member.Id),
+                nameof(Member.Name),
+                nameof(Member.GuildId),
+                nameof(Member.Guild),
+                nameof(Member.IsGuildLeader),
+                nameof(Member.Memberships));
+        }
+
+        [Fact]
         public void AddMember_NullMemberModel_Should_Change_Nothing()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeader().Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
-            var member = MemberFake.NullObject().Generate();
+            var member = Member.Null;
 
             // act
             sut = sut.AddMember(member);
 
             // assert
-            sut.Should().NotBeNull()
-                .And.BeOfType<Guild>();
-            sut.Members.Should().NotBeEmpty();
-            sut.Invites.Should().NotBeEmpty();
+            sut.Should().NotBeNull().And.BeOfType<Guild>();
+            sut.Members.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);
+            sut.Invites.Should().NotBeEmpty().And.HaveCount(expectedInvitesCount);
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
                 nameof(Guild.Name));
@@ -288,7 +333,9 @@ namespace Tests.Domain.Models
         public void AddMember_AlreadyInGuild_Should_Change_Nothing()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
             var member = sut.Members.First();
 
@@ -298,8 +345,8 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull()
                 .And.BeOfType<Guild>();
-            sut.Members.Should().NotBeEmpty();
-            sut.Invites.Should().NotBeEmpty();
+            sut.Members.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);
+            sut.Invites.Should().NotBeEmpty().And.HaveCount(expectedInvitesCount);
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
                 nameof(Guild.Name));
@@ -310,7 +357,9 @@ namespace Tests.Domain.Models
         public void AddMember_NotInGuild_Should_Change_Members()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count + 1;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
             var member = MemberFake.WithoutGuild().Generate();
 
@@ -318,10 +367,9 @@ namespace Tests.Domain.Models
             sut = sut.AddMember(member);
 
             // assert
-            sut.Should().NotBeNull()
-                    .And.BeOfType<Guild>();
-            sut.Members.Should().NotBeEmpty();
-            sut.Invites.Should().NotBeEmpty();
+            sut.Should().NotBeNull().And.BeOfType<Guild>();
+            sut.Members.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);
+            sut.Invites.Should().NotBeEmpty().And.HaveCount(expectedInvitesCount);
 
             monitor.AssertCollectionChanged(sut.Members);
 
@@ -332,22 +380,26 @@ namespace Tests.Domain.Models
         }
 
         [Fact]
-        public void InviteMember_NullMember_Should_Have_LatestInvite_EqualTo_NullInvite()
+        public void InviteMember_NullMember_ShouldNot_GenerateInvite()
         {
             // arrange
-            const int otherMembersCount = 1;
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: otherMembersCount).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
-            var member = MemberFake.NullObject().Generate();
+            var member = Member.Null;
 
             // act
             sut = sut.InviteMember(member);
 
             // assert
             sut.Should().NotBeNull().And.BeOfType<Guild>();
-            sut.GetLatestInvite().Should().NotBeNull().And.BeOfType<NullInvite>();
-            sut.Members.Should().NotBeEmpty().And.HaveCount(otherMembersCount + 1);
-            sut.Invites.Should().NotBeEmpty().And.HaveCount(otherMembersCount + 2);
+            sut.Invites.Should().NotBeEmpty()
+                .And.AllBeOfType<Invite>()
+                .And.Match(x => !x.Any(y => y.Member.Equals(member)))
+                .And.HaveCount(expectedMembersCount);
+            sut.Members.Should().NotBeEmpty()
+                .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
@@ -359,7 +411,9 @@ namespace Tests.Domain.Models
         public void InviteMember_AlreadyInGuild_Should_Change_Nothing()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
             var member = sut.Members.First();
 
@@ -368,8 +422,8 @@ namespace Tests.Domain.Models
 
             // assert
             sut.Should().NotBeNull().And.BeOfType<Guild>();
-            sut.Members.Should().NotBeEmpty().And.HaveCount(2);
-            sut.Invites.Should().NotBeEmpty().And.HaveCount(2);
+            sut.Members.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);
+            sut.Invites.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
@@ -381,7 +435,9 @@ namespace Tests.Domain.Models
         public void InviteMember_NotInGuild_Should_Change_Invites()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
+            var expectedMembersCount = sut.Members.Count;
+            var expectedInvitesCount = sut.Invites.Count + 1;
             var monitor = sut.Monitor();
             var member = MemberFake.WithoutGuild().Generate();
 
@@ -391,8 +447,10 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<Guild>();
             sut.GetLatestInvite().Should().NotBeNull().And.BeOfType<Invite>();
-            sut.Members.Should().NotBeEmpty().And.HaveCount(2);
-            sut.Invites.Should().NotBeEmpty().And.HaveCount(3);
+            sut.Members.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);
+            sut.Invites.Should().NotBeEmpty()
+                .And.Match(x => x.Any(y => y.Member.Equals(member)))
+                .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
@@ -405,7 +463,7 @@ namespace Tests.Domain.Models
         public void Promote_GuildMember_Should_Change_GuildLeader()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
             var monitor = sut.Monitor();
             var newLeader = sut.GetVice();
             var perviousLeader = sut.GetLeader();
@@ -437,7 +495,7 @@ namespace Tests.Domain.Models
         public void Promote_GuildLeader_Should_Change_Nothing()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
             var monitor = sut.Monitor();
             var leader = sut.GetLeader();
             var vice = sut.GetVice();
@@ -469,28 +527,26 @@ namespace Tests.Domain.Models
         public void Promote_NotMember_Should_Change_Nothing()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
             var monitor = sut.Monitor();
             var notMember = MemberFake.WithoutGuild().Generate();
-            var currentLeader = sut.GetLeader();
+            var unchangedLeader = sut.GetLeader();
 
             // act
             sut = sut.Promote(notMember);
 
             // assert
             sut.Should().NotBeNull().And.BeOfType<Guild>();
-            sut.Members.Should().Contain(currentLeader).And.NotContain(notMember);
+            sut.Members.Should().Contain(unchangedLeader).And.NotContain(notMember);
             sut.GetLeader().Should().NotBeNull()
-                .And.NotBeOfType<NullMember>()
-                .And.Be(currentLeader)
+                .And.BeOfType<Member>()
+                .And.Be(unchangedLeader)
                 .And.NotBe(notMember);
             sut.GetVice().Should().NotBeNull()
-                .And.NotBeOfType<NullMember>()
-                .And.NotBe(currentLeader)
-                .And.NotBe(notMember);
-            notMember.IsGuildLeader.Should().BeFalse();
-            currentLeader.IsGuildLeader.Should().BeTrue();
+                .And.BeOfType<Member>();
+            notMember.IsGuildLeader.Should().BeFalse().And.Be(!unchangedLeader.IsGuildLeader);
 
+            monitor.AssertCollectionNotChanged(sut.Members, sut.Invites);
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
                 nameof(Guild.Name));
@@ -501,27 +557,28 @@ namespace Tests.Domain.Models
         public void DemoteLeader_GuildWithLeaderAndMembers_Should_Change_GuildLeader()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 1).Generate();
+            var sut = GuildFake.Valid().Generate();
             var monitor = sut.Monitor();
-            var newLeader = sut.GetVice();
-            var perviousLeader = sut.GetLeader();
+            var expectedLeader = sut.GetVice();
+            var expectedVice = sut.GetLeader();
 
             // act
             sut = sut.DemoteLeader();
+            var actualLeader = sut.GetLeader();
+            var actualVice = sut.GetVice();
 
             // assert
             sut.Should().NotBeNull().And.BeOfType<Guild>();
-            sut.Members.Should().Contain(new[] { newLeader, perviousLeader });
-            sut.GetLeader().Should().NotBeNull()
-                .And.NotBeOfType<NullMember>()
-                .And.Be(newLeader)
-                .And.NotBe(perviousLeader);
-            sut.GetVice().Should().NotBeNull()
-                .And.NotBeOfType<NullMember>()
-                .And.Be(perviousLeader)
-                .And.NotBe(newLeader);
-            newLeader.IsGuildLeader.Should().BeTrue();
-            perviousLeader.IsGuildLeader.Should().BeFalse();
+            sut.Members.Should().Contain(new[] { expectedLeader, expectedVice });
+            actualLeader.Should().NotBeNull()
+                .And.BeOfType<Member>()
+                .And.Be(expectedLeader);
+            actualVice.Should().NotBeNull()
+                .And.BeOfType<Member>()
+                .And.Be(expectedVice);
+            actualLeader.Should().NotBe(actualVice);
+            actualLeader.IsGuildLeader.Should().BeTrue();
+            actualVice.IsGuildLeader.Should().BeFalse();
 
             monitor.AssertPropertyNotChanged(
                 nameof(Guild.Id),
@@ -533,9 +590,11 @@ namespace Tests.Domain.Models
         public void DemoteLeader_GuildWithLeaderOnly_Should_Change_Nothing()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeader().Generate();
-            var monitor = sut.Monitor();
+            var sut = GuildFake.Valid().Generate();
             var leader = sut.GetLeader();
+            sut.Members.Clear();
+            sut.Members.Add(leader);
+            var monitor = sut.Monitor();
             var nullVice = sut.GetVice();
 
             // act
@@ -565,8 +624,8 @@ namespace Tests.Domain.Models
         public void DemoteLeader_NoMembers_Should_Change_Nothing()
         {
             // arrange
-            var sut = GuildFake.WithGuildLeader().Generate();
-            sut.RemoveMember(sut.GetLeader());
+            var sut = GuildFake.Valid().Generate();
+            sut.Members.Clear();
             var monitor = sut.Monitor();
             var nullLeader = sut.GetLeader();
             var nullVice = sut.GetVice();

@@ -1,5 +1,6 @@
 ﻿using Application.Members.Queries.ListMember;
 using Bogus;
+using System;
 
 namespace Tests.Application.Members.Queries.ListMember
 {
@@ -11,6 +12,8 @@ namespace Tests.Application.Members.Queries.ListMember
             {
                 Page = page ?? x.Random.Int(min: 1),
                 PageSize = pageSize ?? x.Random.Int(min: 1),
+                Name = x.Name.FullName(),
+                GuildId = Guid.NewGuid()
             });
         }
 

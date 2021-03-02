@@ -15,7 +15,7 @@ namespace Tests.Domain.Models
         public void Constructor_WithGuildAndMember_Should_Create_Pending_With_AllProperties()
         {
             // arrange
-            var guild = GuildFake.WithGuildLeader().Generate();
+            var guild = GuildFake.Valid().Generate();
             var member = MemberFake.WithoutGuild().Generate();
 
             // act

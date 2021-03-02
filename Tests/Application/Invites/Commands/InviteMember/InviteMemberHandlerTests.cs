@@ -18,7 +18,7 @@ namespace Tests.Application.Invites.Commands.InviteMember
         public async Task Handle_Should_Succeed_With_ValidCommandAsync()
         {
             // arrange
-            var guild = GuildFake.WithGuildLeader().Generate();
+            var guild = GuildFake.Valid().Generate();
             var member = MemberFake.WithoutGuild().Generate();
             var command = InviteMemberCommandFake.Valid(guild.Id, member.Id).Generate();
             var expectedInvite = InviteFake.ValidWithStatus(InviteStatuses.Pending, guild, member).Generate();
@@ -34,10 +34,10 @@ namespace Tests.Application.Invites.Commands.InviteMember
             var result = await sut.Handle(command, default);
 
             // assert
-            result.Should().NotBeNull().And.BeOfType<ApiCreatedResult>();
+            result.Should().NotBeNull().And.BeOfType<SuccessCreatedResult>();
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
-            result.As<ApiCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
+            result.As<SuccessCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
             result.Data.Should().NotBeNull().And.BeOfType<Invite>();
             result.Data.As<Invite>().Id.Should().Be(expectedInvite.Id);
             result.Data.As<Invite>().Guild.Id.Should().Be(expectedInvite.GuildId.Value).And.Be(guild.Id);

@@ -1,7 +1,6 @@
 ﻿using Domain.Models;
 using FluentAssertions;
 using Tests.Domain.Models.Fakes;
-using Tests.Helpers;
 using Xunit;
 
 namespace Tests.Domain.Models
@@ -13,7 +12,7 @@ namespace Tests.Domain.Models
         public void Constructor_WithGuildAndMember_Should_CreateWith_AllProperties_Except_ModifiedDate()
         {
             // arrange
-            var guild = GuildFake.WithGuildLeader().Generate();
+            var guild = GuildFake.Valid().Generate();
             var member = MemberFake.WithoutGuild().Generate();
 
             // act
@@ -27,64 +26,6 @@ namespace Tests.Domain.Models
             sut.GuildId.Should().NotBeEmpty().And.Be(guild.Id);
             sut.Member.Should().Be(member);
             sut.MemberId.Should().NotBeEmpty().And.Be(member.Id);
-        }
-
-        [Fact]
-        public void BeFinished_ActiveMembership_Should_Change_ModifiedDateOnly()
-        {
-            // arrange
-            var sut = MembershipFake.Active().Generate();
-            var monitor = sut.Monitor();
-
-            // act
-            sut.BeFinished();
-
-            // assert
-            sut.Should().NotBeNull().And.BeOfType<Membership>();
-            sut.Guild.Should().NotBeNull().And.BeOfType<Guild>();
-            sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull().And.BeOfType<Member>();
-            sut.MemberId.Should().NotBeEmpty();
-            sut.ModifiedDate.Should().NotBeNull();
-            sut.CreatedDate.Should().BeBefore(sut.ModifiedDate.Value);
-
-            monitor.AssertPropertyChanged(nameof(Membership.ModifiedDate));
-            monitor.AssertPropertyNotChanged(
-                nameof(Membership.Id),
-                nameof(Membership.CreatedDate),
-                nameof(Membership.Guild),
-                nameof(Membership.GuildId),
-                nameof(Membership.Member),
-                nameof(Membership.MemberId));
-        }
-
-        [Fact]
-        public void BeFinished_FinishedMembership_Should_Change_Nothing()
-        {
-            // arrange
-            var sut = MembershipFake.Finished().Generate();
-            var monitor = sut.Monitor();
-
-            // act
-            sut.BeFinished();
-
-            // assert
-            sut.Should().NotBeNull().And.BeOfType<Membership>();
-            sut.Guild.Should().NotBeNull().And.BeOfType<Guild>();
-            sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull().And.BeOfType<Member>();
-            sut.MemberId.Should().NotBeEmpty();
-            sut.ModifiedDate.Should().NotBeNull();
-            sut.CreatedDate.Should().BeBefore(sut.ModifiedDate.Value);
-
-            monitor.AssertPropertyNotChanged(
-                nameof(Membership.Id),
-                nameof(Membership.CreatedDate),
-                nameof(Membership.ModifiedDate),
-                nameof(Membership.Guild),
-                nameof(Membership.GuildId),
-                nameof(Membership.Member),
-                nameof(Membership.MemberId));
         }
 
         [Fact]

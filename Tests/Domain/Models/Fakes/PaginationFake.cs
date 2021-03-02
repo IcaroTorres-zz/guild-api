@@ -1,4 +1,5 @@
 ﻿using Application.Common.Responses;
+using Application.Members.Queries.ListMember;
 using Bogus;
 using Domain.Enums;
 using Domain.Models;
@@ -11,27 +12,31 @@ namespace Tests.Domain.Models.Fakes
     {
         public static Faker<PagedResponse<Guild>> PaginateGuilds(int pageSize = 10, int page = 1, int totalItems = 20)
         {
-            var items = GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 2).Generate(totalItems);
+            var items = GuildFake.Valid(membersCount: 2).Generate(totalItems);
 
             return new Faker<PagedResponse<Guild>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
         }
 
-        public static Faker<PagedResponse<Member>> PaginateMembers(int pageSize = 10, int page = 1, int totalItems = 20)
+        public static Faker<PagedResponse<Member>> PaginateMembers(ListMemberCommand command, int totalItems = 20)
         {
-            var items = new List<Member>();
-            var guild = GuildFake.WithGuildLeader().Generate();
-            for (int i = 0; i < totalItems; i++)
+            return new Faker<PagedResponse<Member>>().CustomInstantiator(x =>
             {
-                var member = i switch
+                var items = new List<Member>();
+                if (command.GuildId.HasValue)
                 {
-                    int count when count % 3 == 0 => MemberFake.WithoutGuild().Generate(),
-                    int count when count == totalItems - 1 => MemberFake.GuildLeader(guild: guild).Generate(),
-                    _ => MemberFake.GuildMember(guild: guild).Generate(),
-                };
-                items.Add(member);
-            }
+                    var guild = GuildFake.Valid(id: command.GuildId).Generate();
+                    items.Add(guild.GetLeader());
+                    for (int i = items.Count; i < totalItems; i++)
+                        items.Add(MemberFake.GuildMember(guild, $"{x.Name.FullName()} {command.Name}").Generate());
 
-            return new Faker<PagedResponse<Member>>().CustomInstantiator(_ => Paginate(items, pageSize, page));
+                    return Paginate(items, command.PageSize, command.Page);
+                }
+
+                for (var i = 0; i < totalItems; i++)
+                    items.Add(MemberFake.WithoutGuild($"{x.Name.FullName()} {command.Name}").Generate());
+
+                return Paginate(items, command.PageSize, command.Page);
+            });
         }
 
         public static Faker<PagedResponse<Invite>> PaginateInvites(int pageSize = 10, int page = 1, int totalItems = 20)

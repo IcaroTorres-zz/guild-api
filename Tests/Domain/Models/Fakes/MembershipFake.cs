@@ -5,16 +5,11 @@ namespace Tests.Domain.Models.Fakes
 {
     public static class MembershipFake
     {
-        public static Faker<Membership> NullObject()
-        {
-            return new Faker<Membership>().CustomInstantiator(_ => Membership.Null);
-        }
-
         public static Faker<Membership> Active()
         {
             return new Faker<Membership>().CustomInstantiator(_ =>
             {
-                return MemberFake.GuildMember().Generate().ActiveMembership;
+                return MemberFake.GuildMember().Generate().GetActiveMembership();
             });
         }
 
@@ -23,8 +18,8 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Membership>().CustomInstantiator(_ =>
             {
                 var member = MemberFake.GuildMember().Generate();
-                member.LeaveGuild();
-                return member.LastFinishedMembership;
+                member.State.Leave();
+                return member.GetLastFinishedMembership();
             });
         }
     }
