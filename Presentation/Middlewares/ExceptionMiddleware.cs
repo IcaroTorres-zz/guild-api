@@ -57,19 +57,17 @@ namespace Presentation.Middlewares
         private static Task Handle(string title, string message, HttpStatusCode code, HttpContext context, Exception ex, IUnitOfWork uow, bool isProduction)
         {
             if (uow.HasOpenTransaction) uow.RollbackTransactionAsync();
-
-            var errorOutput = new ApiResult();
-            var errors = new List<ApiError>() { new ApiError(title, message) };
+            var errors = new List<Error>() { new Error(title, message) };
 
             if (!isProduction) errors.AddRange(ex.ToApiError());
 
-            errorOutput.SetExecutionError(code, errors.ToArray());
-            return WriteErrorAsync(errorOutput, context);
+            var result = new FailExecutionResult(code, errors.ToArray());
+            return WriteErrorAsync(result, context);
         }
 
-        private static Task WriteErrorAsync(ApiResult apiResponse, HttpContext context)
+        private static Task WriteErrorAsync(FailExecutionResult result, HttpContext context)
         {
-            var stringResult = JsonConvert.SerializeObject(apiResponse.Value, new JsonSerializerSettings
+            var stringResult = JsonConvert.SerializeObject(result.Value, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 Formatting = Formatting.Indented,
@@ -77,7 +75,7 @@ namespace Presentation.Middlewares
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = apiResponse.StatusCode ?? 500;
+            context.Response.StatusCode = result.StatusCode ?? 500;
             return context.Response.WriteAsync(stringResult);
         }
     }
