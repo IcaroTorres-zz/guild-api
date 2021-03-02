@@ -1,5 +1,6 @@
 ﻿using Application.Invites.Commands.DenyInvite;
 using Domain.Enums;
+using Domain.Models;
 using FluentAssertions;
 using FluentValidation.Results;
 using Tests.Domain.Models.Fakes;
@@ -54,7 +55,7 @@ namespace Tests.Application.Invites.Commands.DenyInvite
         public void Should_Fail_Deny_By_Invite_NotFound()
         {
             // arrange
-            var invite = InviteFake.NullObject().Generate();
+            var invite = Invite.Null;
             var command = PatchInviteCommandFake.DenyValid(invite.Id).Generate();
             var inviteRepository = InviteRepositoryMockBuilder.Create().GetByIdFail(command.Id).Build();
             var sut = new DenyInviteValidator(inviteRepository)

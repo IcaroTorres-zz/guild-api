@@ -32,10 +32,10 @@ namespace Tests.Application.Invites.Queries.ListInvite
             var result = await sut.Handle(command, default);
 
             // assert
-            result.Should().NotBeNull().And.BeOfType<ApiResult>();
+            result.Should().NotBeNull().And.BeOfType<SuccessResult>();
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
-            result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
+            result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<PagedResponse<Invite>>();
             result.Data.As<PagedResponse<Invite>>().Items.Should().NotBeEmpty()
                 .And.AllBeAssignableTo<Invite>()

@@ -1,5 +1,6 @@
 ﻿using Application.Invites.Commands.AcceptInvite;
 using Domain.Enums;
+using Domain.Models;
 using FluentAssertions;
 using FluentValidation.Results;
 using Tests.Domain.Models.Fakes;
@@ -54,7 +55,7 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
         public void Should_Fail_Accept_By_Invite_NotFound()
         {
             // arrange
-            var invite = InviteFake.NullObject().Generate();
+            var invite = Invite.Null;
             var command = PatchInviteCommandFake.AcceptValid(invite.Id).Generate();
             var inviteRepository = InviteRepositoryMockBuilder.Create().GetByIdFail(command.Id).Build();
             var sut = new AcceptInviteValidator(inviteRepository)

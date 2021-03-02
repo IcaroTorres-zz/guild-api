@@ -1,30 +1,30 @@
 ﻿using Bogus;
 using Domain.Models;
+using System;
 
 namespace Tests.Domain.Models.Fakes
 {
     public static class GuildFake
     {
-        public static Faker<Guild> NullObject()
+        /// <summary>
+        /// Generates a valid <see cref="Guild"/> with at least the leader and a vice-leader for testing purposes.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="membersCount">The members count.</param>
+        /// <param name="leader">The leader.</param>
+        /// <returns></returns>
+        public static Faker<Guild> Valid(Guid? id = null, int membersCount = 2, Member leader = null)
         {
-            return new Faker<Guild>().CustomInstantiator(_ => Guild.Null);
-        }
-
-        public static Faker<Guild> WithGuildLeader(Member leader = null)
-        {
+            membersCount = Math.Max(2, membersCount);
             return new Faker<Guild>().CustomInstantiator(x =>
             {
-                leader ??= MemberFake.WithoutGuild().Generate();
-                return new Guild(x.Company.CatchPhrase(), leader);
-            });
-        }
-
-        public static Faker<Guild> WithGuildLeaderAndMembers(Member leader = null, int otherMembersCount = 5)
-        {
-            return new Faker<Guild>().CustomInstantiator(_ =>
-            {
-                var guild = WithGuildLeader(leader).Generate();
-                foreach (var member in MemberFake.WithoutGuild().Generate(otherMembersCount))
+                var guild = new Guild(x.Company.CatchPhrase(), Member.Null) { Id = id ?? Guid.NewGuid() };
+                if (leader is Member)
+                {
+                    guild.InviteMember(leader);
+                    guild.GetLatestInvite().BeAccepted();
+                }
+                foreach (var member in MemberFake.WithoutGuild().Generate(membersCount - guild.Members.Count))
                 {
                     guild.InviteMember(member);
                     guild.GetLatestInvite().BeAccepted();

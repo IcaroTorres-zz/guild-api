@@ -5,6 +5,7 @@ using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Tests.Helpers.Builders;
 using Xunit;
@@ -21,26 +22,26 @@ namespace Tests.Application.Members.Queries.ListMember
             var expectedPage = new Random().Next(1, 5);
             var expectedPages = new Random().Next(expectedPage, expectedPage + 1);
             var expectedPageSize = new Random().Next(5, 10);
-            var command = ListMemberCommandFake.Valid(pageSize: expectedPageSize, page: expectedPage).Generate();
-            var repository = MemberRepositoryMockBuilder.Create().Paginate(
-                pageSize: command.PageSize,
-                page: command.Page,
-                totalItems: command.PageSize * expectedPages).Build();
+            var command = ListMemberCommandFake.Valid(expectedPageSize, expectedPage).Generate();
+            var totalItems = command.PageSize * expectedPages;
+            var repository = MemberRepositoryMockBuilder.Create().Paginate(command, totalItems).Build();
             var sut = new ListMemberHandler(repository);
 
             // act
             var result = await sut.Handle(command, default);
 
             // assert
-            result.Should().NotBeNull().And.BeOfType<ApiResult>();
+            result.Should().NotBeNull().And.BeOfType<SuccessResult>();
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
-            result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
+            result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<PagedResponse<Member>>();
             result.Data.As<PagedResponse<Member>>().Items.Should().NotBeEmpty()
                 .And.AllBeAssignableTo<Member>()
                 .And.HaveCount(expectedPageSize)
-                .And.HaveCount(command.PageSize);
+                .And.HaveCount(command.PageSize)
+                .And.Match(x => x.All(y => y.Name.Contains(command.Name, StringComparison.OrdinalIgnoreCase) ||
+                                           y.GuildId == command.GuildId));
             result.Data.As<PagedResponse<Member>>().PageSize.Should().Be(expectedPageSize)
                 .And.Be(command.PageSize);
             result.Data.As<PagedResponse<Member>>().Page.Should().Be(expectedPage)

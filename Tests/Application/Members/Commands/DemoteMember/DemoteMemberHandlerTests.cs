@@ -17,9 +17,9 @@ namespace Tests.Application.Members.Commands.DemoteMember
         public async Task Handle_Should_Succeed_With_ValidCommand()
         {
             // arrange
-            var demotedMember = MemberFake.GuildLeader().Generate();
-            var guild = demotedMember.Guild;
-            var expectedLeader = demotedMember.Guild.GetVice();
+            var guild = GuildFake.Valid(membersCount: 1).Generate();
+            var demotedMember = guild.GetLeader();
+            var expectedLeader = guild.GetVice();
             var command = PatchMemberCommandFake.DemoteMemberValid(demotedMember.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
                 .GetForGuildOperationsSuccess(command.Id, demotedMember)
@@ -32,10 +32,10 @@ namespace Tests.Application.Members.Commands.DemoteMember
             var result = await sut.Handle(command, default);
 
             // assert
-            result.Should().NotBeNull().And.BeOfType<ApiResult>();
+            result.Should().NotBeNull().And.BeOfType<SuccessResult>();
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
-            result.As<ApiResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
+            result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<Member>();
             result.Data.As<Member>().Id.Should().Be(demotedMember.Id);
             result.Data.As<Member>().IsGuildLeader.Should().BeFalse()

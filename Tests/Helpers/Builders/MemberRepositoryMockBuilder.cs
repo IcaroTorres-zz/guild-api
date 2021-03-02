@@ -1,4 +1,5 @@
 ﻿using Application.Common.Abstractions;
+using Application.Members.Queries.ListMember;
 using Domain.Models;
 using Moq;
 using System;
@@ -113,55 +114,22 @@ namespace Tests.Helpers.Builders
             return this;
         }
 
-        public MemberRepositoryMockBuilder CanChangeName(bool result, Guid? id = null, string name = null)
+        public MemberRepositoryMockBuilder CanChangeName(bool result, Guid id, string name)
         {
-            if (id == null && name == null)
-            {
-                _mock.Setup(x => x.CanChangeNameAsync(It.IsAny<Guid>(), It.IsAny<string>(), default)).ReturnsAsync(result);
-            }
-            else if (id == null)
-            {
-                _mock.Setup(x => x.CanChangeNameAsync(It.IsAny<Guid>(), name, default)).ReturnsAsync(result);
-            }
-            else
-            {
-                _mock.Setup(x => x.CanChangeNameAsync(id.Value, It.IsAny<string>(), default)).ReturnsAsync(result);
-            }
-
+            _mock.Setup(x => x.CanChangeNameAsync(id, name, default)).ReturnsAsync(result);
             return this;
         }
 
-        public MemberRepositoryMockBuilder IsGuildMember(bool result, Guid? id = null, Guid? guildId = null)
+        public MemberRepositoryMockBuilder IsGuildMember(bool result, Guid id, Guid guildId)
         {
-            if (id == null && guildId == null)
-            {
-                _mock.Setup(x => x.IsGuildMemberAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), default)).ReturnsAsync(result);
-            }
-            else if (id == null)
-            {
-                _mock.Setup(x => x.IsGuildMemberAsync(It.IsAny<Guid>(), guildId.Value, default)).ReturnsAsync(result);
-            }
-            else
-            {
-                _mock.Setup(x => x.IsGuildMemberAsync(id.Value, It.IsAny<Guid>(), default)).ReturnsAsync(result);
-            }
-
+            _mock.Setup(x => x.IsGuildMemberAsync(id, guildId, default)).ReturnsAsync(result);
             return this;
         }
 
-        public MemberRepositoryMockBuilder Insert(Member input = null, Member output = null)
+        public MemberRepositoryMockBuilder Insert(string name, Member output = null)
         {
             var result = output ?? MemberFake.WithoutGuild().Generate();
-
-            if (input == null)
-            {
-                _mock.Setup(x => x.InsertAsync(It.IsAny<Member>(), default)).ReturnsAsync(result);
-            }
-            else
-            {
-                _mock.Setup(x => x.InsertAsync(input, default)).ReturnsAsync(result);
-            }
-
+            _mock.Setup(x => x.InsertAsync(It.Is<Member>(x => x.Name == name), default)).ReturnsAsync(result);
             return this;
         }
 
@@ -181,11 +149,11 @@ namespace Tests.Helpers.Builders
             return this;
         }
 
-        public MemberRepositoryMockBuilder Paginate(int pageSize = 10, int page = 1, int totalItems = 20)
+        public MemberRepositoryMockBuilder Paginate(ListMemberCommand command, int totalItems)
         {
-            var PagedResponse = PagedResponseFake.PaginateMembers(pageSize, page, totalItems);
+            var PagedResponse = PagedResponseFake.PaginateMembers(command, totalItems).Generate();
 
-            _mock.Setup(x => x.PaginateAsync(It.IsAny<Expression<Func<Member, bool>>>(), pageSize, page, default))
+            _mock.Setup(x => x.PaginateAsync(It.IsAny<Expression<Func<Member, bool>>>(), command.PageSize, command.Page, default))
                  .ReturnsAsync(PagedResponse);
 
             return this;

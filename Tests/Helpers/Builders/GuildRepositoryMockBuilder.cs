@@ -34,18 +34,11 @@ namespace Tests.Helpers.Builders
             return this;
         }
 
-        public GuildRepositoryMockBuilder GetByIdSuccess(Guid? input = null, Guild output = null)
+        public GuildRepositoryMockBuilder GetByIdSuccess(Guid input, Guild output = null)
         {
-            var result = output ?? GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 3).Generate();
+            var result = output ?? GuildFake.Valid(membersCount: 3).Generate();
 
-            if (input == null)
-            {
-                _mock.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), default)).ReturnsAsync(result);
-            }
-            else
-            {
-                _mock.Setup(x => x.GetByIdAsync(input.Value, It.IsAny<bool>(), default)).ReturnsAsync(result);
-            }
+            _mock.Setup(x => x.GetByIdAsync(input, It.IsAny<bool>(), default)).ReturnsAsync(result);
 
             return this;
         }
@@ -82,7 +75,7 @@ namespace Tests.Helpers.Builders
 
         public GuildRepositoryMockBuilder GetForMemberHandlingSuccess(Guid? input = null, Guild output = null)
         {
-            var result = output ?? GuildFake.WithGuildLeaderAndMembers(otherMembersCount: 3).Generate();
+            var result = output ?? GuildFake.Valid(membersCount: 3).Generate();
 
             if (input == null)
             {
@@ -132,7 +125,7 @@ namespace Tests.Helpers.Builders
 
         public GuildRepositoryMockBuilder Insert(Guild input = null, Guild output = null)
         {
-            var result = output ?? GuildFake.WithGuildLeader().Generate();
+            var result = output ?? GuildFake.Valid().Generate();
 
             if (input == null)
             {
@@ -148,7 +141,7 @@ namespace Tests.Helpers.Builders
 
         public GuildRepositoryMockBuilder Update(Guild input = null, Guild output = null)
         {
-            var result = output ?? GuildFake.WithGuildLeader().Generate();
+            var result = output ?? GuildFake.Valid().Generate();
 
             if (input == null)
             {
