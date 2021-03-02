@@ -16,9 +16,14 @@ namespace Domain.Models
 
         private string _name;
 
-        [JsonConstructor] protected Guild() { }
+        [JsonConstructor]
+        protected Guild()
+        {
+            Members = new HashSet<Member>();
+            Invites = new HashSet<Invite>();
+        }
 
-        public Guild(string name, Member member)
+        public Guild(string name, Member member) : this()
         {
             Id = Guid.NewGuid();
             Name = name;
@@ -36,32 +41,31 @@ namespace Domain.Models
 
         public virtual Guild InviteMember(Member member)
         {
-            if (!Members.Contains(member))
+            if (!(member is INullObject) && !Members.Contains(member))
             {
-                var invite = member.ConfirmGuildInvite(this);
-                Invites.Add(invite);
-                CollectionChanged?.Invoke(Invites, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, invite));
+                var invite = new Invite(this, member);
+                if (Invites.Add(invite))
+                {
+                    CollectionChanged?.Invoke(Invites, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, invite));
+                }
             }
             return this;
         }
 
-        internal virtual Guild RemoveMember(Member member)
+        public virtual Guild RemoveMember(Member member)
         {
-            if (Members.Contains(member))
+            if (!(member is INullObject) && Members.Remove(member))
             {
-                if (member.IsGuildLeader) member.TransferLeadership(GetVice());
-                Members.Remove(member);
+                member.State.Leave();
                 CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, member));
-                member.LeaveGuild();
             }
             return this;
         }
 
         internal virtual Guild AddMember(Member newMember)
         {
-            if (!Members.Contains(newMember))
+            if (!(newMember is INullObject) && Members.Add(newMember))
             {
-                Members.Add(newMember);
                 CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newMember));
             }
             return this;
@@ -69,24 +73,18 @@ namespace Domain.Models
 
         public virtual Guild Promote(Member member)
         {
-            Members.SingleOrDefault(x => x.Id == member.Id)?.ReceiveLeadership(GetLeader());
+            if (Members.FirstOrDefault(x => x.Id == member.Id) is { } memberInGuild)
+            {
+                GetLeader().State.BeDemoted();
+                memberInGuild.State.BePromoted();
+            }
 
             return this;
         }
 
         public virtual Guild DemoteLeader()
         {
-            if (Members.Count > 1)
-            {
-                GetLeader().TransferLeadership(GetVice());
-            }
-
-            return this;
-        }
-
-        internal virtual Membership ConfirmMembership(Member member)
-        {
-            return new Membership(this, member);
+            return Members.Count > 1 ? Promote(GetVice()) : this;
         }
 
         public virtual string Name
@@ -94,19 +92,21 @@ namespace Domain.Models
             get => _name;
             protected set
             {
-                if (_name == value) return;
-                _name = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                if (_name != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                    _name = value;
+                }
             }
         }
 
-        public virtual ICollection<Member> Members { get; protected set; } = new List<Member>();
-        public virtual ICollection<Invite> Invites { get; protected set; } = new List<Invite>();
+        public virtual HashSet<Member> Members { get; protected set; }
+        public virtual HashSet<Invite> Invites { get; protected set; }
 
         private static bool FilterGuildLeader(Member x) => x.IsGuildLeader;
         public Member GetLeader() => Members.SingleOrDefault(FilterGuildLeader) ?? Member.Null;
 
-        private static TimeSpan OrderActiveMembershipByDuration(Member x) => x.ActiveMembership.GetDuration();
+        private static TimeSpan OrderActiveMembershipByDuration(Member x) => x.GetActiveMembership().GetDuration();
         public Member GetVice() => Members.OrderByDescending(OrderActiveMembershipByDuration)
                                           .FirstOrDefault(x => x.Id != GetLeader()?.Id && !x.IsGuildLeader) ?? Member.Null;
 

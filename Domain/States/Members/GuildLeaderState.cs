@@ -13,13 +13,26 @@ namespace Domain.States.Members
 
         internal override Member Join(Guild guild)
         {
-            base.Leave();
+            Leave();
             return base.Join(guild);
+        }
+
+        internal override Member Leave()
+        {
+            Context.Guild.GetVice().State.BePromoted();
+            BeDemoted();
+            Context.GetActiveMembership().State.Finish();
+            return Context.ChangeState(new NoGuildMemberState(Context));
         }
 
         internal override Member BePromoted()
         {
             return Context;
+        }
+
+        internal override Member BeDemoted()
+        {
+            return Context.ChangeState(new GuildMemberState(Context, Context.Guild));
         }
     }
 }

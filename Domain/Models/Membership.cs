@@ -40,11 +40,6 @@ namespace Domain.Models
             return this;
         }
 
-        internal virtual Membership BeFinished()
-        {
-            return State.Finish();
-        }
-
         public virtual TimeSpan GetDuration()
         {
             return (ModifiedDate ?? DateTime.UtcNow).Subtract(CreatedDate);
@@ -53,22 +48,26 @@ namespace Domain.Models
         public override DateTime CreatedDate
         {
             get => _createdDate;
-            protected set
+            protected internal set
             {
-                if (_createdDate == value) return;
-                _createdDate = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CreatedDate)));
+                if (_createdDate != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CreatedDate)));
+                    _createdDate = value;
+                }
             }
         }
 
         public override DateTime? ModifiedDate
         {
             get => _modifiedDate;
-            protected set
+            protected internal set
             {
-                if (_modifiedDate == value) return;
-                _modifiedDate = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ModifiedDate)));
+                if (_modifiedDate != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ModifiedDate)));
+                    _modifiedDate = value;
+                }
             }
         }
 
@@ -77,9 +76,11 @@ namespace Domain.Models
             get => _memberId;
             protected set
             {
-                if (_memberId == value) return;
-                _memberId = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MemberId)));
+                if (_memberId != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MemberId)));
+                    _memberId = value;
+                }
             }
         }
 
@@ -88,9 +89,11 @@ namespace Domain.Models
             get => _guildId;
             protected set
             {
-                if (_guildId == value) return;
-                _guildId = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
+                if (_guildId != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
+                    _guildId = value;
+                }
             }
         }
 
@@ -99,9 +102,11 @@ namespace Domain.Models
             get => _guild ??= Guild.Null;
             protected set
             {
-                if (_guild == value) return;
-                _guild = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
+                if (_guild != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
+                    _guild = value;
+                }
             }
         }
 
@@ -110,13 +115,15 @@ namespace Domain.Models
             get => _member ??= Member.Null;
             protected set
             {
-                if (_member == value) return;
-                _member = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Member)));
+                if (_member != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Member)));
+                    _member = value;
+                }
             }
         }
 
-        protected virtual MembershipState State
+        internal virtual MembershipState State
         {
             get => _state ??= MembershipState.NewState(this, ModifiedDate);
             set => _state = value;

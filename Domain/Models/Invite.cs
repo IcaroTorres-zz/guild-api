@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace Domain.Models
@@ -63,9 +62,11 @@ namespace Domain.Models
             get => _status;
             protected set
             {
-                if (_status == value) return;
-                _status = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
+                if (_status != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
+                    _status = value;
+                }
             }
         }
 
@@ -74,9 +75,11 @@ namespace Domain.Models
             get => _memberId;
             protected set
             {
-                if (_memberId == value) return;
-                _memberId = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MemberId)));
+                if (_memberId != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MemberId)));
+                    _memberId = value;
+                }
             }
         }
 
@@ -85,9 +88,11 @@ namespace Domain.Models
             get => _guildId;
             protected set
             {
-                if (_guildId == value) return;
-                _guildId = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
+                if (_guildId != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
+                    _guildId = value;
+                }
             }
         }
 
@@ -96,9 +101,11 @@ namespace Domain.Models
             get => _guild ??= Guild.Null;
             protected set
             {
-                if (_guild == value) return;
-                _guild = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
+                if (_guild != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
+                    _guild = value;
+                }
             }
         }
 
@@ -107,22 +114,24 @@ namespace Domain.Models
             get => _member ??= Member.Null;
             protected set
             {
-                if (_member == value) return;
-                _member = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Member)));
+                if (_member != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Member)));
+                    _member = value;
+                }
             }
         }
 
-        protected virtual InviteState State
+        internal virtual InviteState State
         {
             get => _state ??= InviteState.NewState(this, Guild, Member, Status);
             set => _state = value;
         }
 
-        [NotMapped]
-        public IEnumerable<Invite> InvitesToCancel => Guild.Invites.Where(x => x.Status == InviteStatuses.Pending &&
-                                                                               x.MemberId == Member.Id &&
-                                                                               x.GuildId == Guild.Id &&
-                                                                               x.Id != Id).ToList();
+        public HashSet<Invite> GetInvitesToCancel() => Guild.Invites
+            .Where(x => x.Status == InviteStatuses.Pending &&
+                        x.MemberId == Member.Id &&
+                        x.GuildId == Guild.Id &&
+                        x.Id != Id).ToHashSet();
     }
 }

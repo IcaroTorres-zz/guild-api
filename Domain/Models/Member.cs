@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace Domain.Models
@@ -22,9 +21,13 @@ namespace Domain.Models
         private Guild _guild;
         private MemberState _state;
 
-        [JsonConstructor] protected Member() { }
+        [JsonConstructor]
+        protected Member()
+        {
+            Memberships = new HashSet<Membership>();
+        }
 
-        public Member(string name)
+        public Member(string name) : this()
         {
             Id = Guid.NewGuid();
             Name = name;
@@ -37,7 +40,7 @@ namespace Domain.Models
             State = state;
             IsGuildLeader = State.IsGuildLeader;
             Guild = State.Guild;
-            if (Guild is NullGuild) GuildId = null;
+            if (Guild is INullObject) GuildId = null;
             else GuildId = State.Guild.Id;
 
             return this;
@@ -49,38 +52,13 @@ namespace Domain.Models
             return this;
         }
 
-        public virtual Member LeaveGuild()
-        {
-            return State.Leave();
-        }
-
-        internal virtual Member ReceiveLeadership(Member currentLeader)
-        {
-            currentLeader.State.BeDemoted();
-            return State.BePromoted();
-        }
-
-        internal virtual Member TransferLeadership(Member newLeader)
-        {
-            newLeader.State.BePromoted();
-            return State.BeDemoted();
-        }
-
-        internal virtual Member JoinGuild(Guild guild)
-        {
-            return State.Join(guild);
-        }
-
-        internal virtual Invite ConfirmGuildInvite(Guild guild)
-        {
-            return new Invite(guild, this);
-        }
-
         internal virtual Member ActivateMembership(Guild guild)
         {
-            var membership = guild.ConfirmMembership(this);
-            Memberships.Add(membership);
-            CollectionChanged?.Invoke(Memberships, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, membership));
+            var membership = new Membership(guild, this);
+            if (!(guild is INullObject) && Memberships.Add(membership))
+            {
+                CollectionChanged?.Invoke(Memberships, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, membership));
+            }
             return this;
         }
 
@@ -89,9 +67,11 @@ namespace Domain.Models
             get => _name;
             protected set
             {
-                if (_name == value) return;
-                _name = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                if (_name != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                    _name = value;
+                }
             }
         }
 
@@ -100,9 +80,11 @@ namespace Domain.Models
             get => _isGuildLeader;
             protected set
             {
-                if (_isGuildLeader == value) return;
-                _isGuildLeader = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsGuildLeader)));
+                if (_isGuildLeader != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsGuildLeader)));
+                    _isGuildLeader = value;
+                }
             }
         }
 
@@ -111,9 +93,11 @@ namespace Domain.Models
             get => _guildId;
             protected set
             {
-                if (_guildId == value) return;
-                _guildId = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
+                if (_guildId != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
+                    _guildId = value;
+                }
             }
         }
 
@@ -122,26 +106,28 @@ namespace Domain.Models
             get => _guild ??= Guild.Null;
             protected set
             {
-                if (_guild == value) return;
-                _guild = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
+                if (_guild != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
+                    _guild = value;
+                }
             }
         }
 
-        protected virtual MemberState State
+        internal virtual MemberState State
         {
-            get => _state ??= MemberState.NewState(this, Guild, IsGuildLeader);
+            get => _state ??= MemberState.NewState(this);
             set => _state = value;
         }
 
-        public virtual ICollection<Membership> Memberships { get; protected set; } = new List<Membership>();
+        public virtual HashSet<Membership> Memberships { get; protected set; }
 
-        [NotMapped]
-        public Membership ActiveMembership => Memberships.SingleOrDefault(x => x.ModifiedDate == null) ?? Membership.Null;
+        private static bool activeMembershipFilter(Membership x) => x.ModifiedDate == null && x != Membership.Null;
+        public Membership GetActiveMembership() => Memberships.SingleOrDefault(activeMembershipFilter) ?? Membership.Null;
 
-        [NotMapped]
-        public Membership LastFinishedMembership => Memberships.Where(x => x.ModifiedDate != null)
-                                                               .OrderByDescending(x => x.ModifiedDate)
-                                                               .FirstOrDefault() ?? Membership.Null;
+        private static bool finishedMembershipFilter(Membership x) => x.ModifiedDate != null && x != Membership.Null;
+        public Membership GetLastFinishedMembership() => Memberships.Where(finishedMembershipFilter)
+                                                                    .OrderByDescending(x => x.ModifiedDate)
+                                                                    .FirstOrDefault() ?? Membership.Null;
     }
 }

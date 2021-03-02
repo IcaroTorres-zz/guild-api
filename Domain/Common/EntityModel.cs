@@ -12,10 +12,10 @@ namespace Domain.Common
     [ExcludeFromCodeCoverage]
     public abstract class EntityModel<T> where T : EntityModel<T>
     {
-        public virtual Guid Id { get; protected set; }
-        public virtual DateTime CreatedDate { get; protected set; } = DateTime.UtcNow;
-        public virtual DateTime? ModifiedDate { get; protected set; }
-        public bool Disabled { get; protected set; } = false;
+        public virtual Guid Id { get; protected internal set; }
+        public virtual DateTime CreatedDate { get; protected internal set; } = DateTime.UtcNow;
+        public virtual DateTime? ModifiedDate { get; protected internal set; }
+        public bool Disabled { get; protected internal set; } = false;
 
         public override int GetHashCode()
         {

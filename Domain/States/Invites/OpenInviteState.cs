@@ -13,7 +13,7 @@ namespace Domain.States.Invites
 
         internal override Invite BeAccepted()
         {
-            Context.Member.JoinGuild(Context.Guild);
+            Context.Member.State.Join(Context.Guild);
             return Context.ChangeState(new ClosedInviteState(Context, InviteStatuses.Accepted));
         }
 

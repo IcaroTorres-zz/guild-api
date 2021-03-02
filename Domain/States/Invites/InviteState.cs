@@ -21,9 +21,8 @@ namespace Domain.States.Invites
         {
             if (guild is INullObject || member is INullObject) return new ClosedInviteState(invite, status);
 
-            if (status == InviteStatuses.Pending) return new OpenInviteState(invite);
-
-            return new ClosedInviteState(invite, status);
+            return status == InviteStatuses.Pending
+                ? new OpenInviteState(invite) : new ClosedInviteState(invite, status) as InviteState;
         }
     }
 }

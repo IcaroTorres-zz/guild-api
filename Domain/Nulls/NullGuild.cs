@@ -18,7 +18,7 @@ namespace Domain.Nulls
             return this;
         }
 
-        internal override Guild RemoveMember(Member member)
+        public override Guild RemoveMember(Member member)
         {
             return this;
         }
@@ -38,12 +38,9 @@ namespace Domain.Nulls
             return this;
         }
 
-        internal override Membership ConfirmMembership(Member member)
-        {
-            return Membership.Null;
-        }
-
-        public override Guid Id { get => Guid.Empty; protected set { } }
+        public override Guid Id { get => Guid.Empty; protected internal set { } }
         public override string Name { get => string.Empty; protected set { } }
+        public override DateTime CreatedDate { get => default; protected internal set { } }
+        public override DateTime? ModifiedDate { get => default; protected internal set { } }
     }
 }
