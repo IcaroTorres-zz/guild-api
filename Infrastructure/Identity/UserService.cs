@@ -4,7 +4,6 @@ using Application.Common.Results;
 using Application.Identity;
 using AutoMapper;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -38,18 +37,16 @@ namespace Infrastructure.Identity
 
         public IApiResult Authenticate(AuthenticateUserCommand command)
         {
-            var response = new ApiResult();
-
             if (_authenticateModelValidator.Validate(command) is { } validation && !validation.IsValid)
             {
-                return response.SetValidationError(validation.Errors.ToArray());
+                return new FailValidationResult(validation.Errors.ToArray());
             }
 
             var user = _context.Users.SingleOrDefault(x => x.Name == command.Name);
 
             if (user == null || !VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt))
             {
-                return response.SetExecutionError(HttpStatusCode.BadRequest, new ApiError("Auth", "Username or password is incorrect"));
+                return new FailExecutionResult(HttpStatusCode.BadRequest, new Error("Auth", "Username or password is incorrect"));
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -67,7 +64,7 @@ namespace Infrastructure.Identity
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return response.SetResult(new
+            return new SuccessResult(new
             {
                 user.Id,
                 user.Name,
@@ -81,27 +78,24 @@ namespace Infrastructure.Identity
         {
             var users = _context.Users;
             var models = _mapper.Map<List<UserResponse>>(users);
-            return new ApiResult().SetResult(models);
+            return new SuccessResult(models);
         }
 
         public IApiResult GetByName(string userName)
         {
-            var response = new ApiResult();
             var user = _context.Users.SingleOrDefault(x => x.Name == userName);
 
             return user is null
-                ? response.SetExecutionError(HttpStatusCode.NotFound,
-                    new ApiError("User", $"Record not found for user with given name \"{userName}\"."))
-                : response.SetResult(_mapper.Map<UserResponse>(user));
+                ? new FailExecutionResult(HttpStatusCode.NotFound,
+                    new Error("User", $"Record not found for user with given name \"{userName}\"."))
+                : new SuccessResult(_mapper.Map<UserResponse>(user)) as IApiResult;
         }
 
         public IApiResult Create(RegisterUserCommand command)
         {
-            var response = new ApiResult();
-
             if (_registerModelValidator.Validate(command) is { } validation && !validation.IsValid)
             {
-                return response.SetValidationError(validation.Errors.ToArray());
+                return new FailValidationResult(validation.Errors.ToArray());
             }
 
             var user = _mapper.Map<User>(command);
@@ -113,7 +107,7 @@ namespace Infrastructure.Identity
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            return response.SetCreated(new UserResponse
+            return new SuccessCreatedResult(new UserResponse
             {
                 Id = user.Id,
                 Name = user.Name,
@@ -123,19 +117,17 @@ namespace Infrastructure.Identity
 
         public IApiResult Update(UpdateUserCommand command)
         {
-            var response = new ApiResult();
-
             var user = _context.Users.Find(command.Id);
             if (user == null)
             {
-                return response.SetExecutionError(HttpStatusCode.NotFound, new ApiError("Auth", "User not found."));
+                return new FailExecutionResult(HttpStatusCode.NotFound, new Error("Auth", "User not found."));
             }
 
             if (!string.IsNullOrWhiteSpace(command.Name) && command.Name != user.Name)
             {
                 if (_context.Users.Any(x => x.Name == command.Name))
                 {
-                    return response.SetExecutionError(errors: new ApiError("Auth", "Username " + command.Name + " is already taken."));
+                    return new FailExecutionResult(errors: new Error("Auth", $"Username '{command.Name}' is already taken."));
                 }
 
                 user.Name = command.Name;
@@ -156,7 +148,7 @@ namespace Infrastructure.Identity
             _context.Users.Update(user);
             _context.SaveChanges();
 
-            return new ApiResult().SetResult(new UserResponse
+            return new SuccessResult(new UserResponse
             {
                 Id = user.Id,
                 Name = user.Name,
@@ -172,10 +164,7 @@ namespace Infrastructure.Identity
                 _context.Users.Remove(user);
                 _context.SaveChanges();
             }
-            return new ApiResult
-            {
-                StatusCode = StatusCodes.Status204NoContent
-            };
+            return new SuccessResult(default, HttpStatusCode.NoContent);
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

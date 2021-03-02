@@ -71,9 +71,9 @@ namespace Infrastructure.Persistence.Repositories
             {
                 await RollbackStatesAsync(cancellationToken);
                 var errors = exception.ToApiError()
-                                      .Prepend(new ApiError("database", "Data constraint violation. Register is invalid or already exists."))
+                                      .Prepend(new Error("database", "Data constraint violation. Register is invalid or already exists."))
                                       .ToArray();
-                return result.SetExecutionError(HttpStatusCode.Conflict, errors);
+                return new FailExecutionResult(HttpStatusCode.Conflict, errors);
             }
         }
 
