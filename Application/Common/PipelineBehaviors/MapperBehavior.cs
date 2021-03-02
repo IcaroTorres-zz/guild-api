@@ -23,7 +23,7 @@ namespace Application.Common.PipelineBehaviors
             if (result.Success)
             {
                 var mappedData = command.MapResult(result.Data, _mapper);
-                result.SetResult(mappedData, result.GetStatus());
+                result.SetData(mappedData);
             }
             return result;
         }

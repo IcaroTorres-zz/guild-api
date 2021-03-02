@@ -18,25 +18,11 @@ namespace Application.Common.PipelineBehaviors
 
         public async Task<TResult> Handle(TCommand command, CancellationToken cancellationToken, RequestHandlerDelegate<TResult> next)
         {
-            TResult result;
+            if (!(command is ITransactionalCommand)) return await next();
 
-            if (command is ITransactionalCommand)
-            {
-                _unitOfWork.BeginTransaction();
-                result = await next();
-                if (result.Success)
-                {
-                    result = (TResult)await _unitOfWork.CommitAsync(result, cancellationToken);
-                }
-                else
-                {
-                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                }
-            }
-            else
-            {
-                result = await next();
-            }
+            _unitOfWork.BeginTransaction();
+            var result = await next();
+            if (result.Success) result = (TResult)await _unitOfWork.CommitAsync(result, cancellationToken);
 
             return result;
         }

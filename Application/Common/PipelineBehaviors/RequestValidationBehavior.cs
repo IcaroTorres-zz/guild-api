@@ -29,7 +29,7 @@ namespace Application.Common.PipelineBehaviors
             var failures = validations.SelectMany(x => x.Errors).Where(x => x != null).ToList();
 
             return failures.Count > 0
-                ? (TResult)new ApiResult().SetValidationError(failures.ToArray())
+                ? (TResult)(new FailValidationResult(failures.ToArray()) as IApiResult)
                 : await next();
         }
     }

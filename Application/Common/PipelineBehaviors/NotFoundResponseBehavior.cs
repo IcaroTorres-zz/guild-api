@@ -24,9 +24,9 @@ namespace Application.Common.PipelineBehaviors
                     var dataType = result.Data.GetType();
                     var typeName = Regex.Replace(dataType.Name, "dto", "", RegexOptions.IgnoreCase);
 
-                    result.SetExecutionError(
+                    return (TResult)(new FailExecutionResult(
                         HttpStatusCode.NotFound,
-                        new ApiError(typeName, $"Record not found for {typeName} with given id {queryItemCommand.Id}."));
+                        new Error(typeName, $"Record not found for {typeName} with given id {queryItemCommand.Id}.")) as IApiResult);
                 }
             }
             return result;
