@@ -17,8 +17,6 @@ namespace Application.Memberships.Queries.ListMemberships
 
         public async Task<IApiResult> Handle(ListMembershipCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var pagedMemberships = await _membershipRepository.PaginateAsync(
             predicate: x =>
                     (command.MemberId == null || x.MemberId == command.MemberId) &&
@@ -28,7 +26,7 @@ namespace Application.Memberships.Queries.ListMemberships
                 cancellationToken);
 
             pagedMemberships.SetAppliedCommand(command);
-            return result.SetResult(pagedMemberships);
+            return new SuccessResult(pagedMemberships);
         }
     }
 }

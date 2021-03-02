@@ -17,9 +17,8 @@ namespace Application.Members.Queries.GetMember
 
         public async Task<IApiResult> Handle(GetMemberCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
             var member = await _memberRepository.GetByIdAsync(command.Id, readOnly: true, cancellationToken);
-            return result.SetResult(member);
+            return new SuccessResult(member);
         }
     }
 }

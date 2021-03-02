@@ -17,14 +17,12 @@ namespace Application.Guilds.Queries.ListGuild
 
         public async Task<IApiResult> Handle(ListGuildCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var pagedGuilds = await _guildRepository.PaginateAsync(
                 top: command.PageSize,
                 page: command.Page,
                 cancellationToken);
 
-            return result.SetResult(pagedGuilds.SetAppliedCommand(command));
+            return new SuccessResult(pagedGuilds.SetAppliedCommand(command));
         }
     }
 }

@@ -17,9 +17,8 @@ namespace Application.Invites.Queries.GetInvite
 
         public async Task<IApiResult> Handle(GetInviteCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
             var invite = await _inviteRepository.GetByIdAsync(command.Id, true, cancellationToken);
-            return result.SetResult(invite);
+            return new SuccessResult(invite);
         }
     }
 }

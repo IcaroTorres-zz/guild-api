@@ -17,8 +17,6 @@ namespace Application.Invites.Queries.ListInvite
 
         public async Task<IApiResult> Handle(ListInviteCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var pagedInvites = await _inviteRepository.PaginateAsync(
                 predicate: x =>
                     (command.MemberId == null || x.MemberId == command.MemberId) &&
@@ -28,7 +26,7 @@ namespace Application.Invites.Queries.ListInvite
                 cancellationToken);
 
             pagedInvites.SetAppliedCommand(command);
-            return result.SetResult(pagedInvites);
+            return new SuccessResult(pagedInvites);
         }
     }
 }

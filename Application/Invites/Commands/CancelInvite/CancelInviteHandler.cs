@@ -17,12 +17,10 @@ namespace Application.Invites.Commands.CancelInvite
 
         public async Task<IApiResult> Handle(CancelInviteCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var invite = await _inviteRepository.GetByIdAsync(command.Id, readOnly: false, cancellationToken);
             invite = _inviteRepository.Update(invite.BeCanceled());
 
-            return result.SetResult(invite);
+            return new SuccessResult(invite);
         }
     }
 }

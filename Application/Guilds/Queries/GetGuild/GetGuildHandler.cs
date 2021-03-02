@@ -17,9 +17,8 @@ namespace Application.Guilds.Queries.GetGuild
 
         public async Task<IApiResult> Handle(GetGuildCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
             var guild = await _guildRepository.GetByIdAsync(command.Id, true, cancellationToken);
-            return result.SetResult(guild);
+            return new SuccessResult(guild);
         }
     }
 }

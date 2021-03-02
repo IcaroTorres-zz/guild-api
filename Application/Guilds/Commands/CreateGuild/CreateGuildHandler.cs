@@ -18,20 +18,18 @@ namespace Application.Guilds.Commands.CreateGuild
 
         public async Task<IApiResult> Handle(CreateGuildCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var leader = await _unit.Members.GetForGuildOperationsAsync(command.LeaderId, cancellationToken);
             var guild = new Guild(command.Name, leader);
 
             await Task.WhenAll(
                 _unit.Guilds.InsertAsync(guild),
                 _unit.Invites.InsertAsync(guild.GetLatestInvite()),
-                _unit.Memberships.InsertAsync(leader.ActiveMembership));
+                _unit.Memberships.InsertAsync(leader.GetActiveMembership()));
 
             _unit.Members.Update(leader);
-            _unit.Memberships.Update(leader.LastFinishedMembership);
+            _unit.Memberships.Update(leader.GetLastFinishedMembership());
 
-            return result.SetCreated(guild, command);
+            return new SuccessCreatedResult(guild, command);
         }
     }
 }

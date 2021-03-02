@@ -17,12 +17,10 @@ namespace Application.Invites.Commands.DenyInvite
 
         public async Task<IApiResult> Handle(DenyInviteCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var invite = await _inviteRepository.GetByIdAsync(command.Id, readOnly: false, cancellationToken);
             invite = _inviteRepository.Update(invite.BeDenied());
 
-            return result.SetResult(invite);
+            return new SuccessResult(invite);
         }
     }
 }

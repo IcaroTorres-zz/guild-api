@@ -18,12 +18,10 @@ namespace Application.Members.Commands.CreateMember
 
         public async Task<IApiResult> Handle(CreateMemberCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var member = new Member(command.Name);
             member = await _memberRepository.InsertAsync(member, cancellationToken);
 
-            return result.SetCreated(member, command);
+            return new SuccessCreatedResult(member, command);
         }
     }
 }

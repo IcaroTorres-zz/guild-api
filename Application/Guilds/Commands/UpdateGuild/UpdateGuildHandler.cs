@@ -20,8 +20,6 @@ namespace Application.Guilds.Commands.UpdateGuild
 
         public async Task<IApiResult> Handle(UpdateGuildCommand command, CancellationToken cancellationToken)
         {
-            var result = new ApiResult();
-
             var guild = await _guildRepository.GetByIdAsync(command.Id, readOnly: false, cancellationToken);
             var newLeader = guild.Members.Single(x => x.Id.Equals(command.LeaderId));
             var previousLeader = guild.GetLeader();
@@ -33,7 +31,7 @@ namespace Application.Guilds.Commands.UpdateGuild
             _memberRepository.Update(newLeader);
             _memberRepository.Update(previousLeader);
 
-            return result.SetResult(guild);
+            return new SuccessResult(guild);
         }
     }
 }
