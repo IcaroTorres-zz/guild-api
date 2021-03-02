@@ -33,8 +33,8 @@ namespace Presentation.Controllers
             _hateoasFactory = hateoasFactory;
         }
 
-        [ProducesResponseType(typeof(Result<MemberResponse>), StatusCodes.Status201Created)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<MemberResponse>), StatusCodes.Status201Created)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPost(Name = "create-member")]
         public async Task<IActionResult> CreateAsync([FromBody] CreateMemberCommand command, CancellationToken cancellationToken)
         {
@@ -43,8 +43,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<MemberResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<MemberResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet("{id}", Name = "get-member")]
         [UseCache(10)]
         public async Task<IActionResult> GetAsync([FromRoute] GetMemberCommand command, CancellationToken cancellationToken)
@@ -52,8 +52,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<PagedResponse<MemberResponse>>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<PagedResponse<MemberResponse>>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet(Name = "get-members")]
         [UseCache(10)]
         public async Task<IActionResult> ListAsync([FromQuery] ListMemberCommand command, CancellationToken cancellationToken)
@@ -61,8 +61,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<MemberResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<MemberResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPatch("{id}/name", Name = "change-member-name")]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] ChangeMemberNameCommand command, CancellationToken cancellationToken)
         {
@@ -70,24 +70,24 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<MemberResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<MemberResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPatch("{id}/promote", Name = "promote-member")]
         public async Task<IActionResult> PromoteAsync([FromRoute] PromoteMemberCommand command, CancellationToken cancellationToken)
         {
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<MemberResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<MemberResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPatch("{id}/demote", Name = "demote-member")]
         public async Task<IActionResult> DemoteAsync([FromRoute] DemoteMemberCommand command, CancellationToken cancellationToken)
         {
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<MemberResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<MemberResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPatch("{id}/leave", Name = "leave-guild")]
         public async Task<IActionResult> LeaveGuildAsync([FromRoute] LeaveGuildCommand command, CancellationToken cancellationToken)
         {

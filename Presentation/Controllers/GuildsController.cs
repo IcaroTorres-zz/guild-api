@@ -27,8 +27,8 @@ namespace Presentation.Controllers
             _mediator = mediator;
         }
 
-        [ProducesResponseType(typeof(Result<GuildResponse>), StatusCodes.Status201Created)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<GuildResponse>), StatusCodes.Status201Created)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPost(Name = "create-guild")]
         public async Task<IActionResult> PostAsync([FromBody] CreateGuildCommand command, CancellationToken cancellationToken)
         {
@@ -37,8 +37,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<GuildResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<GuildResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet("{id}", Name = "get-guild")]
         [UseCache(10)]
         public async Task<IActionResult> GetAsync([FromRoute] GetGuildCommand command, CancellationToken cancellationToken)
@@ -46,8 +46,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<PagedResponse<GuildResponse>>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<PagedResponse<GuildResponse>>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet(Name = "get-guilds")]
         [UseCache(20)]
         public async Task<IActionResult> ListAsync([FromQuery] ListGuildCommand command, CancellationToken cancellationToken)
@@ -55,8 +55,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<GuildResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<GuildResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPut("{id}", Name = "update-guild")]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateGuildCommand command, CancellationToken cancellationToken)
         {

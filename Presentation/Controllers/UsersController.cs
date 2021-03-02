@@ -22,8 +22,8 @@ namespace Presentation.Controllers
             _userService = userService;
         }
 
-        [ProducesResponseType(typeof(Result<UserResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<UserResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [AllowAnonymous]
         [HttpPost("authenticate", Name = "authenticate")]
         public IActionResult Authenticate([FromBody] AuthenticateUserCommand command)
@@ -31,8 +31,8 @@ namespace Presentation.Controllers
             return _userService.Authenticate(command);
         }
 
-        [ProducesResponseType(typeof(Result<UserResponse>), StatusCodes.Status201Created)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<UserResponse>), StatusCodes.Status201Created)]
+        [ProducesErrorResponseType(typeof(Output))]
         [AllowAnonymous]
         [HttpPost("register", Name = "register")]
         public IActionResult Register([FromBody] RegisterUserCommand command)
@@ -42,24 +42,24 @@ namespace Presentation.Controllers
             return _userService.Create(command);
         }
 
-        [ProducesResponseType(typeof(Result<List<UserResponse>>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<List<UserResponse>>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet(Name = "get-users")]
         public IActionResult GetAll()
         {
             return _userService.GetAll();
         }
 
-        [ProducesResponseType(typeof(Result<UserResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<UserResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet("{username}", Name = "get-user")]
         public IActionResult GetByName(string username)
         {
             return _userService.GetByName(username);
         }
 
-        [ProducesResponseType(typeof(Result<UserResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<UserResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPut("{id}", Name = "update-user")]
         public IActionResult Update(Guid id, [FromBody] UpdateUserCommand command)
         {

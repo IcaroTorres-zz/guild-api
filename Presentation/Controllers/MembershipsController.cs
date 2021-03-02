@@ -16,8 +16,8 @@ namespace Presentation.Controllers
     [Route("api/[controller]/v1")]
     public class MembershipsController : ControllerBase
     {
-        [ProducesResponseType(typeof(Result<PagedResponse<MembershipResponse>>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<PagedResponse<MembershipResponse>>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet(Name = "get-memberships")]
         [UseCache(10)]
         public async Task<IActionResult> ListAsync([FromQuery] ListMembershipCommand command, [FromServices] IMediator mediator, CancellationToken cancellationToken)

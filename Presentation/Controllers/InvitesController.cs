@@ -28,8 +28,8 @@ namespace Presentation.Controllers
             _mediator = mediator;
         }
 
-        [ProducesResponseType(typeof(Result<InviteResponse>), StatusCodes.Status201Created)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<InviteResponse>), StatusCodes.Status201Created)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPost(Name = "invite-member")]
         public async Task<IActionResult> InviteMember([FromBody] InviteMemberCommand command, CancellationToken cancellationToken)
         {
@@ -38,8 +38,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<InviteResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<InviteResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet("{id}", Name = "get-invite")]
         [UseCache(20)]
         public async Task<IActionResult> GetAsync([FromRoute] GetInviteCommand command, CancellationToken cancellationToken)
@@ -47,8 +47,8 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<PagedResponse<InviteResponse>>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<PagedResponse<InviteResponse>>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpGet(Name = "get-invites")]
         [UseCache(30)]
         public async Task<IActionResult> ListAsync([FromQuery] ListInviteCommand command, CancellationToken cancellationToken)
@@ -56,24 +56,24 @@ namespace Presentation.Controllers
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<InviteResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<InviteResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPatch("{id}/accept", Name = "accept-invite")]
         public async Task<IActionResult> AcceptAsync([FromRoute] AcceptInviteCommand command, CancellationToken cancellationToken)
         {
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<InviteResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<InviteResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPatch("{id}/deny", Name = "deny-invite")]
         public async Task<IActionResult> DenyAsync([FromRoute] DenyInviteCommand command, CancellationToken cancellationToken)
         {
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [ProducesResponseType(typeof(Result<InviteResponse>), StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(Result))]
+        [ProducesResponseType(typeof(Output<InviteResponse>), StatusCodes.Status200OK)]
+        [ProducesErrorResponseType(typeof(Output))]
         [HttpPatch("{id}/cancel", Name = "cancel-invite")]
         public async Task<IActionResult> CancelAsync([FromRoute] CancelInviteCommand command, CancellationToken cancellationToken)
         {
