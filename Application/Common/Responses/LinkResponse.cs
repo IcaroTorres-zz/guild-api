@@ -3,8 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Application.Common.Responses
 {
-    [Serializable]
-    [ExcludeFromCodeCoverage]
+    [Serializable, ExcludeFromCodeCoverage]
     public class LinkResponse
     {
         public string Method { get; set; }

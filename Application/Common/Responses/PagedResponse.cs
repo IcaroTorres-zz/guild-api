@@ -5,8 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Application.Common.Responses
 {
-    [Serializable]
-    [ExcludeFromCodeCoverage]
+    [Serializable, ExcludeFromCodeCoverage]
     public class PagedResponse<T> where T : class
     {
         public PagedResponse(List<T> items, int count, int pageSize, int page = 1)

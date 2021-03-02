@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Application.Common.Responses
 {
-    [Serializable]
+    [Serializable, ExcludeFromCodeCoverage]
     public class MembershipResponse
     {
         public Guid Id { get; set; }

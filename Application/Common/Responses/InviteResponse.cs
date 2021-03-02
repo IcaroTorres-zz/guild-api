@@ -1,9 +1,10 @@
 ﻿using Domain.Enums;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Application.Common.Responses
 {
-    [Serializable]
+    [Serializable, ExcludeFromCodeCoverage]
     public class InviteResponse
     {
         public Guid Id { get; set; }

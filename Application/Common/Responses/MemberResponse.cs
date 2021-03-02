@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Application.Common.Responses
 {
-    [Serializable]
+    [Serializable, ExcludeFromCodeCoverage]
     public class MemberResponse
     {
         public Guid Id { get; set; }
@@ -11,7 +12,7 @@ namespace Application.Common.Responses
         public MemberGuildResponse Guild { get; set; }
     }
 
-    [Serializable]
+    [Serializable, ExcludeFromCodeCoverage]
     public class MemberGuildResponse
     {
         public Guid Id { get; set; }

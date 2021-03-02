@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Application.Common.Responses
 {
-    [Serializable]
+    [Serializable, ExcludeFromCodeCoverage]
     public class GuildResponse
     {
         public Guid Id { get; set; }
@@ -13,7 +14,7 @@ namespace Application.Common.Responses
         public int MembersCount => Members.Count;
     }
 
-    [Serializable]
+    [Serializable, ExcludeFromCodeCoverage]
     public class GuildMemberResponse
     {
         public Guid Id { get; set; }
