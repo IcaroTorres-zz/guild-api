@@ -18,10 +18,9 @@ namespace Application.Members.Commands.PromoteMember
         public async Task<IApiResult> Handle(PromoteMemberCommand command, CancellationToken cancellationToken)
         {
             var promotionMember = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
-            var guild = promotionMember.Guild;
-            var previousGuildLeader = guild.GetLeader();
+            var previousGuildLeader = promotionMember.Guild.GetLeader();
+            promotionMember = promotionMember.Guild.Promote(promotionMember);
 
-            guild.Promote(promotionMember);
             promotionMember = _memberRepository.Update(promotionMember);
             _memberRepository.Update(previousGuildLeader);
 

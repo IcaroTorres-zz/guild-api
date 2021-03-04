@@ -1,6 +1,6 @@
 ﻿using Application.Common.Abstractions;
 using Application.Common.Results;
-using Domain.Models;
+using Domain.Common;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,26 +10,34 @@ namespace Application.Guilds.Commands.CreateGuild
     public class CreateGuildHandler : IRequestHandler<CreateGuildCommand, IApiResult>
     {
         private readonly IUnitOfWork _unit;
+        private readonly IModelFactory _factory;
 
-        public CreateGuildHandler(IUnitOfWork unit)
+        public CreateGuildHandler(IUnitOfWork unit, IModelFactory factory)
         {
             _unit = unit;
+            _factory = factory;
         }
 
         public async Task<IApiResult> Handle(CreateGuildCommand command, CancellationToken cancellationToken)
         {
             var leader = await _unit.Members.GetForGuildOperationsAsync(command.LeaderId, cancellationToken);
-            var guild = new Guild(command.Name, leader);
+            var previousMembership = leader.GetActiveMembership();
+            var newGuild = _factory.CreateGuild(command.Name, leader);
+            var newInvite = newGuild.GetLatestInvite();
+            var newMembership = leader.GetActiveMembership();
 
-            await Task.WhenAll(
-                _unit.Guilds.InsertAsync(guild),
-                _unit.Invites.InsertAsync(guild.GetLatestInvite()),
-                _unit.Memberships.InsertAsync(leader.GetActiveMembership()));
+            var guildtask = _unit.Guilds.InsertAsync(newGuild);
+            var invitetask = _unit.Invites.InsertAsync(newInvite);
+            var membershiptask = _unit.Memberships.InsertAsync(newMembership);
 
             _unit.Members.Update(leader);
-            _unit.Memberships.Update(leader.GetLastFinishedMembership());
+            _unit.Memberships.Update(previousMembership);
 
-            return new SuccessCreatedResult(guild, command);
+            await invitetask;
+            await membershiptask;
+            newGuild = await guildtask;
+
+            return new SuccessCreatedResult(newGuild, command);
         }
     }
 }

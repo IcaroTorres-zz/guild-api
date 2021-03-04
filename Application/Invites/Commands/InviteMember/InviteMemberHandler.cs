@@ -1,5 +1,6 @@
 ﻿using Application.Common.Abstractions;
 using Application.Common.Results;
+using Domain.Common;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,18 +10,19 @@ namespace Application.Invites.Commands.InviteMember
     public class InviteMemberHandler : IRequestHandler<InviteMemberCommand, IApiResult>
     {
         private readonly IUnitOfWork _unit;
+        private readonly IModelFactory _factory;
 
-        public InviteMemberHandler(IUnitOfWork unit)
+        public InviteMemberHandler(IUnitOfWork unit, IModelFactory factory)
         {
             _unit = unit;
+            _factory = factory;
         }
 
         public async Task<IApiResult> Handle(InviteMemberCommand command, CancellationToken cancellationToken)
         {
             var invitingGuild = await _unit.Guilds.GetForMemberHandlingAsync(command.GuildId, cancellationToken);
             var invitedMember = await _unit.Members.GetForGuildOperationsAsync(command.MemberId, cancellationToken);
-            var invite = invitingGuild.InviteMember(invitedMember).GetLatestInvite();
-
+            var invite = _factory.CreateInvite(invitingGuild, invitedMember);
             invite = await _unit.Invites.InsertAsync(invite, cancellationToken);
 
             return new SuccessCreatedResult(invite, command);
