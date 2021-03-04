@@ -1,5 +1,7 @@
 ﻿using Bogus;
 using Domain.Models;
+using System;
+using Tests.Domain.Models.TestModels;
 
 namespace Tests.Domain.Models.Fakes
 {
@@ -7,19 +9,16 @@ namespace Tests.Domain.Models.Fakes
     {
         public static Faker<Member> WithoutGuild(string name = null)
         {
-            return new Faker<Member>().CustomInstantiator(x => new Member(name ?? x.Name.FullName()));
+            return new Faker<Member>().CustomInstantiator(x => new TestMember
+            {
+                Name = name ?? x.Name.FullName(),
+                Id = Guid.NewGuid()
+            });
         }
 
-        public static Faker<Member> GuildMember(Guild guild = null, string name = null)
+        public static Faker<Member> GuildMember()
         {
-            return new Faker<Member>().CustomInstantiator(_ =>
-            {
-                var member = WithoutGuild(name).Generate();
-                guild ??= GuildFake.Valid().Generate();
-                guild.InviteMember(member);
-                guild.GetLatestInvite().BeAccepted();
-                return member;
-            });
+            return new Faker<Member>().CustomInstantiator(_ => GuildFake.Valid().Generate().GetVice());
         }
 
         public static Faker<Member> GuildLeader()
