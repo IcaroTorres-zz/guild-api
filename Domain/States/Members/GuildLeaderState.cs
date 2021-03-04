@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Models;
 
 namespace Domain.States.Members
@@ -11,10 +12,10 @@ namespace Domain.States.Members
 
         internal override bool IsGuildLeader => true;
 
-        internal override Member Join(Guild guild)
+        internal override Membership Join(Guild guild, IModelFactory factory)
         {
             Leave();
-            return base.Join(guild);
+            return base.Join(guild, factory);
         }
 
         internal override Member Leave()

@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using Domain.Common;
+using Domain.Enums;
 using Domain.Models;
 
 namespace Domain.States.Invites
@@ -11,10 +12,11 @@ namespace Domain.States.Invites
             Status = InviteStatuses.Pending;
         }
 
-        internal override Invite BeAccepted()
+        internal override Membership BeAccepted(IModelFactory factory)
         {
-            Context.Member.State.Join(Context.Guild);
-            return Context.ChangeState(new ClosedInviteState(Context, InviteStatuses.Accepted));
+            var membership = Context.Member.State.Join(Context.Guild, factory);
+            Context.ChangeState(new ClosedInviteState(Context, InviteStatuses.Accepted));
+            return membership;
         }
 
         internal override Invite BeDenied()

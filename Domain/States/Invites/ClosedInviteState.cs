@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using Domain.Common;
+using Domain.Enums;
 using Domain.Models;
 
 namespace Domain.States.Invites
@@ -11,9 +12,9 @@ namespace Domain.States.Invites
             Status = status;
         }
 
-        internal override Invite BeAccepted()
+        internal override Membership BeAccepted(IModelFactory factory)
         {
-            return Context;
+            return Membership.Null;
         }
 
         internal override Invite BeDenied()

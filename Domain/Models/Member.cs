@@ -1,38 +1,14 @@
 using Domain.Common;
 using Domain.Nulls;
 using Domain.States.Members;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 
 namespace Domain.Models
 {
-    public class Member : EntityModel<Member>, INotifyPropertyChanged, INotifyCollectionChanged
+    public class Member : EntityModel<Member>
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        private string _name;
-        private bool _isGuildLeader;
-        private Guid? _guildId;
-        private Guild _guild;
-        private MemberState _state;
-
-        [JsonConstructor]
-        protected Member()
-        {
-            Memberships = new HashSet<Membership>();
-        }
-
-        public Member(string name) : this()
-        {
-            Id = Guid.NewGuid();
-            Name = name;
-        }
-
         public static readonly NullMember Null = new NullMember();
 
         internal virtual Member ChangeState(MemberState state)
@@ -52,82 +28,47 @@ namespace Domain.Models
             return this;
         }
 
-        internal virtual Member ActivateMembership(Guild guild)
+        internal virtual Membership ActivateMembership(Guild guild, IModelFactory factory)
         {
-            var membership = new Membership(guild, this);
-            if (!(guild is INullObject) && Memberships.Add(membership))
+            if (!(guild is INullObject))
             {
-                CollectionChanged?.Invoke(Memberships, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, membership));
+                var membership = factory.CreateMembership(guild, this);
+                Memberships.Add(membership);
+                return membership;
             }
-            return this;
+            return Membership.Null;
         }
 
-        public virtual string Name
-        {
-            get => _name;
-            protected set
-            {
-                if (_name != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
-                    _name = value;
-                }
-            }
-        }
+        public virtual string Name { get; protected internal set; }
+        public virtual bool IsGuildLeader { get; protected set; }
+        public virtual Guid? GuildId { get; protected set; }
 
-        public virtual bool IsGuildLeader
-        {
-            get => _isGuildLeader;
-            protected set
-            {
-                if (_isGuildLeader != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsGuildLeader)));
-                    _isGuildLeader = value;
-                }
-            }
-        }
+        private Guild _guild;
+        public virtual Guild Guild { get => _guild ??= Guild.Null; protected set { _guild = value; } }
 
-        public virtual Guid? GuildId
-        {
-            get => _guildId;
-            protected set
-            {
-                if (_guildId != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
-                    _guildId = value;
-                }
-            }
-        }
-
-        public virtual Guild Guild
-        {
-            get => _guild ??= Guild.Null;
-            protected set
-            {
-                if (_guild != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
-                    _guild = value;
-                }
-            }
-        }
-
+        private MemberState _state;
         internal virtual MemberState State
         {
             get => _state ??= MemberState.NewState(this);
             set => _state = value;
         }
 
-        public virtual HashSet<Membership> Memberships { get; protected set; }
+        public virtual HashSet<Membership> Memberships { get; protected set; } = new HashSet<Membership>();
 
         private static bool activeMembershipFilter(Membership x) => x.ModifiedDate == null && x != Membership.Null;
-        public Membership GetActiveMembership() => Memberships.SingleOrDefault(activeMembershipFilter) ?? Membership.Null;
+        public Membership GetActiveMembership()
+        {
+            var activeMembership = Memberships.SingleOrDefault(activeMembershipFilter);
+            return activeMembership ?? Membership.Null;
+        }
 
         private static bool finishedMembershipFilter(Membership x) => x.ModifiedDate != null && x != Membership.Null;
-        public Membership GetLastFinishedMembership() => Memberships.Where(finishedMembershipFilter)
-                                                                    .OrderByDescending(x => x.ModifiedDate)
-                                                                    .FirstOrDefault() ?? Membership.Null;
+        public Membership GetLastFinishedMembership()
+        {
+            var closedMemberships = Memberships.Where(finishedMembershipFilter);
+            closedMemberships = closedMemberships.OrderByDescending(x => x.ModifiedDate);
+            var latest = closedMemberships.FirstOrDefault();
+            return latest ?? Membership.Null;
+        }
     }
 }
