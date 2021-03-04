@@ -27,7 +27,7 @@ namespace Application.Guilds.Commands.UpdateGuild
             guild.ChangeName(command.Name)
                  .Promote(newLeader);
 
-            _guildRepository.Update(guild);
+            guild = _guildRepository.Update(guild);
             _memberRepository.Update(newLeader);
             _memberRepository.Update(previousLeader);
 

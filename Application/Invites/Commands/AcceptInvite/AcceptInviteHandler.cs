@@ -1,5 +1,6 @@
 ﻿using Application.Common.Abstractions;
 using Application.Common.Results;
+using Domain.Common;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,17 +10,22 @@ namespace Application.Invites.Commands.AcceptInvite
     public class AcceptInviteHandler : IRequestHandler<AcceptInviteCommand, IApiResult>
     {
         private readonly IUnitOfWork _unit;
+        private readonly IModelFactory _factory;
 
-        public AcceptInviteHandler(IUnitOfWork unit)
+        public AcceptInviteHandler(IUnitOfWork unit, IModelFactory factory)
         {
             _unit = unit;
+            _factory = factory;
         }
 
         public async Task<IApiResult> Handle(AcceptInviteCommand command, CancellationToken cancellationToken)
         {
             var invite = await _unit.Invites.GetForAcceptOperationAsync(command.Id, cancellationToken);
+            var previousGuildMembership = invite.Member.GetActiveMembership();
+            var membership = invite.BeAccepted(_factory);
+            var newMembershipTask = _unit.Memberships.InsertAsync(membership);
 
-            foreach (var inviteToCancel in invite.BeAccepted().GetInvitesToCancel())
+            foreach (var inviteToCancel in invite.GetInvitesToCancel())
             {
                 inviteToCancel.BeCanceled();
                 _unit.Invites.Update(inviteToCancel);
@@ -27,9 +33,9 @@ namespace Application.Invites.Commands.AcceptInvite
 
             invite = _unit.Invites.Update(invite);
             _unit.Members.Update(invite.Member);
-            _unit.Memberships.Update(invite.Member.GetLastFinishedMembership());
-            await _unit.Memberships.InsertAsync(invite.Member.GetActiveMembership());
+            _unit.Memberships.Update(previousGuildMembership);
 
+            await newMembershipTask;
             return new SuccessResult(invite);
         }
     }
