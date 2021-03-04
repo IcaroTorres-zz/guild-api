@@ -14,13 +14,14 @@ namespace Domain.States.Members
         internal virtual Guild Guild { get; set; }
         internal virtual bool IsGuildLeader => false;
 
-        internal virtual Member Join(Guild guild)
+        internal virtual Membership Join(Guild guild, IModelFactory factory)
         {
-            Context.ActivateMembership(guild);
+            var membership = Context.ActivateMembership(guild, factory);
             guild.AddMember(Context);
             var nextState = guild.Members.Count == 1 ? new GuildLeaderState(Context, guild) as MemberState
                                                      : new GuildMemberState(Context, guild);
-            return Context.ChangeState(nextState);
+            Context.ChangeState(nextState);
+            return membership;
         }
 
         internal abstract Member Leave();

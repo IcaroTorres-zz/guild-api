@@ -13,13 +13,13 @@ namespace Domain.Nulls
             return this;
         }
 
-        internal override Member ActivateMembership(Guild guild)
+        internal override Membership ActivateMembership(Guild guild, IModelFactory factory)
         {
-            return this;
+            return Membership.Null;
         }
 
         public override Guid Id { get => Guid.Empty; protected internal set { } }
-        public override string Name { get => string.Empty; protected set { } }
+        public override string Name { get => string.Empty; protected internal set { } }
         public override bool IsGuildLeader { get => false; protected set { } }
         public override Guid? GuildId { get => null; protected set { } }
         public override DateTime CreatedDate { get => default; protected internal set { } }

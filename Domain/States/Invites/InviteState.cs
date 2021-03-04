@@ -13,7 +13,7 @@ namespace Domain.States.Invites
 
         internal Invite Context { get; set; }
         internal InviteStatuses Status { get; set; }
-        internal abstract Invite BeAccepted();
+        internal abstract Membership BeAccepted(IModelFactory factory);
         internal abstract Invite BeDenied();
         internal abstract Invite BeCanceled();
 

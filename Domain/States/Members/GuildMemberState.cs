@@ -1,3 +1,4 @@
+using Domain.Common;
 using Domain.Models;
 
 namespace Domain.States.Members
@@ -9,10 +10,10 @@ namespace Domain.States.Members
             Guild = guild;
         }
 
-        internal override Member Join(Guild guild)
+        internal override Membership Join(Guild guild, IModelFactory factory)
         {
             Leave();
-            return base.Join(guild);
+            return base.Join(guild, factory);
         }
 
         internal override Member Leave()

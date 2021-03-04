@@ -13,33 +13,33 @@ namespace Domain.Nulls
             return this;
         }
 
-        public override Guild InviteMember(Member member)
+        public override Invite InviteMember(Member member, IModelFactory factory)
         {
-            return this;
+            return Invite.Null;
         }
 
-        public override Guild RemoveMember(Member member)
+        public override Member RemoveMember(Member member)
         {
-            return this;
+            return Member.Null;
         }
 
-        internal override Guild AddMember(Member member)
+        internal override Member AddMember(Member member)
         {
-            return this;
+            return Member.Null;
         }
 
-        public override Guild Promote(Member member)
+        public override Member Promote(Member member)
         {
-            return this;
+            return Member.Null;
         }
 
-        public override Guild DemoteLeader()
+        public override Member DemoteLeader()
         {
-            return this;
+            return Member.Null;
         }
 
         public override Guid Id { get => Guid.Empty; protected internal set { } }
-        public override string Name { get => string.Empty; protected set { } }
+        public override string Name { get => string.Empty; protected internal set { } }
         public override DateTime CreatedDate { get => default; protected internal set { } }
         public override DateTime? ModifiedDate { get => default; protected internal set { } }
     }
