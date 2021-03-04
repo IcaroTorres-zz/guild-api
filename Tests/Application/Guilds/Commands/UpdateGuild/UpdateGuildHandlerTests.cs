@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -42,7 +43,7 @@ namespace Tests.Application.Guilds.Commands.UpdateGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Guild>();
+            result.Data.Should().NotBeNull().And.BeOfType<TestGuild>();
             result.Data.As<Guild>().Name.Should().Be(expectedGuild.Name);
             result.Data.As<Guild>().Id.Should().Be(expectedGuild.Id);
             result.Data.As<Guild>().GetLeader().Id.Should().Be(expectedLeader.Id);

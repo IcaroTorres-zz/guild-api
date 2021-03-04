@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -18,9 +19,10 @@ namespace Tests.Application.Members.Commands.CreateMember
         {
             // arrange
             var command = CreateMemberCommandFake.Valid().Generate();
-            var member = MemberFake.WithoutGuild().Generate();
-            var repository = MemberRepositoryMockBuilder.Create().Insert(command.Name, member).Build();
-            var sut = new CreateMemberHandler(repository);
+            var expectedMember = MemberFake.WithoutGuild(command.Name).Generate();
+            var repository = MemberRepositoryMockBuilder.Create().Insert(command.Name, expectedMember).Build();
+            var factory = ModelFactoryMockBuilder.Create().CreateMember(command.Name, expectedMember).Build();
+            var sut = new CreateMemberHandler(repository, factory);
 
             // act
             var response = await sut.Handle(command, default);
@@ -30,9 +32,10 @@ namespace Tests.Application.Members.Commands.CreateMember
             response.Success.Should().BeTrue();
             response.Errors.Should().BeEmpty();
             response.As<SuccessCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
-            response.Data.Should().NotBeNull().And.BeOfType<Member>();
-            response.Data.As<Member>().Id.Should().Be(member.Id);
-            response.Data.As<Member>().Name.Should().Be(member.Name);
+            response.Data.Should().NotBeNull().And.BeOfType<TestMember>();
+            response.Data.As<Member>().Should().Be(expectedMember);
+            //response.Data.As<Member>().Id.Should().Be(expectedMember.Id);
+            //response.Data.As<Member>().Name.Should().Be(expectedMember.Name);
         }
     }
 }

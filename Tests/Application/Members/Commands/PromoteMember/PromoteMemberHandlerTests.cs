@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -36,7 +37,7 @@ namespace Tests.Application.Members.Commands.PromoteMember
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Member>();
+            result.Data.Should().NotBeNull().And.BeOfType<TestMember>();
             result.Data.As<Member>().Id.Should().Be(promotedMember.Id);
             result.Data.As<Member>().IsGuildLeader.Should().BeTrue()
                 .And.Be(!expectedDemotedMember.IsGuildLeader);

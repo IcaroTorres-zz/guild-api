@@ -1,10 +1,10 @@
 ﻿using Application.Common.Results;
 using Application.Guilds.Commands.CreateGuild;
-using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -18,7 +18,8 @@ namespace Tests.Application.Guilds.Commands.CreateGuild
         {
             // arrange
             var leader = MemberFake.GuildLeader().Generate();
-            var command = CreateGuildCommandFake.Valid(leader.Id);
+            var command = CreateGuildCommandFake.Valid(leader.Id).Generate();
+            var expectedNewGuild = leader.Guild;
             var unit = UnitOfWorkMockBuilder.Create()
                 .SetupMembers(
                     x => x.GetForGuildOperationsSuccess(leader.Id, leader)
@@ -31,7 +32,8 @@ namespace Tests.Application.Guilds.Commands.CreateGuild
                 .SetupGuilds(x => x.Insert(output: leader.Guild).Build())
                 .SetupInvites(x => x.Insert(output: leader.Guild.GetLatestInvite()).Build())
                 .Build();
-            var sut = new CreateGuildHandler(unit);
+            var factory = ModelFactoryMockBuilder.Create().CreateGuild(command.Name, leader, expectedNewGuild).Build();
+            var sut = new CreateGuildHandler(unit, factory);
 
             // act
             var result = await sut.Handle(command, default);
@@ -41,9 +43,9 @@ namespace Tests.Application.Guilds.Commands.CreateGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
-            result.Data.Should().NotBeNull().And.BeOfType<Guild>();
-            result.Data.As<Guild>().Id.Should().Be(leader.Guild.Id);
-            result.Data.As<Guild>().Name.Should().Be(leader.Guild.Name);
+            result.Data.Should().NotBeNull().And.BeOfType<TestGuild>().And.Be(expectedNewGuild);
+            //result.Data.As<Guild>().Id.Should().Be(leader.Guild.Id);
+            //result.Data.As<Guild>().Name.Should().Be(leader.Guild.Name);
         }
     }
 }
