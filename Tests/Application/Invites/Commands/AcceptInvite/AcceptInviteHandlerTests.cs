@@ -5,9 +5,9 @@ using Domain.Models;
 using Domain.Nulls;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using System;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -20,14 +20,14 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
         public async Task Handle_Should_Succeed_With_ValidCommandAsync()
         {
             // arrange
-            var canceledCount = new Random().Next(1, 5);
-            var acceptedInvite = InviteFake.ValidToAcceptWithInvitesToCancel(canceledCount).Generate();
+            const int canceledCount = 2;
+            var invitedMember = MemberFake.GuildMember().Generate();
+            var invitingGuild = GuildFake.Valid().Generate();
+            var acceptedInvite = InviteFake.ValidToAcceptWithInvitesToCancel(canceledCount, invitingGuild, invitedMember).Generate();
             var command = PatchInviteCommandFake.AcceptValid(acceptedInvite.Id).Generate();
             var canceledInvites = acceptedInvite.GetInvitesToCancel();
 
-            var invitedMember = acceptedInvite.Member;
-            var invitingGuild = acceptedInvite.Guild;
-            var startedMembership = MembershipFake.Active().Generate();
+            var startedMembership = MembershipFake.Active(invitingGuild, invitedMember).Generate();
             var finishedMembership = invitedMember.GetActiveMembership();
 
             var unit = UnitOfWorkMockBuilder.Create()
@@ -42,7 +42,8 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
 
                     return x.Build();
                 }).Build();
-            var sut = new AcceptInviteHandler(unit);
+            var factory = ModelFactoryMockBuilder.Create().CreateMembership(invitingGuild, invitedMember, startedMembership).Build();
+            var sut = new AcceptInviteHandler(unit, factory);
 
             // act
             var result = await sut.Handle(command, default);
@@ -52,7 +53,7 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Invite>();
+            result.Data.Should().NotBeNull().And.BeOfType<TestInvite>();
             result.Data.As<Invite>().Id.Should().Be(acceptedInvite.Id);
             result.Data.As<Invite>().Status.Should().Be(InviteStatuses.Accepted)
                 .And.Be(acceptedInvite.Status);

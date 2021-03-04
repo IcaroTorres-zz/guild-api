@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -34,7 +35,7 @@ namespace Tests.Application.Invites.Commands.CancelInvite
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Invite>();
+            result.Data.Should().NotBeNull().And.BeOfType<TestInvite>();
             result.Data.As<Invite>().Id.Should().Be(canceledInvite.Id);
             result.Data.As<Invite>().Status.Should().Be(InviteStatuses.Canceled)
                 .And.Be(canceledInvite.Status);

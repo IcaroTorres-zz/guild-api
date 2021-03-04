@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -17,14 +18,14 @@ namespace Tests.Application.Members.Commands.DemoteMember
         public async Task Handle_Should_Succeed_With_ValidCommand()
         {
             // arrange
-            var guild = GuildFake.Valid(membersCount: 1).Generate();
-            var demotedMember = guild.GetLeader();
-            var expectedLeader = guild.GetVice();
-            var command = PatchMemberCommandFake.DemoteMemberValid(demotedMember.Id).Generate();
+            var guild = GuildFake.Valid().Generate();
+            var demotedLeader = guild.GetLeader();
+            var expectedNewLeader = guild.GetVice();
+            var command = PatchMemberCommandFake.DemoteMemberValid(demotedLeader.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
-                .GetForGuildOperationsSuccess(command.Id, demotedMember)
-                .Update(demotedMember, demotedMember)
-                .Update(expectedLeader, expectedLeader)
+                .GetForGuildOperationsSuccess(command.Id, demotedLeader)
+                .Update(demotedLeader, demotedLeader)
+                .Update(expectedNewLeader, expectedNewLeader)
                 .Build();
             var sut = new DemoteMemberHandler(memberRepository);
 
@@ -36,10 +37,10 @@ namespace Tests.Application.Members.Commands.DemoteMember
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<Member>();
-            result.Data.As<Member>().Id.Should().Be(demotedMember.Id);
+            result.Data.Should().NotBeNull().And.BeOfType<TestMember>();
+            result.Data.As<Member>().Id.Should().Be(demotedLeader.Id);
             result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
-                .And.Be(!expectedLeader.IsGuildLeader);
+                .And.Be(!expectedNewLeader.IsGuildLeader);
             result.Data.As<Member>().Guild.Should().NotBeNull();
             result.Data.As<Member>().Guild.Id.Should().Be(guild.Id);
         }
