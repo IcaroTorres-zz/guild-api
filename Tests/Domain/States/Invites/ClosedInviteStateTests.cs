@@ -3,6 +3,7 @@ using Domain.Nulls;
 using Domain.States.Invites;
 using FluentAssertions;
 using Tests.Domain.Models.Fakes;
+using Tests.Helpers;
 using Xunit;
 
 namespace Tests.Domain.States.Invites
@@ -30,10 +31,11 @@ namespace Tests.Domain.States.Invites
             // arrange
             const InviteStatuses initStatus = InviteStatuses.Denied;
             var invite = InviteFake.ValidWithStatus(initStatus).Generate();
-            var sut = new ClosedInviteState(invite, initStatus);
+            var sut = invite.State;
+            var factory = TestModelFactoryHelper.Factory;
 
             // act
-            sut.BeAccepted();
+            sut.BeAccepted(factory);
 
             // assert
             sut.Status.Should().Be(initStatus).And.Be(invite.Status);
@@ -49,7 +51,7 @@ namespace Tests.Domain.States.Invites
             // arrange
             const InviteStatuses initStatus = InviteStatuses.Denied;
             var invite = InviteFake.ValidWithStatus(initStatus).Generate();
-            var sut = new ClosedInviteState(invite, initStatus);
+            var sut = invite.State;
 
             // act
             sut.BeDenied();
@@ -68,7 +70,7 @@ namespace Tests.Domain.States.Invites
             // arrange
             const InviteStatuses initStatus = InviteStatuses.Denied;
             var invite = InviteFake.ValidWithStatus(initStatus).Generate();
-            var sut = new ClosedInviteState(invite, initStatus);
+            var sut = invite.State;
 
             // act
             sut.BeCanceled();
