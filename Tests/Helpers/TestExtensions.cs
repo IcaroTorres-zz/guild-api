@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Events;
 using FluentValidation.Results;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -38,43 +39,41 @@ namespace Tests.Helpers
 
         public static void AssertCollectionChanged<T>(this IMonitor<T> monitor, params IEnumerable[] collections)
         {
-            var collectionItemTypes = collections.Select(GetGenericType).ToArray();
-            var collectionsChanged = monitor.GetChangedCollections();
-            var intersec = collectionsChanged.Intersect(collectionItemTypes);
-
-            intersec.Should().BeEquivalentTo(collectionItemTypes);
+            var expectedTypesOfItemsChanged = collections.Select(GetGenericType).ToArray();
+            var typesOfItemsChanged = monitor.GetGenericTypesFromCollectionsChanged();
+            expectedTypesOfItemsChanged.Should().OnlyContain(
+                given => typesOfItemsChanged.Any(
+                    gotten => given.IsAssignableFrom(gotten)));
         }
 
         public static void AssertCollectionNotChanged<T>(this IMonitor<T> monitor, params IEnumerable[] collections)
         {
-            var collectionItemTypes = collections.Select(GetGenericType).ToArray();
-            var collectionsChanged = monitor.GetChangedCollections();
-            var except = collectionsChanged.Except(collectionItemTypes);
-
-            except.Should().BeEquivalentTo(collectionsChanged);
+            var expectedTypesOfItemsUnchanged = collections.Select(GetGenericType).ToArray();
+            var typesOfItemsChanged = monitor.GetGenericTypesFromCollectionsChanged();
+            expectedTypesOfItemsUnchanged.Should().NotContain(
+                given => typesOfItemsChanged.Any(
+                    gotten => given.IsAssignableFrom(gotten)));
         }
 
-        public static string[] GetChangedCollections<T>(this IMonitor<T> monitor)
+        public static Type[] GetGenericTypesFromCollectionsChanged<T>(this IMonitor<T> monitor)
         {
-            var parameters = monitor.OccurredEvents.SelectMany(e => e.Parameters).ToArray();
-            var collectionParameters = parameters.OfType<NotifyCollectionChangedEventArgs>().ToArray();
-            var chengedElements = collectionParameters
+            var parameters = monitor.OccurredEvents.SelectMany(e => e.Parameters);//.ToArray();
+            var collectionParameters = parameters.OfType<NotifyCollectionChangedEventArgs>();//.ToArray();
+            return collectionParameters
                 .SelectMany(arg =>
                 {
                     var elements = new List<object>();
                     if (arg.OldItems != null) elements.AddRange(arg.OldItems.Cast<object>());
                     if (arg.NewItems != null) elements.AddRange(arg.NewItems.Cast<object>());
-                    return elements;
+                    return elements.Select(e => e.GetType()).Distinct();
                 }).ToArray();
-            var changedTypes = chengedElements.Select(e => e.GetType().Name).Distinct().ToArray();
-            return changedTypes;
         }
 
-        private static string GetGenericType(IEnumerable collection)
+        private static Type GetGenericType(IEnumerable collection)
         {
             var type = collection.GetType();
             var generics = type.GetGenericArguments();
-            return generics.FirstOrDefault()?.Name;
+            return generics.FirstOrDefault();
         }
 
         public static void AssertErrorsCount(this ValidationResult result, int count)
