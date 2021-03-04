@@ -26,7 +26,7 @@ namespace Tests.Domain.States.Memberships
         {
             // arrange
             var membership = MembershipFake.Finished().Generate();
-            var sut = new ClosedMembershipState(membership, membership.ModifiedDate.Value);
+            var sut = membership.State;
 
             // act
             sut.Finish();

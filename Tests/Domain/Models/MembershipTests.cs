@@ -1,6 +1,6 @@
-﻿using Domain.Models;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Tests.Domain.Models.Fakes;
+using Tests.Domain.Models.TestModels;
 using Xunit;
 
 namespace Tests.Domain.Models
@@ -8,25 +8,6 @@ namespace Tests.Domain.Models
     [Trait("Domain", "Model")]
     public class MembershipTests
     {
-        [Fact]
-        public void Constructor_WithGuildAndMember_Should_CreateWith_AllProperties_Except_ModifiedDate()
-        {
-            // arrange
-            var guild = GuildFake.Valid().Generate();
-            var member = MemberFake.WithoutGuild().Generate();
-
-            // act
-            var sut = new Membership(guild, member);
-
-            // assert
-            sut.Should().NotBeNull().And.BeOfType<Membership>();
-            sut.Id.Should().NotBeEmpty();
-            sut.ModifiedDate.Should().BeNull();
-            sut.Guild.Should().Be(guild);
-            sut.GuildId.Should().NotBeEmpty().And.Be(guild.Id);
-            sut.Member.Should().Be(member);
-            sut.MemberId.Should().NotBeEmpty().And.Be(member.Id);
-        }
 
         [Fact]
         public void GetDuration_FinishedMembership_Should_Return_FixedDuration()
@@ -39,7 +20,7 @@ namespace Tests.Domain.Models
             var result = sut.GetDuration();
 
             // assert
-            sut.Should().NotBeNull().And.BeOfType<Membership>();
+            sut.Should().NotBeNull().And.BeOfType<TestMembership>();
             sut.ModifiedDate.Should().NotBeNull();
             result.Should().Be(expectedDuration);
         }
@@ -55,7 +36,7 @@ namespace Tests.Domain.Models
             var result2 = sut.GetDuration();
 
             // assert
-            sut.Should().NotBeNull().And.BeOfType<Membership>();
+            sut.Should().NotBeNull().And.BeOfType<TestMembership>();
             sut.ModifiedDate.Should().BeNull();
             result1.Should().BeLessThan(result2);
         }
