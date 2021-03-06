@@ -18,12 +18,11 @@ namespace Domain.States.Members
             return base.Join(guild, factory);
         }
 
-        internal override Member Leave()
+        internal override Membership Leave()
         {
             Context.Guild.GetVice().State.BePromoted();
             BeDemoted();
-            Context.GetActiveMembership().State.Finish();
-            return Context.ChangeState(new NoGuildMemberState(Context));
+            return base.Leave();
         }
 
         internal override Member BePromoted()

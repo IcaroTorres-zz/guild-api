@@ -16,12 +16,6 @@ namespace Domain.States.Members
             return base.Join(guild, factory);
         }
 
-        internal override Member Leave()
-        {
-            Context.GetActiveMembership().State.Finish();
-            return Context.ChangeState(new NoGuildMemberState(Context));
-        }
-
         internal override Member BePromoted()
         {
             return Context.ChangeState(new GuildLeaderState(Context, Context.Guild));

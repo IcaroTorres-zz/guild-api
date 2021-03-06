@@ -24,7 +24,12 @@ namespace Domain.States.Members
             return membership;
         }
 
-        internal abstract Member Leave();
+        internal virtual Membership Leave()
+        {
+            var finishedMembership = Context.GetActiveMembership().State.Finish();
+            Context.ChangeState(new NoGuildMemberState(Context));
+            return finishedMembership;
+        }
 
         internal abstract Member BePromoted();
 
