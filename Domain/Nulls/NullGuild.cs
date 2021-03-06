@@ -18,9 +18,9 @@ namespace Domain.Nulls
             return Invite.Null;
         }
 
-        public override Member RemoveMember(Member member)
+        public override Membership RemoveMember(Member member)
         {
-            return Member.Null;
+            return Membership.Null;
         }
 
         internal override Member AddMember(Member member)
