@@ -20,8 +20,8 @@ namespace Application.Invites.Commands.InviteMember
 
         public async Task<IApiResult> Handle(InviteMemberCommand command, CancellationToken cancellationToken)
         {
-            var invitingGuild = await _unit.Guilds.GetForMemberHandlingAsync(command.GuildId, cancellationToken);
-            var invitedMember = await _unit.Members.GetForGuildOperationsAsync(command.MemberId, cancellationToken);
+            var invitingGuild = await _unit.Guilds.GetByIdAsync(command.GuildId, true, cancellationToken);
+            var invitedMember = await _unit.Members.GetByIdAsync(command.MemberId, true, cancellationToken);
             var invite = _factory.CreateInvite(invitingGuild, invitedMember);
             invite = await _unit.Invites.InsertAsync(invite, cancellationToken);
 
