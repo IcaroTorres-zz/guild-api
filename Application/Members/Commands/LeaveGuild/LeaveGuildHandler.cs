@@ -21,8 +21,7 @@ namespace Application.Members.Commands.LeaveGuild
         {
             var leavingMember = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
             var vicePromotedWithLeaving = leavingMember.Guild.GetVice();
-            var membershipFinishedWithLeaving = leavingMember.GetActiveMembership();
-            leavingMember.Guild.RemoveMember(leavingMember);
+            var membershipFinishedWithLeaving = leavingMember.Guild.RemoveMember(leavingMember);
 
             leavingMember = _memberRepository.Update(leavingMember);
             _memberRepository.Update(vicePromotedWithLeaving);

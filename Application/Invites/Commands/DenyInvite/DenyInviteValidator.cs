@@ -22,7 +22,7 @@ namespace Application.Invites.Commands.DenyInvite
                         return !(invite is INullObject);
                     })
                     .WithMessage(x => $"Record not found for invite with given id {x.Id}.")
-                    .WithName(x => nameof(x.Id))
+                    .WithName(nameof(Invite.Id))
                     .WithErrorCode(nameof(HttpStatusCode.NotFound))
 
                     .Must(_ => invite.Status == InviteStatuses.Pending)
