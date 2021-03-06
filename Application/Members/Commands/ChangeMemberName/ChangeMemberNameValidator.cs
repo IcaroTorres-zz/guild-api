@@ -1,4 +1,5 @@
 ﻿using Application.Common.Abstractions;
+using Domain.Models;
 using FluentValidation;
 using System;
 using System.Net;
@@ -17,7 +18,7 @@ namespace Application.Members.Commands.ChangeMemberName
                 RuleFor(x => x)
                     .MustAsync((x, ct) => memberRepository.ExistsWithIdAsync(x.Id, ct))
                     .WithMessage(x => $"Record not found for member with given id {x.Id}.")
-                    .WithName(x => nameof(x.Id))
+                    .WithName(nameof(Member.Id))
                     .WithErrorCode(nameof(HttpStatusCode.NotFound))
 
                     .MustAsync((x, ct) => memberRepository.CanChangeNameAsync(x.Id, x.Name, ct))

@@ -1,4 +1,5 @@
 ﻿using Application.Common.Abstractions;
+using Domain.Models;
 using FluentValidation;
 using System;
 using System.Net;
@@ -17,7 +18,7 @@ namespace Application.Guilds.Commands.CreateGuild
                 RuleFor(x => x)
                     .MustAsync(async (x, ct) => !await guildRepository.ExistsWithNameAsync(x.Name, ct))
                     .WithMessage(x => $"Record already exists for guild with given name {x.Name}.")
-                    .WithName(x => nameof(x.Name))
+                    .WithName(nameof(Member.Name))
                     .WithErrorCode(nameof(HttpStatusCode.Conflict))
 
                     .MustAsync((x, ct) => memberRepository.ExistsWithIdAsync(x.LeaderId, ct))
