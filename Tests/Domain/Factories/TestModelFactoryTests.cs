@@ -40,7 +40,7 @@ namespace Tests.Domain.Factories
         public void CreateInvite_WithGuildAndMember_Should_Create_Pending_With_AllProperties()
         {
             // arrange
-            var guild = GuildFake.Valid().Generate();
+            var guild = GuildFake.Complete().Generate();
             var member = MemberFake.WithoutGuild().Generate();
             const InviteStatuses expectedStatus = InviteStatuses.Pending;
 
@@ -61,7 +61,7 @@ namespace Tests.Domain.Factories
         public void CreateMembership_WithGuildAndMember_Should_CreateWith_AllProperties_Except_ModifiedDate()
         {
             // arrange
-            var guild = GuildFake.Valid().Generate();
+            var guild = GuildFake.Complete().Generate();
             var member = MemberFake.WithoutGuild().Generate();
 
             // act

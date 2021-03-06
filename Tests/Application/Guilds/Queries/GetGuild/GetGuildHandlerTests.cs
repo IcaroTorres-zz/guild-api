@@ -19,7 +19,7 @@ namespace Tests.Application.Guilds.Queries.GetGuild
         {
             // arrange
             const int expectedMembersCount = 3;
-            var expectedGuild = GuildFake.Valid(membersCount: expectedMembersCount).Generate();
+            var expectedGuild = GuildFake.Complete(membersCount: expectedMembersCount).Generate();
             var command = GetGuildCommandFake.Valid(expectedGuild.Id).Generate();
             var repository = GuildRepositoryMockBuilder.Create()
                 .GetByIdSuccess(input: command.Id, output: expectedGuild).Build();

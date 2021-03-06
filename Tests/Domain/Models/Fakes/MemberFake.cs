@@ -18,12 +18,12 @@ namespace Tests.Domain.Models.Fakes
 
         public static Faker<Member> GuildMember()
         {
-            return new Faker<Member>().CustomInstantiator(_ => GuildFake.Valid().Generate().GetVice());
+            return new Faker<Member>().CustomInstantiator(_ => GuildFake.Complete().Generate().GetVice());
         }
 
         public static Faker<Member> GuildLeader()
         {
-            return new Faker<Member>().CustomInstantiator(_ => GuildFake.Valid().Generate().GetLeader());
+            return new Faker<Member>().CustomInstantiator(_ => GuildFake.Complete().Generate().GetLeader());
         }
     }
 }

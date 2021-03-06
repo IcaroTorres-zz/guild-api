@@ -19,8 +19,7 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Membership>().CustomInstantiator(_ =>
             {
                 var member = MemberFake.GuildMember().Generate();
-                member.State.Leave();
-                return member.GetLastFinishedMembership();
+                return member.State.Leave();
             });
         }
     }

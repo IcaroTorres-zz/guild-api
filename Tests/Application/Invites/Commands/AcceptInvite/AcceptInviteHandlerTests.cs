@@ -5,6 +5,7 @@ using Domain.Models;
 using Domain.Nulls;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
 using Tests.Domain.Models.TestModels;
@@ -22,10 +23,10 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
             // arrange
             const int canceledCount = 2;
             var invitedMember = MemberFake.GuildMember().Generate();
-            var invitingGuild = GuildFake.Valid().Generate();
+            var invitingGuild = GuildFake.Complete().Generate();
             var acceptedInvite = InviteFake.ValidToAcceptWithInvitesToCancel(canceledCount, invitingGuild, invitedMember).Generate();
             var command = PatchInviteCommandFake.AcceptValid(acceptedInvite.Id).Generate();
-            var canceledInvites = acceptedInvite.GetInvitesToCancel();
+            var canceledInvites = acceptedInvite.GetInvitesToCancel().ToArray();
 
             var startedMembership = MembershipFake.Active(invitingGuild, invitedMember).Generate();
             var finishedMembership = invitedMember.GetActiveMembership();
@@ -42,7 +43,8 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
 
                     return x.Build();
                 }).Build();
-            var factory = ModelFactoryMockBuilder.Create().CreateMembership(invitingGuild, invitedMember, startedMembership).Build();
+            var factory = ModelFactoryMockBuilder.Create()
+                .CreateMembership(invitingGuild, invitedMember, startedMembership).Build();
             var sut = new AcceptInviteHandler(unit, factory);
 
             // act

@@ -32,7 +32,7 @@ namespace Tests.Domain.States.Members
         {
             // arrange
             var member = (TestMember)MemberFake.GuildMember().Generate();
-            var guild = (TestGuild)GuildFake.Valid().Generate();
+            var guild = (TestGuild)GuildFake.Complete().Generate();
             var monitor = member.Monitor();
             var sut = member.State;
             var factory = TestModelFactoryHelper.Factory;
