@@ -10,9 +10,9 @@ namespace Domain.States.Members
 
         internal override Guild Guild => Guild.Null;
 
-        internal override Member Leave()
+        internal override Membership Leave()
         {
-            return Context;
+            return Membership.Null;
         }
 
         internal override Member BePromoted()
