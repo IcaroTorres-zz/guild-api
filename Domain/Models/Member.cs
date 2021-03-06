@@ -33,7 +33,7 @@ namespace Domain.Models
             if (!(guild is INullObject))
             {
                 var membership = factory.CreateMembership(guild, this);
-                Memberships.Add(membership);
+                _memberships.Add(membership);
                 return membership;
             }
             return Membership.Null;
@@ -53,22 +53,22 @@ namespace Domain.Models
             set => _state = value;
         }
 
-        public virtual HashSet<Membership> Memberships { get; protected set; } = new HashSet<Membership>();
+        public HashSet<Membership> _memberships = new HashSet<Membership>();
+        public virtual IReadOnlyCollection<Membership> Memberships => _memberships;
 
-        private static bool activeMembershipFilter(Membership x) => x.ModifiedDate == null && x != Membership.Null;
+        private static bool activeMembershipFilter(Membership x) => x.ModifiedDate == null;
         public Membership GetActiveMembership()
         {
             var activeMembership = Memberships.SingleOrDefault(activeMembershipFilter);
             return activeMembership ?? Membership.Null;
         }
 
-        private static bool finishedMembershipFilter(Membership x) => x.ModifiedDate != null && x != Membership.Null;
         public Membership GetLastFinishedMembership()
         {
-            var closedMemberships = Memberships.Where(finishedMembershipFilter);
-            closedMemberships = closedMemberships.OrderByDescending(x => x.ModifiedDate);
-            var latest = closedMemberships.FirstOrDefault();
-            return latest ?? Membership.Null;
+            var closeds = Memberships.Where(x => !activeMembershipFilter(x));
+            closeds = closeds.OrderBy(x => x.ModifiedDate);
+            var recentlyClosed = closeds.LastOrDefault();
+            return recentlyClosed ?? Membership.Null;
         }
     }
 }

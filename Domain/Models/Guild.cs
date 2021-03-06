@@ -18,34 +18,33 @@ namespace Domain.Models
 
         public virtual Invite InviteMember(Member member, IModelFactory factory)
         {
-            if (!(member is INullObject) && !Members.Contains(member))
+            if (!_members.Contains(member) && !(member is INullObject))
             {
                 var invite = factory.CreateInvite(this, member);
-                Invites.Add(invite);
+                _invites.Add(invite);
                 return invite;
             }
             return Invite.Null;
         }
 
-        public virtual Member RemoveMember(Member member)
+        public virtual Membership RemoveMember(Member member)
         {
-            return !(member is INullObject) && Members.Remove(member) ? member.State.Leave() : Member.Null;
+            return _members.Remove(member) ? member.State.Leave() : Membership.Null;
         }
 
         internal virtual Member AddMember(Member newMember)
         {
-            return !(newMember is INullObject) && Members.Add(newMember) ? newMember : Member.Null;
+            return !(newMember is INullObject) && _members.Add(newMember) ? newMember : Member.Null;
         }
 
         public virtual Member Promote(Member member)
         {
-            if (Members.FirstOrDefault(x => x.Id == member.Id) is { } guildMemberToPromote)
+            if (_members.Contains(member) && member.Guild == this)
             {
                 GetLeader().State.BeDemoted();
-                guildMemberToPromote.State.BePromoted();
-                return guildMemberToPromote;
+                member.State.BePromoted();
+                return member;
             }
-
             return Member.Null;
         }
 
@@ -56,8 +55,11 @@ namespace Domain.Models
 
         public virtual string Name { get; protected internal set; }
 
-        public virtual HashSet<Member> Members { get; protected set; } = new HashSet<Member>();
-        public virtual HashSet<Invite> Invites { get; protected set; } = new HashSet<Invite>();
+        public HashSet<Member> _members = new HashSet<Member>();
+        public virtual IReadOnlyCollection<Member> Members => _members;
+
+        public List<Invite> _invites = new List<Invite>();
+        public virtual IReadOnlyCollection<Invite> Invites => _invites;
 
         private static bool FilterGuildLeader(Member x) => x.IsGuildLeader;
         public Member GetLeader()

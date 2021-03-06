@@ -51,13 +51,13 @@ namespace Domain.Models
             set => _state = value;
         }
 
-        public HashSet<Invite> GetInvitesToCancel()
+        public IReadOnlyCollection<Invite> GetInvitesToCancel()
         {
             var cancellables = Guild.Invites
                 .Where(x => x.Status == InviteStatuses.Pending &&
                             x.MemberId == Member.Id &&
                             x.GuildId == Guild.Id &&
-                            x.Id != Id).ToHashSet();
+                            x.Id != Id).ToArray();
             return cancellables;
         }
     }
