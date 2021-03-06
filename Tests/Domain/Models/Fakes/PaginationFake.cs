@@ -11,7 +11,7 @@ namespace Tests.Domain.Models.Fakes
     {
         public static Faker<PagedResponse<Guild>> PaginateGuilds(int pageSize = 3, int page = 1, int totalItems = 20)
         {
-            List<Guild> items = new List<Guild>(GuildFake.Valid().Generate(pageSize));
+            List<Guild> items = new List<Guild>(GuildFake.Complete().Generate(pageSize));
             var pagedResult = new PagedResponse<Guild>(items, totalItems, pageSize, page);
             return new Faker<PagedResponse<Guild>>().CustomInstantiator(_ => pagedResult);
         }
@@ -21,7 +21,7 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<PagedResponse<Member>>().CustomInstantiator(x =>
             {
                 var items = new List<Member>();
-                var guild = GuildFake.Valid(id: command.GuildId, membersCount: command.PageSize).Generate();
+                var guild = GuildFake.Complete(id: command.GuildId, membersCount: command.PageSize).Generate();
                 foreach (var member in guild.Members)
                 {
                     items.Add(member.ChangeName($"{x.Name.FullName()} {command.Name}"));

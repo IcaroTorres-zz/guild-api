@@ -18,7 +18,7 @@ namespace Tests.Application.Guilds.Commands.UpdateGuild
         public async Task Handle_Should_Succeed_With_ValidCommand()
         {
             // arrange
-            var expectedGuild = GuildFake.Valid().Generate();
+            var expectedGuild = GuildFake.Complete().Generate();
             var expectedMembersCount = expectedGuild.Members.Count;
             var expectedLeader = expectedGuild.GetVice();
             var expectedVice = expectedGuild.GetLeader();

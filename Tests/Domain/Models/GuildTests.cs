@@ -17,7 +17,7 @@ namespace Tests.Domain.Models
         {
             // arrange
             const string expectedNane = "new name";
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var monitor = sut.Monitor();
 
             // act
@@ -38,7 +38,7 @@ namespace Tests.Domain.Models
         public void RemoveMember_GuildMember_Should_Change_Guild()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count - 1;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -82,7 +82,7 @@ namespace Tests.Domain.Models
         public void RemoveMember_GuildLeader_Should_Change_Guild_Members()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count - 1;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -126,7 +126,7 @@ namespace Tests.Domain.Models
         [Fact]
         public void RemoveMember_WithoutGuild_Should_Change_Nothing()
         {
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -170,11 +170,11 @@ namespace Tests.Domain.Models
         public void RemoveMember_OtherGuildMember_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
-            var otherGuild = (TestGuild)GuildFake.Valid(membersCount: 1).Generate();
+            var otherGuild = (TestGuild)GuildFake.Complete(membersCount: 1).Generate();
             var member = (TestMember)otherGuild.Members.Single(x => !x.IsGuildLeader);
             var memberMonitor = member.Monitor();
 
@@ -212,11 +212,11 @@ namespace Tests.Domain.Models
         public void RemoveMember_OtherGuildLeader_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
-            var otherGuild = (TestGuild)GuildFake.Valid().Generate();
+            var otherGuild = (TestGuild)GuildFake.Complete().Generate();
             var member = (TestMember)otherGuild.Members.First();
             var memberMonitor = member.Monitor();
 
@@ -253,7 +253,7 @@ namespace Tests.Domain.Models
         public void RemoveMember_NullMember_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -282,7 +282,7 @@ namespace Tests.Domain.Models
         public void AddMember_NullMemberModel_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -305,7 +305,7 @@ namespace Tests.Domain.Models
         public void AddMember_AlreadyInGuild_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -329,7 +329,7 @@ namespace Tests.Domain.Models
         public void AddMember_NotInGuild_Should_Change_Members()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count + 1;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -355,7 +355,7 @@ namespace Tests.Domain.Models
         public void InviteMember_NullMember_ShouldNot_GenerateInvite()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -383,7 +383,7 @@ namespace Tests.Domain.Models
         public void InviteMember_AlreadyInGuild_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count;
             var monitor = sut.Monitor();
@@ -407,7 +407,7 @@ namespace Tests.Domain.Models
         public void InviteMember_NotInGuild_Should_Change_Invites()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var expectedMembersCount = sut.Members.Count;
             var expectedInvitesCount = sut.Invites.Count + 1;
             var monitor = sut.Monitor();
@@ -435,7 +435,7 @@ namespace Tests.Domain.Models
         public void Promote_GuildMember_Should_Change_GuildLeader()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var monitor = sut.Monitor();
             var newLeader = sut.GetVice();
             var perviousLeader = sut.GetLeader();
@@ -467,7 +467,7 @@ namespace Tests.Domain.Models
         public void Promote_GuildLeader_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var monitor = sut.Monitor();
             var leader = sut.GetLeader();
             var vice = sut.GetVice();
@@ -499,7 +499,7 @@ namespace Tests.Domain.Models
         public void Promote_NotMember_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var monitor = sut.Monitor();
             var notMember = (TestMember)MemberFake.WithoutGuild().Generate();
             var unchangedLeader = sut.GetLeader();
@@ -529,7 +529,7 @@ namespace Tests.Domain.Models
         public void DemoteLeader_GuildWithLeaderAndMembers_Should_Change_GuildLeader()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.Complete().Generate();
             var monitor = sut.Monitor();
             var expectedLeader = sut.GetVice();
             var expectedVice = sut.GetLeader();
@@ -562,10 +562,8 @@ namespace Tests.Domain.Models
         public void DemoteLeader_GuildWithLeaderOnly_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
+            var sut = (TestGuild)GuildFake.LeaderOnly().Generate();
             var leader = sut.GetLeader();
-            sut.Members.Clear();
-            sut.Members.Add(leader);
             var monitor = sut.Monitor();
             var nullVice = sut.GetVice();
 
@@ -596,8 +594,7 @@ namespace Tests.Domain.Models
         public void DemoteLeader_NoMembers_Should_Change_Nothing()
         {
             // arrange
-            var sut = (TestGuild)GuildFake.Valid().Generate();
-            sut.Members.Clear();
+            var sut = (TestGuild)GuildFake.NoMembers().Generate();
             var monitor = sut.Monitor();
             var nullLeader = sut.GetLeader();
             var nullVice = sut.GetVice();

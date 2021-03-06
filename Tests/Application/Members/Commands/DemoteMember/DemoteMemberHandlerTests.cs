@@ -18,7 +18,7 @@ namespace Tests.Application.Members.Commands.DemoteMember
         public async Task Handle_Should_Succeed_With_ValidCommand()
         {
             // arrange
-            var guild = GuildFake.Valid().Generate();
+            var guild = GuildFake.Complete().Generate();
             var demotedLeader = guild.GetLeader();
             var expectedNewLeader = guild.GetVice();
             var command = PatchMemberCommandFake.DemoteMemberValid(demotedLeader.Id).Generate();

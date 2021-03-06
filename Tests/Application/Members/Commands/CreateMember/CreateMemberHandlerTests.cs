@@ -34,8 +34,6 @@ namespace Tests.Application.Members.Commands.CreateMember
             response.As<SuccessCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
             response.Data.Should().NotBeNull().And.BeOfType<TestMember>();
             response.Data.As<Member>().Should().Be(expectedMember);
-            //response.Data.As<Member>().Id.Should().Be(expectedMember.Id);
-            //response.Data.As<Member>().Name.Should().Be(expectedMember.Name);
         }
     }
 }

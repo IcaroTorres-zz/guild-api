@@ -23,7 +23,7 @@ namespace Tests.Domain.Models.Fakes
 
         public static Faker<Invite> InvalidWithoutMember()
         {
-            var guild = GuildFake.Valid().Generate();
+            var guild = GuildFake.Complete().Generate();
 
             return new Faker<Invite>().CustomInstantiator(_ => new TestInvite
             {
@@ -38,7 +38,7 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Invite>().CustomInstantiator(_ =>
             {
                 member ??= MemberFake.GuildMember().Generate();
-                guild ??= GuildFake.Valid().Generate();
+                guild ??= GuildFake.Complete().Generate();
                 var invite = guild.InviteMember(member, TestModelFactoryHelper.Factory);
                 if (status == InviteStatuses.Accepted) invite.BeAccepted(TestModelFactoryHelper.Factory);
                 else if (status == InviteStatuses.Denied) invite.BeDenied();
@@ -47,7 +47,7 @@ namespace Tests.Domain.Models.Fakes
             });
         }
 
-        public static Faker<Invite> ValidToAcceptWithInvitesToCancel(int canceledCount = 5, Guild guild = null, Member member = null)
+        public static Faker<Invite> ValidToAcceptWithInvitesToCancel(int canceledCount = 2, Guild guild = null, Member member = null)
         {
             return new Faker<Invite>().CustomInstantiator(_ =>
             {

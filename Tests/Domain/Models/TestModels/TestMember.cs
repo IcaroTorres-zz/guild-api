@@ -11,6 +11,12 @@ namespace Tests.Domain.Models.TestModels
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
+        public override Member ChangeName(string newName)
+        {
+            if (base.Name != newName) PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+            return base.ChangeName(newName);
+        }
+
         internal override Membership ActivateMembership(Guild guild, IModelFactory factory)
         {
             var membership = base.ActivateMembership(guild, factory);
@@ -19,18 +25,6 @@ namespace Tests.Domain.Models.TestModels
                 CollectionChanged?.Invoke(Memberships, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, membership));
             }
             return membership;
-        }
-
-        public override string Name
-        {
-            get => base.Name; protected internal set
-            {
-                if (base.Name != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
-                    base.Name = value;
-                }
-            }
         }
 
         public override bool IsGuildLeader

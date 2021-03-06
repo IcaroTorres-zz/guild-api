@@ -10,6 +10,12 @@ namespace Tests.Domain.Models.TestModels
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
+        public override Guild ChangeName(string newName)
+        {
+            if (base.Name != newName) PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+            return base.ChangeName(newName);
+        }
+
         public override Invite InviteMember(Member member, IModelFactory factory)
         {
             var invite = base.InviteMember(member, factory);
@@ -20,14 +26,14 @@ namespace Tests.Domain.Models.TestModels
             return invite;
         }
 
-        public override Member RemoveMember(Member member)
+        public override Membership RemoveMember(Member member)
         {
-            var removedMember = base.RemoveMember(member);
-            if (!(removedMember is INullObject))
+            var finishedMembership = base.RemoveMember(member);
+            if (!(finishedMembership is INullObject))
             {
-                CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedMember));
+                CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, member));
             }
-            return removedMember;
+            return finishedMembership;
         }
 
         internal override Member AddMember(Member newMember)
@@ -38,18 +44,6 @@ namespace Tests.Domain.Models.TestModels
                 CollectionChanged?.Invoke(Members, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newMember));
             }
             return addedMember;
-        }
-
-        public override string Name
-        {
-            get => base.Name; protected internal set
-            {
-                if (base.Name != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
-                    base.Name = value;
-                }
-            }
         }
     }
 }
