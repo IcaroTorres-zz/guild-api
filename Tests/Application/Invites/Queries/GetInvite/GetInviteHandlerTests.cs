@@ -35,8 +35,8 @@ namespace Tests.Application.Invites.Queries.GetInvite
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<TestInvite>();
             result.Data.As<Invite>().Id.Should().Be(expectedInvite.Id);
-            result.Data.As<Invite>().Guild.Id.Should().Be(expectedInvite.GuildId.Value);
-            result.Data.As<Invite>().Member.Id.Should().Be(expectedInvite.MemberId.Value);
+            result.Data.As<Invite>().GetGuild().Id.Should().Be(expectedInvite.GuildId.Value);
+            result.Data.As<Invite>().GetMember().Id.Should().Be(expectedInvite.MemberId.Value);
         }
     }
 }

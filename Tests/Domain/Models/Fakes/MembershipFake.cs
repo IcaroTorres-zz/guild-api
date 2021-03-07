@@ -9,7 +9,7 @@ namespace Tests.Domain.Models.Fakes
         public static Faker<Membership> Active(Guild guild = null, Member member = null)
         {
             member ??= MemberFake.GuildMember().Generate();
-            guild ??= member.Guild;
+            guild ??= member.GetGuild();
             var membership = TestModelFactoryHelper.Factory.CreateMembership(guild, member);
             return new Faker<Membership>().CustomInstantiator(_ => membership);
         }
@@ -19,7 +19,7 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Membership>().CustomInstantiator(_ =>
             {
                 var member = MemberFake.GuildMember().Generate();
-                return member.State.Leave();
+                return member.GetState().Leave();
             });
         }
     }

@@ -19,8 +19,8 @@ namespace Tests.Application.Members.Commands.PromoteMember
         {
             // arrange
             var promotedMember = MemberFake.GuildMember().Generate();
-            var guild = promotedMember.Guild;
-            var expectedDemotedMember = promotedMember.Guild.GetLeader();
+            var guild = promotedMember.GetGuild();
+            var expectedDemotedMember = promotedMember.GetGuild().GetLeader();
             var command = PatchMemberCommandFake.PromoteMemberValid(promotedMember.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
                 .GetForGuildOperationsSuccess(command.Id, promotedMember)
@@ -41,8 +41,8 @@ namespace Tests.Application.Members.Commands.PromoteMember
             result.Data.As<Member>().Id.Should().Be(promotedMember.Id);
             result.Data.As<Member>().IsGuildLeader.Should().BeTrue()
                 .And.Be(!expectedDemotedMember.IsGuildLeader);
-            result.Data.As<Member>().Guild.Should().NotBeNull();
-            result.Data.As<Member>().Guild.Id.Should().Be(guild.Id);
+            result.Data.As<Member>().GetGuild().Should().NotBeNull();
+            result.Data.As<Member>().GetGuild().Id.Should().Be(guild.Id);
         }
     }
 }

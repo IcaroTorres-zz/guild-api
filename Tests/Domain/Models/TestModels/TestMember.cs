@@ -1,5 +1,6 @@
 using Domain.Common;
 using Domain.Models;
+using Domain.States.Members;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -10,6 +11,16 @@ namespace Tests.Domain.Models.TestModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        internal override Member ChangeState(MemberState newState)
+        {
+            if (base.GetGuild() != newState.Guild)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
+            }
+
+            return base.ChangeState(newState);
+        }
 
         public override Member ChangeName(string newName)
         {
@@ -47,18 +58,6 @@ namespace Tests.Domain.Models.TestModels
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GuildId)));
                     base.GuildId = value;
-                }
-            }
-        }
-
-        public override Guild Guild
-        {
-            get => base.Guild; protected set
-            {
-                if (base.Guild != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
-                    base.Guild = value;
                 }
             }
         }

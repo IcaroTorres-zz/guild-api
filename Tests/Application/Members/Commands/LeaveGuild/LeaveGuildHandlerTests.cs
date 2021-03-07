@@ -20,7 +20,7 @@ namespace Tests.Application.Members.Commands.LeaveGuild
         {
             // arrange
             var leavingMaster = (TestMember)MemberFake.GuildLeader().Generate();
-            var expectedNewLeader = leavingMaster.Guild.GetVice();
+            var expectedNewLeader = leavingMaster.GetGuild().GetVice();
             var expectedFinishedMembership = leavingMaster.GetActiveMembership();
             var command = PatchMemberCommandFake.LeaveGuildValid(leavingMaster.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
@@ -42,7 +42,7 @@ namespace Tests.Application.Members.Commands.LeaveGuild
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<TestMember>();
             result.Data.As<Member>().Id.Should().Be(leavingMaster.Id);
-            result.Data.As<Member>().Guild.Should().BeOfType<NullGuild>();
+            result.Data.As<Member>().GetGuild().Should().BeOfType<NullGuild>();
             result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedNewLeader.IsGuildLeader);
             expectedFinishedMembership.Should().BeOfType<TestMembership>();
@@ -56,7 +56,7 @@ namespace Tests.Application.Members.Commands.LeaveGuild
         {
             // arrange
             var leavingMember = (TestMember)MemberFake.GuildMember().Generate();
-            var expectedUnchangedLeader = leavingMember.Guild.GetLeader();
+            var expectedUnchangedLeader = leavingMember.GetGuild().GetLeader();
             var expectedFinishedMembership = leavingMember.GetActiveMembership();
             var command = PatchMemberCommandFake.LeaveGuildValid(leavingMember.Id).Generate();
             var memberRepository = MemberRepositoryMockBuilder.Create()
@@ -80,7 +80,7 @@ namespace Tests.Application.Members.Commands.LeaveGuild
             result.Data.As<Member>().Id.Should().Be(leavingMember.Id);
             result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedUnchangedLeader.IsGuildLeader);
-            result.Data.As<Member>().Guild.Should().BeOfType<NullGuild>();
+            result.Data.As<Member>().GetGuild().Should().BeOfType<NullGuild>();
             expectedFinishedMembership.Should().NotBeOfType<NullMembership>();
             expectedFinishedMembership.Id.Should().Be(leavingMember.GetLastFinishedMembership().Id);
             expectedFinishedMembership.ModifiedDate.Should().NotBeNull()

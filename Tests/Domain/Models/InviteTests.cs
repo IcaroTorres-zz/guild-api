@@ -26,18 +26,18 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull();
+            sut.GetGuild().Should().NotBeNull();
             sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull();
+            sut.GetMember().Should().NotBeNull();
             sut.MemberId.Should().NotBeEmpty();
             sut.Status.Should().Be(expectedStatus);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member),
+                nameof(Member),
                 nameof(Invite.Status));
         }
 
@@ -54,9 +54,9 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull();
+            sut.GetGuild().Should().NotBeNull();
             sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull();
+            sut.GetMember().Should().NotBeNull();
             sut.MemberId.Should().NotBeEmpty();
             sut.Status.Should().Be(InviteStatuses.Canceled);
 
@@ -64,9 +64,9 @@ namespace Tests.Domain.Models
             monitor.AssertPropertyNotChanged(
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member));
+                nameof(Member));
         }
         [Fact]
         public void BeDenied_Not_Status_Pending_Should_Change_Nothing()
@@ -82,18 +82,18 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull();
+            sut.GetGuild().Should().NotBeNull();
             sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull();
+            sut.GetMember().Should().NotBeNull();
             sut.MemberId.Should().NotBeEmpty();
             sut.Status.Should().Be(expectedStatus);
 
             monitor.AssertPropertyNotChanged(
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member),
+                nameof(Member),
                 nameof(Invite.Status));
         }
 
@@ -110,9 +110,9 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull();
+            sut.GetGuild().Should().NotBeNull();
             sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull();
+            sut.GetMember().Should().NotBeNull();
             sut.MemberId.Should().NotBeEmpty();
             sut.Status.Should().Be(InviteStatuses.Denied);
 
@@ -120,9 +120,9 @@ namespace Tests.Domain.Models
             monitor.AssertPropertyNotChanged(
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member));
+                nameof(Member));
         }
 
         [Fact]
@@ -131,8 +131,8 @@ namespace Tests.Domain.Models
             // arrange
             var sut = (TestInvite)InviteFake.ValidWithStatus(InviteStatuses.Pending).Generate();
             var monitor = sut.Monitor();
-            var guildMonitor = ((TestGuild)sut.Guild).Monitor();
-            var memberMonitor = ((TestMember)sut.Member).Monitor();
+            var guildMonitor = ((TestGuild)sut.GetGuild()).Monitor();
+            var memberMonitor = ((TestMember)sut.GetMember()).Monitor();
             var factory = TestModelFactoryHelper.Factory;
 
             // act
@@ -141,9 +141,9 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull();
+            sut.GetGuild().Should().NotBeNull();
             sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull();
+            sut.GetMember().Should().NotBeNull();
             sut.MemberId.Should().NotBeEmpty();
             sut.Status.Should().Be(InviteStatuses.Accepted);
 
@@ -151,13 +151,13 @@ namespace Tests.Domain.Models
             monitor.AssertPropertyNotChanged(
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member));
+                nameof(Member));
 
-            guildMonitor.AssertCollectionChanged(sut.Guild.Members);
-            memberMonitor.AssertCollectionChanged(sut.Member.Memberships);
-            memberMonitor.AssertPropertyChanged(nameof(Member.Guild), nameof(Member.GuildId));
+            guildMonitor.AssertCollectionChanged(sut.GetGuild().Members);
+            memberMonitor.AssertCollectionChanged(sut.GetMember().Memberships);
+            memberMonitor.AssertPropertyChanged(nameof(Guild), nameof(Member.GuildId));
         }
 
         [Fact]
@@ -166,8 +166,8 @@ namespace Tests.Domain.Models
             // arrange
             var sut = (TestInvite)InviteFake.ValidWithStatus(InviteStatuses.Canceled).Generate();
             var monitor = sut.Monitor();
-            var guildMonitor = ((TestGuild)sut.Guild).Monitor();
-            var memberMonitor = ((TestMember)sut.Member).Monitor();
+            var guildMonitor = ((TestGuild)sut.GetGuild()).Monitor();
+            var memberMonitor = ((TestMember)sut.GetMember()).Monitor();
             var factory = TestModelFactoryHelper.Factory;
 
             // act
@@ -176,9 +176,9 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull();
+            sut.GetGuild().Should().NotBeNull();
             sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull();
+            sut.GetMember().Should().NotBeNull();
             sut.MemberId.Should().NotBeEmpty();
             sut.Status.Should().Be(InviteStatuses.Canceled);
 
@@ -186,13 +186,13 @@ namespace Tests.Domain.Models
                 nameof(Invite.Status),
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member));
+                nameof(Member));
 
-            guildMonitor.AssertCollectionNotChanged(sut.Guild.Members);
-            memberMonitor.AssertCollectionNotChanged(sut.Member.Memberships);
-            memberMonitor.AssertPropertyNotChanged(nameof(Member.Guild), nameof(Member.GuildId));
+            guildMonitor.AssertCollectionNotChanged(sut.GetGuild().Members);
+            memberMonitor.AssertCollectionNotChanged(sut.GetMember().Memberships);
+            memberMonitor.AssertPropertyNotChanged(nameof(Guild), nameof(Member.GuildId));
         }
 
         [Fact]
@@ -210,9 +210,9 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull().And.BeOfType<NullGuild>();
+            sut.GetGuild().Should().NotBeNull().And.BeOfType<NullGuild>();
             sut.GuildId.Should().BeNull();
-            sut.Member.Should().NotBeNull().And.BeOfType<TestMember>();
+            sut.GetMember().Should().NotBeNull().And.BeOfType<TestMember>();
             sut.MemberId.Should().NotBeEmpty();
             sut.Status.Should().Be(expectedStatus);
 
@@ -220,9 +220,9 @@ namespace Tests.Domain.Models
                 nameof(Invite.Status),
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member));
+                nameof(Member));
         }
 
         [Fact]
@@ -238,9 +238,9 @@ namespace Tests.Domain.Models
             // assert
             sut.Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Id.Should().NotBeEmpty();
-            sut.Guild.Should().NotBeNull().And.BeOfType<TestGuild>();
+            sut.GetGuild().Should().NotBeNull().And.BeOfType<TestGuild>();
             sut.GuildId.Should().NotBeEmpty();
-            sut.Member.Should().NotBeNull().And.BeOfType<NullMember>();
+            sut.GetMember().Should().NotBeNull().And.BeOfType<NullMember>();
             sut.MemberId.Should().BeNull();
             sut.Status.Should().NotBe(InviteStatuses.Accepted);
 
@@ -248,9 +248,9 @@ namespace Tests.Domain.Models
                 nameof(Invite.Status),
                 nameof(Invite.Id),
                 nameof(Invite.GuildId),
-                nameof(Invite.Guild),
+                nameof(Guild),
                 nameof(Invite.MemberId),
-                nameof(Invite.Member));
+                nameof(Member));
         }
     }
 }

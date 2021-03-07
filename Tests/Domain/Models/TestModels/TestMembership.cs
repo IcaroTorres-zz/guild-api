@@ -55,29 +55,5 @@ namespace Tests.Domain.Models.TestModels
                 }
             }
         }
-
-        public override Guild Guild
-        {
-            get => base.Guild; protected internal set
-            {
-                if (base.Guild != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Guild)));
-                    base.Guild = value;
-                }
-            }
-        }
-
-        public override Member Member
-        {
-            get => base.Member; protected internal set
-            {
-                if (base.Member != value)
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Member)));
-                    base.Member = value;
-                }
-            }
-        }
     }
 }

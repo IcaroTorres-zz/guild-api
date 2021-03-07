@@ -32,7 +32,7 @@ namespace Tests.Domain.States.Invites
             const InviteStatuses initStatus = InviteStatuses.Pending;
             const InviteStatuses expectedStatus = InviteStatuses.Accepted;
             var invite = InviteFake.ValidWithStatus(initStatus).Generate();
-            var sut = invite.State;
+            var sut = invite.GetState();
             var factory = TestModelFactoryHelper.Factory;
 
             // act
@@ -41,10 +41,10 @@ namespace Tests.Domain.States.Invites
             // assert
             sut.Status.Should().Be(initStatus).And.NotBe(invite.Status);
             invite.Status.Should().Be(expectedStatus);
-            invite.Guild.Should().NotBeOfType<NullGuild>();
-            invite.Member.Should().NotBeOfType<NullMember>();
-            invite.Guild.Members.Should().Contain(invite.Member);
-            invite.Member.Guild.Should().Be(invite.Guild);
+            invite.GetGuild().Should().NotBeOfType<NullGuild>();
+            invite.GetMember().Should().NotBeOfType<NullMember>();
+            invite.GetGuild().Members.Should().Contain(invite.GetMember());
+            invite.GetMember().GetGuild().Should().Be(invite.GetGuild());
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Tests.Domain.States.Invites
             const InviteStatuses initStatus = InviteStatuses.Pending;
             const InviteStatuses expectedStatus = InviteStatuses.Denied;
             var invite = InviteFake.ValidWithStatus(initStatus).Generate();
-            var sut = invite.State;
+            var sut = invite.GetState();
 
             // act
             sut.BeDenied();
@@ -62,10 +62,10 @@ namespace Tests.Domain.States.Invites
             // assert
             sut.Status.Should().Be(initStatus).And.NotBe(invite.Status);
             invite.Status.Should().Be(expectedStatus);
-            invite.Guild.Should().NotBeOfType<NullGuild>();
-            invite.Member.Should().NotBeOfType<NullMember>();
-            invite.Guild.Members.Should().NotContain(invite.Member);
-            invite.Member.Guild.Should().NotBe(invite.Guild);
+            invite.GetGuild().Should().NotBeOfType<NullGuild>();
+            invite.GetMember().Should().NotBeOfType<NullMember>();
+            invite.GetGuild().Members.Should().NotContain(invite.GetMember());
+            invite.GetMember().GetGuild().Should().NotBe(invite.GetGuild());
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Tests.Domain.States.Invites
             const InviteStatuses initStatus = InviteStatuses.Pending;
             const InviteStatuses expectedStatus = InviteStatuses.Canceled;
             var invite = InviteFake.ValidWithStatus(initStatus).Generate();
-            var sut = invite.State;
+            var sut = invite.GetState();
 
             // act
             sut.BeCanceled();
@@ -83,10 +83,10 @@ namespace Tests.Domain.States.Invites
             // assert
             sut.Status.Should().Be(initStatus).And.NotBe(invite.Status);
             invite.Status.Should().Be(expectedStatus);
-            invite.Guild.Should().NotBeOfType<NullGuild>();
-            invite.Member.Should().NotBeOfType<NullMember>();
-            invite.Guild.Members.Should().NotContain(invite.Member);
-            invite.Member.Guild.Should().NotBe(invite.Guild);
+            invite.GetGuild().Should().NotBeOfType<NullGuild>();
+            invite.GetMember().Should().NotBeOfType<NullMember>();
+            invite.GetGuild().Members.Should().NotContain(invite.GetMember());
+            invite.GetMember().GetGuild().Should().NotBe(invite.GetGuild());
         }
     }
 }

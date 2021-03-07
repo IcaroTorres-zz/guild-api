@@ -22,7 +22,7 @@ namespace Tests.Domain.States.Members
             var sut = new NoGuildMemberState(member);
 
             // assert
-            sut.Guild.Should().BeOfType<NullGuild>().And.Be(member.Guild);
+            sut.Guild.Should().BeOfType<NullGuild>().And.Be(member.GetGuild());
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             sut.Guild.Members.Should().NotContain(member);
         }
@@ -34,14 +34,14 @@ namespace Tests.Domain.States.Members
             var member = (TestMember)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
             var guild = (TestGuild)GuildFake.Complete().Generate();
-            var sut = member.State;
+            var sut = member.GetState();
             var factory = TestModelFactoryHelper.Factory;
 
             // act
             sut.Join(guild, factory);
 
             // assert
-            sut.Guild.Should().NotBeNull().And.BeOfType<NullGuild>().And.NotBe(member.Guild);
+            sut.Guild.Should().NotBeNull().And.BeOfType<NullGuild>().And.NotBe(member.GetGuild());
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             sut.Guild.Members.Should().NotContain(member);
             member.GuildId.Should().NotBeNull();
@@ -49,7 +49,7 @@ namespace Tests.Domain.States.Members
 
             monitor.AssertCollectionChanged(member.Memberships);
             monitor.AssertPropertyChanged(
-                nameof(Member.Guild),
+                nameof(Guild),
                 nameof(Member.GuildId));
 
             monitor.AssertPropertyNotChanged(
@@ -64,13 +64,13 @@ namespace Tests.Domain.States.Members
             // arrange
             var member = (TestMember)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
-            var sut = member.State;
+            var sut = member.GetState();
 
             // act
             sut.BePromoted();
 
             // assert
-            sut.Guild.Should().NotBeNull().And.BeOfType<NullGuild>().And.Be(member.Guild);
+            sut.Guild.Should().NotBeNull().And.BeOfType<NullGuild>().And.Be(member.GetGuild());
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             sut.Guild.Members.Should().NotContain(member);
             member.GuildId.Should().BeNull();
@@ -79,7 +79,7 @@ namespace Tests.Domain.States.Members
             monitor.AssertPropertyNotChanged(
                 nameof(Member.Id),
                 nameof(Member.Name),
-                nameof(Member.Guild),
+                nameof(Guild),
                 nameof(Member.GuildId),
                 nameof(Member.IsGuildLeader));
         }
@@ -90,13 +90,13 @@ namespace Tests.Domain.States.Members
             // arrange
             var member = (TestMember)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
-            var sut = member.State;
+            var sut = member.GetState();
 
             // act
             sut.BeDemoted();
 
             // assert
-            sut.Guild.Should().NotBeNull().And.BeOfType<NullGuild>().And.Be(member.Guild);
+            sut.Guild.Should().NotBeNull().And.BeOfType<NullGuild>().And.Be(member.GetGuild());
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             sut.Guild.Members.Should().NotContain(member);
             member.GuildId.Should().BeNull();
@@ -105,7 +105,7 @@ namespace Tests.Domain.States.Members
             monitor.AssertPropertyNotChanged(
                 nameof(Member.Id),
                 nameof(Member.Name),
-                nameof(Member.Guild),
+                nameof(Guild),
                 nameof(Member.GuildId),
                 nameof(Member.IsGuildLeader));
         }
@@ -116,20 +116,20 @@ namespace Tests.Domain.States.Members
             // arrange
             var member = (TestMember)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
-            var sut = member.State;
+            var sut = member.GetState();
 
             // act
             sut.Leave();
 
             // assert
-            sut.Guild.Should().BeOfType<NullGuild>().And.Be(member.Guild);
+            sut.Guild.Should().BeOfType<NullGuild>().And.Be(member.GetGuild());
             sut.Guild.Members.Should().NotContain(member);
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             member.GuildId.Should().BeNull();
 
             monitor.AssertCollectionNotChanged(member.Memberships);
             monitor.AssertPropertyNotChanged(
-                nameof(Member.Guild),
+                nameof(Guild),
                 nameof(Member.Id),
                 nameof(Member.Name),
                 nameof(Member.IsGuildLeader),

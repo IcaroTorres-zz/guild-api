@@ -47,11 +47,13 @@ namespace Presentation
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IdentityContext identityContext, ApiContext apiContext)
         {
-            // for development purposes, migrate any database changes on startup (includes initial db creation)
-            apiContext.Database.Migrate();
-            identityContext.Database.Migrate();
-
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+            {
+                // for development purposes, migrate any database changes on startup (includes initial db creation)
+                apiContext.Database.Migrate();
+                identityContext.Database.Migrate();
+                app.UseDeveloperExceptionPage();
+            }
             else app.UseHsts();
 
             var swaggerOptions = new MySwaggerOptions();

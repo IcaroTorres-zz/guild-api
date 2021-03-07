@@ -32,7 +32,7 @@ namespace Tests.Domain.Models
                 nameof(Member.Id),
                 nameof(Member.IsGuildLeader),
                 nameof(Member.GuildId),
-                nameof(Member.Guild));
+                nameof(Guild));
         }
     }
 }

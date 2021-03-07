@@ -26,7 +26,7 @@ namespace Tests.Domain.States.Memberships
         {
             // arrange
             var membership = MembershipFake.Finished().Generate();
-            var sut = membership.State;
+            var sut = membership.GetState();
 
             // act
             sut.Finish();
