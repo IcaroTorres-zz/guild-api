@@ -7,9 +7,11 @@ namespace Application.Common.Responses
     public class MembershipResponse
     {
         public Guid Id { get; set; }
+        public Guid GuildId { get; set; }
+        public string GuildName { get; set; }
+        public Guid MemberId { get; set; }
+        public string MemberName { get; set; }
         public DateTime Since { get; set; }
-        public DateTime Until { get; set; }
-        public MemberGuildResponse Guild { get; set; }
-        public GuildMemberResponse Member { get; set; }
+        public DateTime? Until { get; set; }
     }
 }

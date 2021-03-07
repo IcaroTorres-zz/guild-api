@@ -22,22 +22,22 @@ namespace Application.Invites.Commands.AcceptInvite
                         return !(invite is INullObject);
                     })
                     .WithMessage(x => $"Record not found for invite with given id {x.Id}.")
-                    .WithName(nameof(Invite.Id))
+                    .WithName("Id")
                     .WithErrorCode(nameof(HttpStatusCode.NotFound))
 
                     .Must(_ => invite.Status == InviteStatuses.Pending)
                     .WithMessage("Invite must be on pending status to be accepted.")
-                    .WithName(nameof(invite.Status))
+                    .WithName("Status")
                     .WithErrorCode(nameof(HttpStatusCode.UnprocessableEntity))
 
-                    .Must(_ => !(invite.Member is INullObject))
+                    .Must(_ => !(invite.GetMember() is INullObject))
                     .WithMessage($"Record not found for invited member with given id {invite.MemberId}.")
-                    .WithName(nameof(invite.Member))
+                    .WithName("Member")
                     .WithErrorCode(nameof(HttpStatusCode.NotFound))
 
-                    .Must(_ => !(invite.Guild is INullObject))
+                    .Must(_ => !(invite.GetGuild() is INullObject))
                     .WithMessage($"Record not found for inviting guild with given id {invite.GuildId}.")
-                    .WithName(nameof(Invite.Guild))
+                    .WithName("Guild")
                     .WithErrorCode(nameof(HttpStatusCode.NotFound));
             });
         }

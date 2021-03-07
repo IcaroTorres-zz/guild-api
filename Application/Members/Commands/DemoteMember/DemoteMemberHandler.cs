@@ -18,7 +18,7 @@ namespace Application.Members.Commands.DemoteMember
         public async Task<IApiResult> Handle(DemoteMemberCommand command, CancellationToken cancellationToken)
         {
             var masterToDemote = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
-            var promotedAfterDemotion = masterToDemote.Guild.DemoteLeader();
+            var promotedAfterDemotion = masterToDemote.GetGuild().DemoteLeader();
             masterToDemote = _memberRepository.Update(masterToDemote);
             _memberRepository.Update(promotedAfterDemotion);
 

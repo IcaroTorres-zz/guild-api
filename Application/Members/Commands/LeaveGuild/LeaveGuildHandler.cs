@@ -20,12 +20,14 @@ namespace Application.Members.Commands.LeaveGuild
         public async Task<IApiResult> Handle(LeaveGuildCommand command, CancellationToken cancellationToken)
         {
             var leavingMember = await _memberRepository.GetForGuildOperationsAsync(command.Id, cancellationToken);
-            var vicePromotedWithLeaving = leavingMember.Guild.GetVice();
-            var membershipFinishedWithLeaving = leavingMember.Guild.RemoveMember(leavingMember);
+            var guild = leavingMember.GetGuild();
+            var possiblePromoted = guild.GetVice();
+
+            var finishedMembership = guild.RemoveMember(leavingMember);
 
             leavingMember = _memberRepository.Update(leavingMember);
-            _memberRepository.Update(vicePromotedWithLeaving);
-            _membershipRepository.Update(membershipFinishedWithLeaving);
+            _memberRepository.Update(possiblePromoted);
+            _membershipRepository.Update(finishedMembership);
 
             return new SuccessResult(leavingMember);
         }

@@ -10,18 +10,19 @@ namespace Application.Common.MapperProfiles
         public DomainToApplicationProfile()
         {
             CreateMap<Guild, GuildResponse>()
-                .ForMember(dest => dest.Leader,
-                    opt =>
-                    {
-                        opt.PreCondition(src => !(src.GetLeader() is INullObject));
-                        opt.MapFrom(src => src.GetLeader());
-                    });
+                .ForMember(dest => dest.Leader, opt =>
+                {
+                    opt.PreCondition(src => !(src.GetLeader() is INullObject));
+                    opt.MapFrom(src => src.GetLeader());
+                });
             CreateMap<Guild, MemberGuildResponse>();
 
             CreateMap<Member, MemberResponse>()
-                .ForMember(dest => dest.Guild,
-                    opt => opt.PreCondition(
-                        src => !(src.Guild is INullObject)));
+                .ForMember(dest => dest.Guild, opt =>
+                {
+                    opt.PreCondition(src => !(src.GetGuild() is INullObject));
+                    opt.MapFrom(src => src.GetGuild());
+                });
             CreateMap<Member, GuildMemberResponse>();
 
             CreateMap<Invite, InviteResponse>()
@@ -31,12 +32,16 @@ namespace Application.Common.MapperProfiles
                 .ForMember(dest => dest.ResponseDate,
                     opt => opt.MapFrom(
                         src => src.ModifiedDate))
-                .ForMember(dest => dest.Member,
-                    opt => opt.PreCondition(
-                        src => !(src.Member is INullObject)))
-                .ForMember(dest => dest.Guild,
-                    opt => opt.PreCondition(
-                        src => !(src.Guild is INullObject)));
+                .ForMember(dest => dest.Member, opt =>
+                {
+                    opt.PreCondition(src => !(src.GetMember() is INullObject));
+                    opt.MapFrom(src => src.GetMember());
+                })
+                .ForMember(dest => dest.Guild, opt =>
+                {
+                    opt.PreCondition(src => !(src.GetGuild() is INullObject));
+                    opt.MapFrom(src => src.GetGuild());
+                });
 
             CreateMap<Membership, MembershipResponse>()
                 .ForMember(dest => dest.Since,
@@ -44,13 +49,7 @@ namespace Application.Common.MapperProfiles
                         src => src.CreatedDate))
                 .ForMember(dest => dest.Until,
                     opt => opt.MapFrom(
-                        src => src.ModifiedDate))
-                .ForMember(dest => dest.Member,
-                    opt => opt.PreCondition(
-                        src => !(src.Member is INullObject)))
-                .ForMember(dest => dest.Guild,
-                    opt => opt.PreCondition(
-                        src => !(src.Guild is INullObject)));
+                        src => src.ModifiedDate));
 
             CreateMap<PagedResponse<Member>, PagedResponse<MemberResponse>>();
             CreateMap<PagedResponse<Guild>, PagedResponse<GuildResponse>>();

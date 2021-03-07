@@ -21,9 +21,11 @@ namespace Application.Invites.Commands.AcceptInvite
         public async Task<IApiResult> Handle(AcceptInviteCommand command, CancellationToken cancellationToken)
         {
             var invite = await _unit.Invites.GetForAcceptOperationAsync(command.Id, cancellationToken);
-            var previousGuildMembership = invite.Member.GetActiveMembership();
-            var membership = invite.BeAccepted(_factory);
-            var newMembershipTask = _unit.Memberships.InsertAsync(membership);
+            var invitedMember = invite.GetMember();
+            var previousMembership = invitedMember.GetActiveMembership();
+            var possiblePromoted = invitedMember.GetGuild().GetVice();
+
+            var newMembership = invite.BeAccepted(_factory);
 
             foreach (var inviteToCancel in invite.GetInvitesToCancel())
             {
@@ -32,10 +34,11 @@ namespace Application.Invites.Commands.AcceptInvite
             }
 
             invite = _unit.Invites.Update(invite);
-            _unit.Members.Update(invite.Member);
-            _unit.Memberships.Update(previousGuildMembership);
+            _unit.Members.Update(invitedMember);
+            _unit.Members.Update(possiblePromoted);
+            _unit.Memberships.Update(previousMembership);
+            await _unit.Memberships.InsertAsync(newMembership);
 
-            await newMembershipTask;
             return new SuccessResult(invite);
         }
     }

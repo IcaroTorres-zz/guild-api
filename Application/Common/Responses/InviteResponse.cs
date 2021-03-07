@@ -12,6 +12,6 @@ namespace Application.Common.Responses
         public MemberGuildResponse Guild { get; set; }
         public GuildMemberResponse Member { get; set; }
         public DateTime InviteDate { get; set; }
-        public DateTime ResponseDate { get; set; }
+        public DateTime? ResponseDate { get; set; }
     }
 }
