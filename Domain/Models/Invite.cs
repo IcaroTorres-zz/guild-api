@@ -14,23 +14,24 @@ namespace Domain.Models
 
         public virtual Membership BeAccepted(IModelFactory factory)
         {
-            return State.BeAccepted(factory);
+            return GetState().BeAccepted(factory);
         }
 
         public virtual Invite BeDenied()
         {
-            return State.BeDenied();
+            return GetState().BeDenied();
         }
 
         public virtual Invite BeCanceled()
         {
-            return State.BeCanceled();
+            return GetState().BeCanceled();
         }
 
-        internal virtual Invite ChangeState(InviteState state)
+        internal virtual Invite ChangeState(InviteState newState)
         {
-            State = state;
-            Status = State.Status;
+            state = newState;
+            Status = newState.Status;
+            ModifiedDate = newState.ModifiedDate;
             return this;
         }
 
@@ -38,25 +39,25 @@ namespace Domain.Models
         public virtual Guid? MemberId { get; protected internal set; }
         public virtual Guid? GuildId { get; protected internal set; }
 
-        private Guild _guild;
-        public virtual Guild Guild { get => _guild ??= Guild.Null; protected internal set { _guild = value; } }
+        internal Guild guild;
+        public virtual Guild GetGuild() => guild ?? Guild.Null;
 
-        private Member _member;
-        public virtual Member Member { get => _member ??= Member.Null; protected internal set { _member = value; } }
+        internal Member member;
+        public virtual Member GetMember() => member ?? Member.Null;
 
-        private InviteState _state;
-        internal virtual InviteState State
+        protected InviteState state;
+        internal virtual InviteState GetState()
         {
-            get => _state ??= InviteState.NewState(this, Guild, Member, Status);
-            set => _state = value;
+            state ??= InviteState.NewState(this);
+            return state;
         }
 
         public IReadOnlyCollection<Invite> GetInvitesToCancel()
         {
-            var cancellables = Guild.Invites
+            var cancellables = GetGuild().Invites
                 .Where(x => x.Status == InviteStatuses.Pending &&
-                            x.MemberId == Member.Id &&
-                            x.GuildId == Guild.Id &&
+                            x.MemberId == MemberId &&
+                            x.GuildId == GuildId &&
                             x.Id != Id).ToArray();
             return cancellables;
         }

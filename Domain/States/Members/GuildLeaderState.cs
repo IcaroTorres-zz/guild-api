@@ -20,7 +20,7 @@ namespace Domain.States.Members
 
         internal override Membership Leave()
         {
-            Context.Guild.GetVice().State.BePromoted();
+            Context.GetGuild().GetVice().GetState().BePromoted();
             BeDemoted();
             return base.Leave();
         }
@@ -32,7 +32,7 @@ namespace Domain.States.Members
 
         internal override Member BeDemoted()
         {
-            return Context.ChangeState(new GuildMemberState(Context, Context.Guild));
+            return Context.ChangeState(new GuildMemberState(Context, Context.GetGuild()));
         }
     }
 }

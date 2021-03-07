@@ -12,13 +12,13 @@ namespace Domain.States.Members
 
         internal override Membership Join(Guild guild, IModelFactory factory)
         {
-            Leave();
+            base.Leave();
             return base.Join(guild, factory);
         }
 
         internal override Member BePromoted()
         {
-            return Context.ChangeState(new GuildLeaderState(Context, Context.Guild));
+            return Context.ChangeState(new GuildLeaderState(Context, Context.GetGuild()));
         }
 
         internal override Member BeDemoted()

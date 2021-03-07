@@ -9,10 +9,10 @@ namespace Domain.Models
     {
         public static readonly NullMembership Null = new NullMembership();
 
-        internal Membership ChangeState(MembershipState state)
+        internal Membership ChangeState(MembershipState newState)
         {
-            State = state;
-            ModifiedDate = state.ModifiedDate;
+            state = newState;
+            ModifiedDate = newState.ModifiedDate;
             return this;
         }
 
@@ -23,18 +23,14 @@ namespace Domain.Models
 
         public virtual Guid? MemberId { get; protected internal set; }
         public virtual Guid? GuildId { get; protected internal set; }
+        public virtual string GuildName { get; protected internal set; }
+        public virtual string MemberName { get; protected internal set; }
 
-        private Guild _guild;
-        public virtual Guild Guild { get => _guild ??= Guild.Null; protected internal set { _guild = value; } }
-
-        private Member _member;
-        public virtual Member Member { get => _member ??= Member.Null; protected internal set { _member = value; } }
-
-        private MembershipState _state;
-        internal virtual MembershipState State
+        protected MembershipState state;
+        internal virtual MembershipState GetState()
         {
-            get => _state ??= MembershipState.NewState(this, ModifiedDate);
-            set => _state = value;
+            state ??= MembershipState.NewState(this);
+            return state;
         }
     }
 }

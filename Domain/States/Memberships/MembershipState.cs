@@ -14,11 +14,11 @@ namespace Domain.States.Memberships
         internal DateTime? ModifiedDate { get; set; }
         internal abstract Membership Finish();
 
-        internal static MembershipState NewState(Membership membership, DateTime? modifiedDate)
+        internal static MembershipState NewState(Membership membership)
         {
-            return modifiedDate == null
-                ? new OpenMembershipState(membership)
-                : new ClosedMembershipState(membership, modifiedDate.Value) as MembershipState;
+            return membership.ModifiedDate.HasValue
+                ? new ClosedMembershipState(membership, membership.ModifiedDate) as MembershipState
+                : new OpenMembershipState(membership);
         }
     }
 }

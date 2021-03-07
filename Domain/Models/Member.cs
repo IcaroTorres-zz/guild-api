@@ -11,13 +11,20 @@ namespace Domain.Models
     {
         public static readonly NullMember Null = new NullMember();
 
-        internal virtual Member ChangeState(MemberState state)
+        internal virtual Member ChangeState(MemberState newState)
         {
-            State = state;
-            IsGuildLeader = State.IsGuildLeader;
-            Guild = State.Guild;
-            if (Guild is INullObject) GuildId = null;
-            else GuildId = State.Guild.Id;
+            state = newState;
+            IsGuildLeader = newState.IsGuildLeader;
+            if (newState.Guild is INullObject)
+            {
+                guild = null;
+                GuildId = null;
+            }
+            else
+            {
+                guild = newState.Guild;
+                GuildId = newState.Guild.Id;
+            }
 
             return this;
         }
@@ -33,7 +40,7 @@ namespace Domain.Models
             if (!(guild is INullObject))
             {
                 var membership = factory.CreateMembership(guild, this);
-                _memberships.Add(membership);
+                memberships.Add(membership);
                 return membership;
             }
             return Membership.Null;
@@ -43,18 +50,18 @@ namespace Domain.Models
         public virtual bool IsGuildLeader { get; protected set; }
         public virtual Guid? GuildId { get; protected set; }
 
-        private Guild _guild;
-        public virtual Guild Guild { get => _guild ??= Guild.Null; protected set { _guild = value; } }
+        private Guild guild;
+        public virtual Guild GetGuild() => guild ?? Guild.Null;
 
-        private MemberState _state;
-        internal virtual MemberState State
+        protected MemberState state;
+        internal virtual MemberState GetState()
         {
-            get => _state ??= MemberState.NewState(this);
-            set => _state = value;
+            state ??= MemberState.NewState(this);
+            return state;
         }
 
-        public HashSet<Membership> _memberships = new HashSet<Membership>();
-        public virtual IReadOnlyCollection<Membership> Memberships => _memberships;
+        public HashSet<Membership> memberships = new HashSet<Membership>();
+        public virtual IReadOnlyCollection<Membership> Memberships => memberships;
 
         private static bool activeMembershipFilter(Membership x) => x.ModifiedDate == null;
         public Membership GetActiveMembership()

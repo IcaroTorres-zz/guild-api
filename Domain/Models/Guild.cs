@@ -18,10 +18,10 @@ namespace Domain.Models
 
         public virtual Invite InviteMember(Member member, IModelFactory factory)
         {
-            if (!_members.Contains(member) && !(member is INullObject))
+            if (!members.Contains(member) && !(member is INullObject))
             {
                 var invite = factory.CreateInvite(this, member);
-                _invites.Add(invite);
+                invites.Add(invite);
                 return invite;
             }
             return Invite.Null;
@@ -29,20 +29,25 @@ namespace Domain.Models
 
         public virtual Membership RemoveMember(Member member)
         {
-            return _members.Remove(member) ? member.State.Leave() : Membership.Null;
+            if (members.Contains(member))
+            {
+                members.Remove(member);
+                return member.GetState().Leave();
+            }
+            return Membership.Null;
         }
 
         internal virtual Member AddMember(Member newMember)
         {
-            return !(newMember is INullObject) && _members.Add(newMember) ? newMember : Member.Null;
+            return !(newMember is INullObject) && members.Add(newMember) ? newMember : Member.Null;
         }
 
         public virtual Member Promote(Member member)
         {
-            if (_members.Contains(member) && member.Guild == this)
+            if (members.Contains(member) && member.GetGuild() == this)
             {
-                GetLeader().State.BeDemoted();
-                member.State.BePromoted();
+                GetLeader().GetState().BeDemoted();
+                member.GetState().BePromoted();
                 return member;
             }
             return Member.Null;
@@ -50,16 +55,16 @@ namespace Domain.Models
 
         public virtual Member DemoteLeader()
         {
-            return Members.Count > 1 ? Promote(GetVice()) : Member.Null;
+            return members.Count > 1 ? Promote(GetVice()) : Member.Null;
         }
 
         public virtual string Name { get; protected internal set; }
 
-        public HashSet<Member> _members = new HashSet<Member>();
-        public virtual IReadOnlyCollection<Member> Members => _members;
+        public HashSet<Member> members = new HashSet<Member>();
+        public virtual IReadOnlyCollection<Member> Members => members;
 
-        public List<Invite> _invites = new List<Invite>();
-        public virtual IReadOnlyCollection<Invite> Invites => _invites;
+        public List<Invite> invites = new List<Invite>();
+        public virtual IReadOnlyCollection<Invite> Invites => invites;
 
         private static bool FilterGuildLeader(Member x) => x.IsGuildLeader;
         public Member GetLeader()

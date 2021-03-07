@@ -1,15 +1,16 @@
 ﻿using Domain.Common;
 using Domain.Enums;
 using Domain.Models;
+using System;
 
 namespace Domain.States.Invites
 {
     internal class ClosedInviteState : InviteState
     {
-        internal ClosedInviteState(Invite context, InviteStatuses status) : base(context)
+        internal ClosedInviteState(Invite context, InviteStatuses status, DateTime? modifiedDate) : base(context)
         {
-            Context = context;
             Status = status;
+            ModifiedDate = modifiedDate;
         }
 
         internal override Membership BeAccepted(IModelFactory factory)

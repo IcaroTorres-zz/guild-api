@@ -20,9 +20,9 @@ namespace Domain.Factories
             return new Invite
             {
                 Id = Guid.NewGuid(),
-                Guild = guild,
+                guild = guild,
+                member = member,
                 GuildId = guild.Id,
-                Member = member,
                 MemberId = member.Id,
                 Status = InviteStatuses.Pending,
             };
@@ -38,9 +38,9 @@ namespace Domain.Factories
             return new Membership
             {
                 Id = Guid.NewGuid(),
-                Guild = guild,
+                GuildName = guild.Name,
+                MemberName = member.Name,
                 GuildId = guild.Id,
-                Member = member,
                 MemberId = member.Id,
                 CreatedDate = DateTime.UtcNow,
             };

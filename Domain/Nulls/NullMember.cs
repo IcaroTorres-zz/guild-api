@@ -24,6 +24,6 @@ namespace Domain.Nulls
         public override Guid? GuildId { get => null; protected set { } }
         public override DateTime CreatedDate { get => default; protected internal set { } }
         public override DateTime? ModifiedDate { get => default; protected internal set { } }
-        public override Guild Guild { get => Guild.Null; protected set { } }
+        public override Guild GetGuild() => Guild.Null;
     }
 }

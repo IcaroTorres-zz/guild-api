@@ -7,7 +7,6 @@ namespace Domain.States.Memberships
     {
         internal OpenMembershipState(Membership context) : base(context)
         {
-            Context = context;
         }
 
         internal override Membership Finish()

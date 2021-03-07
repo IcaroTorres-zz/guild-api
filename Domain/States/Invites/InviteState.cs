@@ -1,6 +1,7 @@
 ﻿using Domain.Common;
 using Domain.Enums;
 using Domain.Models;
+using System;
 
 namespace Domain.States.Invites
 {
@@ -13,16 +14,19 @@ namespace Domain.States.Invites
 
         internal Invite Context { get; set; }
         internal InviteStatuses Status { get; set; }
+        internal DateTime? ModifiedDate { get; set; }
         internal abstract Membership BeAccepted(IModelFactory factory);
         internal abstract Invite BeDenied();
         internal abstract Invite BeCanceled();
 
-        internal static InviteState NewState(Invite invite, Guild guild, Member member, InviteStatuses status)
+        internal static InviteState NewState(Invite invite)
         {
-            if (guild is INullObject || member is INullObject) return new ClosedInviteState(invite, status);
+            if (invite.GetGuild() is INullObject || invite.GetMember() is INullObject)
+                return new ClosedInviteState(invite, invite.Status, invite.ModifiedDate);
 
-            return status == InviteStatuses.Pending
-                ? new OpenInviteState(invite) : new ClosedInviteState(invite, status) as InviteState;
+            return invite.Status == InviteStatuses.Pending
+                ? new OpenInviteState(invite)
+                : new ClosedInviteState(invite, invite.Status, invite.ModifiedDate) as InviteState;
         }
     }
 }

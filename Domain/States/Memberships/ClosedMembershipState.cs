@@ -5,9 +5,8 @@ namespace Domain.States.Memberships
 {
     internal class ClosedMembershipState : MembershipState
     {
-        public ClosedMembershipState(Membership context, DateTime modifiedDate) : base(context)
+        public ClosedMembershipState(Membership context, DateTime? modifiedDate) : base(context)
         {
-            Context = context;
             ModifiedDate = modifiedDate;
         }
 

@@ -18,15 +18,16 @@ namespace Domain.States.Members
         {
             var membership = Context.ActivateMembership(guild, factory);
             guild.AddMember(Context);
-            var nextState = guild.Members.Count == 1 ? new GuildLeaderState(Context, guild) as MemberState
-                                                     : new GuildMemberState(Context, guild);
+            var nextState = guild.Members.Count == 1
+                ? new GuildLeaderState(Context, guild) as MemberState
+                : new GuildMemberState(Context, guild);
             Context.ChangeState(nextState);
             return membership;
         }
 
         internal virtual Membership Leave()
         {
-            var finishedMembership = Context.GetActiveMembership().State.Finish();
+            var finishedMembership = Context.GetActiveMembership().GetState().Finish();
             Context.ChangeState(new NoGuildMemberState(Context));
             return finishedMembership;
         }
@@ -37,10 +38,10 @@ namespace Domain.States.Members
 
         internal static MemberState NewState(Member member)
         {
-            if (member.Guild is INullObject) return new NoGuildMemberState(member);
+            if (member.GetGuild() is INullObject) return new NoGuildMemberState(member);
             return member.IsGuildLeader
-                ? new GuildLeaderState(member, member.Guild)
-                : new GuildMemberState(member, member.Guild) as MemberState;
+                ? new GuildLeaderState(member, member.GetGuild())
+                : new GuildMemberState(member, member.GetGuild()) as MemberState;
         }
     }
 }
