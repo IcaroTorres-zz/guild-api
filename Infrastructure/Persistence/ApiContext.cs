@@ -26,11 +26,7 @@ namespace Infrastructure.Persistence
                 .Ignore<NullGuild>()
                 .Ignore<NullMember>()
                 .Ignore<NullInvite>()
-                .Ignore<NullMembership>()
-                .Ignore<Entities.Guild>()
-                .Ignore<Entities.Member>()
-                .Ignore<Entities.Invite>()
-                .Ignore<Entities.Membership>();
+                .Ignore<NullMembership>();
 
             base.OnModelCreating(builder);
         }

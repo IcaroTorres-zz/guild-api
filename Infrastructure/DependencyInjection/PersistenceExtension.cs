@@ -26,10 +26,10 @@ namespace Infrastructure.DependencyInjection
                 })
 
                 // Data access layer dependencies
-                .AddScoped<IRepository<Guild>, NullObjectProxyRepository<Guild, Persistence.Entities.Guild>>()
-                .AddScoped<IRepository<Member>, NullObjectProxyRepository<Member, Persistence.Entities.Member>>()
-                .AddScoped<IRepository<Invite>, NullObjectProxyRepository<Invite, Persistence.Entities.Invite>>()
-                .AddScoped<IRepository<Membership>, NullObjectProxyRepository<Membership, Persistence.Entities.Membership>>()
+                .AddScoped<IRepository<Guild>, Repository<Guild>>()
+                .AddScoped<IRepository<Member>, Repository<Member>>()
+                .AddScoped<IRepository<Invite>, Repository<Invite>>()
+                .AddScoped<IRepository<Membership>, Repository<Membership>>()
                 .AddScoped<IGuildRepository, GuildRepository>()
                 .AddScoped<IMemberRepository, MemberRepository>()
                 .AddScoped<IInviteRepository, InviteRepository>()

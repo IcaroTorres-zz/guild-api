@@ -32,6 +32,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<T> InsertAsync(T entity, CancellationToken cancellationToken = default)
         {
+            if (entity is INullObject) return entity;
             var entry = await _dbSet.AddAsync(entity, cancellationToken);
 
             return entry.Entity;
@@ -39,6 +40,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public T Update(T entity)
         {
+            if (entity is INullObject) return entity;
             return _dbSet.Update(entity).Entity;
         }
 

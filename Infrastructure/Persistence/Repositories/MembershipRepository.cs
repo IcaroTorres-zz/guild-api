@@ -1,7 +1,6 @@
 using Application.Common.Abstractions;
 using Application.Common.Responses;
 using Domain.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq.Expressions;
 using System.Threading;
@@ -31,7 +30,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<PagedResponse<Membership>> PaginateAsync(Expression<Func<Membership, bool>> predicate = null,
             int top = 20, int page = 1, CancellationToken cancellationToken = default)
         {
-            var itemsQuery = _baseRepository.Query(predicate, readOnly: true).Include(x => x.Member).Include(x => x.Guild);
+            var itemsQuery = _baseRepository.Query(predicate, readOnly: true);
 
             return await _baseRepository.PaginateAsync(itemsQuery, top, page, cancellationToken);
         }

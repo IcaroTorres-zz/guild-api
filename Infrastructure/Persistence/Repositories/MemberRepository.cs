@@ -43,9 +43,9 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Member> GetForGuildOperationsAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var entity = await _baseRepository.Query()
-                .Include(x => x.Guild.Invites)
-                .Include(x => x.Guild.Members)
-                .Include(x => x.Memberships)
+                .Include("guild.Invites")
+                .Include("guild.Members.Memberships")
+                .Include("Memberships")
                 .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
             return entity ?? Member.Null;
@@ -54,7 +54,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Member> GetByIdAsync(Guid id, bool readOnly = false, CancellationToken cancellationToken = default)
         {
             var entity = await _baseRepository.Query(readOnly: readOnly)
-                .Include(x => x.Guild)
+                .Include("guild")
                 .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
             return entity ?? Member.Null;
@@ -63,7 +63,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<PagedResponse<Member>> PaginateAsync(Expression<Func<Member, bool>> predicate = null,
             int top = 20, int page = 1, CancellationToken cancellationToken = default)
         {
-            var itemsQuery = _baseRepository.Query(predicate, readOnly: true).Include(x => x.Guild);
+            var itemsQuery = _baseRepository.Query(predicate, readOnly: true).Include("guild");
 
             return await _baseRepository.PaginateAsync(itemsQuery, top, page, cancellationToken);
         }

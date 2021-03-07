@@ -46,10 +46,9 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Guild> GetForMemberHandlingAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var guild = await _baseRepository.Query(readOnly: false)
-                .Include(x => x.Members)
-                .ThenInclude(x => x.Memberships)
-                .Include(x => x.Invites)
-                .ThenInclude(x => x.Member)
+                .Include("Members.guild")
+                .Include("Members.Memberships")
+                .Include("Invites.member")
                 .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
 
             return guild ?? Guild.Null;

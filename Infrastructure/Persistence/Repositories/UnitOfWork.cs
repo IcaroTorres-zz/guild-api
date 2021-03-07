@@ -64,7 +64,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             try
             {
-                await _context.SaveChangesAsync(cancellationToken);
+                var changes = await _context.SaveChangesAsync(cancellationToken);
                 return result;
             }
             catch (Exception exception)
