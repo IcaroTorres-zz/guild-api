@@ -34,7 +34,7 @@ namespace Tests.Application.Members.Queries.GetMember
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
             result.Data.Should().NotBeNull().And.BeOfType<TestMember>();
             result.Data.As<Member>().Id.Should().Be(expectedMember.Id);
-            result.Data.As<Member>().Guild.Id.Should().Be(expectedMember.GuildId.Value);
+            result.Data.As<Member>().GetGuild().Id.Should().Be(expectedMember.GuildId.Value);
         }
     }
 }

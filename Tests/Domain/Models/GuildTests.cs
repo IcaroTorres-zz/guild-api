@@ -66,11 +66,11 @@ namespace Tests.Domain.Models
             member.Should().NotBeNull().And.BeOfType<TestMember>();
             member.IsGuildLeader.Should().BeFalse();
             member.GuildId.Should().BeNull();
-            member.Guild.Should().BeOfType<NullGuild>();
+            member.GetGuild().Should().BeOfType<NullGuild>();
 
             memberMonitor.AssertPropertyChanged(
                 nameof(Member.GuildId),
-                nameof(Member.Guild));
+                nameof(Guild));
             memberMonitor.AssertPropertyNotChanged(
                 nameof(Member.Id),
                 nameof(Member.Name),
@@ -111,12 +111,12 @@ namespace Tests.Domain.Models
                 .And.BeOfType<TestMember>();
             leader.IsGuildLeader.Should().BeFalse();
             leader.GuildId.Should().BeNull();
-            leader.Guild.Should().BeOfType<NullGuild>();
+            leader.GetGuild().Should().BeOfType<NullGuild>();
 
             memberMonitor.AssertPropertyChanged(
                 nameof(Member.IsGuildLeader),
                 nameof(Member.GuildId),
-                nameof(Member.Guild));
+                nameof(Guild));
             memberMonitor.AssertPropertyNotChanged(
                 nameof(Member.Id),
                 nameof(Member.Name));
@@ -155,13 +155,13 @@ namespace Tests.Domain.Models
                 .And.BeOfType<TestMember>();
             member.IsGuildLeader.Should().BeFalse();
             member.GuildId.Should().BeNull();
-            member.Guild.Should().BeOfType<NullGuild>();
+            member.GetGuild().Should().BeOfType<NullGuild>();
 
             memberMonitor.AssertPropertyNotChanged(
                 nameof(Member.Id),
                 nameof(Member.Name),
                 nameof(Member.GuildId),
-                nameof(Member.Guild),
+                nameof(Guild),
                 nameof(Member.IsGuildLeader),
                 nameof(Member.Memberships));
         }
@@ -203,7 +203,7 @@ namespace Tests.Domain.Models
                 nameof(Member.Id),
                 nameof(Member.Name),
                 nameof(Member.GuildId),
-                nameof(Member.Guild),
+                nameof(Guild),
                 nameof(Member.IsGuildLeader),
                 nameof(Member.Memberships));
         }
@@ -244,7 +244,7 @@ namespace Tests.Domain.Models
                 nameof(Member.Id),
                 nameof(Member.Name),
                 nameof(Member.GuildId),
-                nameof(Member.Guild),
+                nameof(Guild),
                 nameof(Member.IsGuildLeader),
                 nameof(Member.Memberships));
         }
@@ -368,7 +368,7 @@ namespace Tests.Domain.Models
             sut.Should().NotBeNull().And.BeOfType<TestGuild>();
             sut.Invites.Should().NotBeEmpty()
                 .And.AllBeOfType<TestInvite>()
-                .And.Match(x => !x.Any(y => y.Member.Equals(member)))
+                .And.Match(x => !x.Any(y => y.GetMember().Equals(member)))
                 .And.HaveCount(expectedMembersCount);
             sut.Members.Should().NotBeEmpty()
                 .And.HaveCount(expectedInvitesCount);
@@ -421,7 +421,7 @@ namespace Tests.Domain.Models
             sut.GetLatestInvite().Should().NotBeNull().And.BeOfType<TestInvite>();
             sut.Members.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);
             sut.Invites.Should().NotBeEmpty()
-                .And.Match(x => x.Any(y => y.Member.Equals(member)))
+                .And.Match(x => x.Any(y => y.GetMember().Equals(member)))
                 .And.HaveCount(expectedInvitesCount);
 
             monitor.AssertPropertyNotChanged(

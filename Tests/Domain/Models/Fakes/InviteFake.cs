@@ -16,7 +16,7 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Invite>().CustomInstantiator(_ => new TestInvite
             {
                 Id = Guid.NewGuid(),
-                Member = member,
+                member = member,
                 MemberId = member.Id
             });
         }
@@ -28,7 +28,7 @@ namespace Tests.Domain.Models.Fakes
             return new Faker<Invite>().CustomInstantiator(_ => new TestInvite
             {
                 Id = Guid.NewGuid(),
-                Guild = guild,
+                guild = guild,
                 GuildId = guild.Id
             });
         }

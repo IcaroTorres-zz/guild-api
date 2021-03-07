@@ -28,7 +28,7 @@ namespace Tests.Domain.States.Memberships
             // arrange
             var referenceDate = DateTime.UtcNow;
             var membership = MembershipFake.Active().Generate();
-            var sut = membership.State;
+            var sut = membership.GetState();
 
             // act
             sut.Finish();

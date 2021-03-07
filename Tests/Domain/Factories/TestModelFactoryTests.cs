@@ -50,9 +50,9 @@ namespace Tests.Domain.Factories
             // assert
             model.Should().NotBeNull().And.BeOfType<TestInvite>();
             model.Id.Should().NotBeEmpty();
-            model.Guild.Should().NotBeNull().And.Be(guild);
+            model.GetGuild().Should().NotBeNull().And.Be(guild);
             model.GuildId.Should().NotBeEmpty().And.Be(guild.Id);
-            model.Member.Should().NotBeNull().And.Be(member);
+            model.GetMember().Should().NotBeNull().And.Be(member);
             model.MemberId.Should().NotBeEmpty().And.Be(member.Id);
             model.Status.Should().Be(expectedStatus);
         }
@@ -71,9 +71,9 @@ namespace Tests.Domain.Factories
             model.Should().NotBeNull().And.BeOfType<TestMembership>();
             model.Id.Should().NotBeEmpty();
             model.ModifiedDate.Should().BeNull();
-            model.Guild.Should().Be(guild);
+            model.GuildName.Should().Be(guild.Name);
             model.GuildId.Should().NotBeEmpty().And.Be(guild.Id);
-            model.Member.Should().Be(member);
+            model.MemberName.Should().Be(member.Name);
             model.MemberId.Should().NotBeEmpty().And.Be(member.Id);
         }
 
@@ -93,7 +93,7 @@ namespace Tests.Domain.Factories
             model.Name.Should().NotBeEmpty().And.Be(expectedName);
             model.IsGuildLeader.Should().BeFalse();
             model.GuildId.Should().BeNull();
-            model.Guild.Should().BeOfType<NullGuild>();
+            model.GetGuild().Should().BeOfType<NullGuild>();
             model.Memberships.Should().BeEmpty();
         }
     }

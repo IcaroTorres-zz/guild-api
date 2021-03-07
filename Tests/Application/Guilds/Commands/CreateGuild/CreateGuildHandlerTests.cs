@@ -19,7 +19,7 @@ namespace Tests.Application.Guilds.Commands.CreateGuild
             // arrange
             var leader = MemberFake.GuildLeader().Generate();
             var command = CreateGuildCommandFake.Valid(leader.Id).Generate();
-            var expectedNewGuild = leader.Guild;
+            var expectedNewGuild = leader.GetGuild();
             var unit = UnitOfWorkMockBuilder.Create()
                 .SetupMembers(
                     x => x.GetForGuildOperationsSuccess(leader.Id, leader)
@@ -29,8 +29,8 @@ namespace Tests.Application.Guilds.Commands.CreateGuild
                     x => x.Insert(output: leader.GetActiveMembership())
                           .Update(output: leader.GetLastFinishedMembership())
                           .Build())
-                .SetupGuilds(x => x.Insert(output: leader.Guild).Build())
-                .SetupInvites(x => x.Insert(output: leader.Guild.GetLatestInvite()).Build())
+                .SetupGuilds(x => x.Insert(output: leader.GetGuild()).Build())
+                .SetupInvites(x => x.Insert(output: leader.GetGuild().GetLatestInvite()).Build())
                 .Build();
             var factory = ModelFactoryMockBuilder.Create().CreateGuild(command.Name, leader, expectedNewGuild).Build();
             var sut = new CreateGuildHandler(unit, factory);

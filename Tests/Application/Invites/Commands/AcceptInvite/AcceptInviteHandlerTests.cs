@@ -22,7 +22,8 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
         {
             // arrange
             const int canceledCount = 2;
-            var invitedMember = MemberFake.GuildMember().Generate();
+            var invitedMember = MemberFake.GuildLeader().Generate();
+            var promotedMember = invitedMember.GetGuild().GetVice();
             var invitingGuild = GuildFake.Complete().Generate();
             var acceptedInvite = InviteFake.ValidToAcceptWithInvitesToCancel(canceledCount, invitingGuild, invitedMember).Generate();
             var command = PatchInviteCommandFake.AcceptValid(acceptedInvite.Id).Generate();
@@ -32,7 +33,8 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
             var finishedMembership = invitedMember.GetActiveMembership();
 
             var unit = UnitOfWorkMockBuilder.Create()
-                .SetupMembers(x => x.Update(input: invitedMember, output: invitedMember).Build())
+                .SetupMembers(x => x.Update(input: invitedMember, output: invitedMember)
+                                    .Update(input: promotedMember, output: promotedMember).Build())
                 .SetupMemberships(x => x.Insert(output: startedMembership).Update(output: finishedMembership).Build())
                 .SetupInvites(x =>
                 {
@@ -62,7 +64,7 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
 
             invitedMember.Should().NotBeOfType<NullMember>();
             invitedMember.IsGuildLeader.Should().BeFalse();
-            invitedMember.Guild.Should().Be(invitingGuild);
+            invitedMember.GetGuild().Should().Be(invitingGuild);
 
             invitingGuild.Should().NotBeOfType<NullGuild>();
             invitingGuild.Members.Should().Contain(invitedMember);
@@ -71,6 +73,8 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
                 .And.Be(invitedMember.GetLastFinishedMembership().ModifiedDate);
             canceledInvites.Should().HaveCount(canceledCount)
                 .And.OnlyContain(x => x.Status == InviteStatuses.Canceled);
+            promotedMember.Should().NotBeNull().And.BeOfType<TestMember>();
+            promotedMember.IsGuildLeader.Should().Be(!invitedMember.IsGuildLeader);
         }
     }
 }

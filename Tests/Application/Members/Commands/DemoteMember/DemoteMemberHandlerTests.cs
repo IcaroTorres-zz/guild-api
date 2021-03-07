@@ -41,8 +41,8 @@ namespace Tests.Application.Members.Commands.DemoteMember
             result.Data.As<Member>().Id.Should().Be(demotedLeader.Id);
             result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedNewLeader.IsGuildLeader);
-            result.Data.As<Member>().Guild.Should().NotBeNull();
-            result.Data.As<Member>().Guild.Id.Should().Be(guild.Id);
+            result.Data.As<Member>().GetGuild().Should().NotBeNull();
+            result.Data.As<Member>().GetGuild().Id.Should().Be(guild.Id);
         }
     }
 }
