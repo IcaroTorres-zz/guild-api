@@ -20,7 +20,7 @@ namespace Infrastructure.Persistence.Maps
             builder.Entity<Guild>().Seed(jsonSettings, x => new { x.Id, x.Name, x.Disabled, x.CreatedDate, x.ModifiedDate });
             builder.Entity<Member>().Seed(jsonSettings, x => new { x.Id, x.Name, x.GuildId, x.Disabled, x.IsGuildLeader, x.CreatedDate, x.ModifiedDate });
             builder.Entity<Invite>().Seed(jsonSettings, x => new { x.Id, x.GuildId, x.MemberId, x.Disabled, x.Status, x.CreatedDate, x.ModifiedDate });
-            builder.Entity<Membership>().Seed(jsonSettings, x => new { x.Id, x.GuildId, x.MemberId, x.Disabled, x.CreatedDate, x.ModifiedDate });
+            builder.Entity<Membership>().Seed(jsonSettings, x => new { x.Id, x.GuildId, x.GuildName, x.MemberId, x.MemberName, x.Disabled, x.CreatedDate, x.ModifiedDate });
             return builder;
         }
         private class NonPublicPropertiesResolver : DefaultContractResolver

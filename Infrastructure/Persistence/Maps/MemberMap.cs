@@ -11,18 +11,15 @@ namespace Infrastructure.Persistence.Maps
             builder.HasKey(x => x.Id);
             builder.HasIndex(u => u.Name)
                 .IsUnique();
+            builder.Property(x => x.Name)
+                .IsRequired(true);
             builder.Property(x => x.GuildId)
                 .IsRequired(false);
-            builder.Property(x => x.CreatedDate)
-                .ValueGeneratedOnAdd()
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            builder.Property(x => x.ModifiedDate)
-                .ValueGeneratedOnUpdate()
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            builder.HasOne(x => x.Guild)
-                .WithMany(x => x.Members)
-                .HasForeignKey(x => x.GuildId)
-                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(x => x.Memberships)
+                .WithOne()
+                .HasForeignKey(x => x.MemberId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
