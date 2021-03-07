@@ -26,9 +26,9 @@ namespace Application.Guilds.Commands.CreateGuild
             var newInvite = newGuild.GetLatestInvite();
             var newMembership = leader.GetActiveMembership();
 
-            var guildtask = _unit.Guilds.InsertAsync(newGuild);
-            var invitetask = _unit.Invites.InsertAsync(newInvite);
-            var membershiptask = _unit.Memberships.InsertAsync(newMembership);
+            var guildtask = _unit.Guilds.InsertAsync(newGuild, cancellationToken);
+            var invitetask = _unit.Invites.InsertAsync(newInvite, cancellationToken);
+            var membershiptask = _unit.Memberships.InsertAsync(newMembership, cancellationToken);
 
             _unit.Members.Update(leader);
             _unit.Memberships.Update(previousMembership);

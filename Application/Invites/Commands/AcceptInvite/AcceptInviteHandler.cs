@@ -37,7 +37,7 @@ namespace Application.Invites.Commands.AcceptInvite
             _unit.Members.Update(invitedMember);
             _unit.Members.Update(possiblePromoted);
             _unit.Memberships.Update(previousMembership);
-            await _unit.Memberships.InsertAsync(newMembership);
+            await _unit.Memberships.InsertAsync(newMembership, cancellationToken);
 
             return new SuccessResult(invite);
         }
