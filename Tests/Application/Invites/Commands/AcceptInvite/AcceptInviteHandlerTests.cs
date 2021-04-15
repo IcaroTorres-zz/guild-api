@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -57,7 +57,7 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<TestInvite>();
+            result.Data.Should().NotBeNull().And.BeOfType<InviteTestProxy>();
             result.Data.As<Invite>().Id.Should().Be(acceptedInvite.Id);
             result.Data.As<Invite>().Status.Should().Be(InviteStatuses.Accepted)
                 .And.Be(acceptedInvite.Status);
@@ -73,7 +73,7 @@ namespace Tests.Application.Invites.Commands.AcceptInvite
                 .And.Be(invitedMember.GetLastFinishedMembership().ModifiedDate);
             canceledInvites.Should().HaveCount(canceledCount)
                 .And.OnlyContain(x => x.Status == InviteStatuses.Canceled);
-            promotedMember.Should().NotBeNull().And.BeOfType<TestMember>();
+            promotedMember.Should().NotBeNull().And.BeOfType<MemberTestProxy>();
             promotedMember.IsGuildLeader.Should().Be(!invitedMember.IsGuildLeader);
         }
     }

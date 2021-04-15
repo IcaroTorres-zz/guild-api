@@ -5,9 +5,9 @@ using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace Tests.Domain.Models.TestModels
+namespace Tests.Domain.Models.Proxies
 {
-    public class TestMember : Member, INotifyPropertyChanged, INotifyCollectionChanged
+    public class MemberTestProxy : Member, INotifyPropertyChanged, INotifyCollectionChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;

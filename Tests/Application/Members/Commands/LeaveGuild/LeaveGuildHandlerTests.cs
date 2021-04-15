@@ -6,7 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -19,7 +19,7 @@ namespace Tests.Application.Members.Commands.LeaveGuild
         public async Task Handle_Should_Succeed_With_ValidCommand_GuildLeader()
         {
             // arrange
-            var leavingMaster = (TestMember)MemberFake.GuildLeader().Generate();
+            var leavingMaster = (MemberTestProxy)MemberFake.GuildLeader().Generate();
             var expectedNewLeader = leavingMaster.GetGuild().GetVice();
             var expectedFinishedMembership = leavingMaster.GetActiveMembership();
             var command = PatchMemberCommandFake.LeaveGuildValid(leavingMaster.Id).Generate();
@@ -40,12 +40,12 @@ namespace Tests.Application.Members.Commands.LeaveGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<TestMember>();
+            result.Data.Should().NotBeNull().And.BeOfType<MemberTestProxy>();
             result.Data.As<Member>().Id.Should().Be(leavingMaster.Id);
             result.Data.As<Member>().GetGuild().Should().BeOfType<NullGuild>();
             result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedNewLeader.IsGuildLeader);
-            expectedFinishedMembership.Should().BeOfType<TestMembership>();
+            expectedFinishedMembership.Should().BeOfType<MembershipTestProxy>();
             expectedFinishedMembership.Id.Should().Be(leavingMaster.GetLastFinishedMembership().Id);
             expectedFinishedMembership.ModifiedDate.Should().NotBeNull()
                 .And.Be(leavingMaster.GetLastFinishedMembership().ModifiedDate);
@@ -55,7 +55,7 @@ namespace Tests.Application.Members.Commands.LeaveGuild
         public async Task Handle_Should_Succeed_With_ValidCommand_GuildMember()
         {
             // arrange
-            var leavingMember = (TestMember)MemberFake.GuildMember().Generate();
+            var leavingMember = (MemberTestProxy)MemberFake.GuildMember().Generate();
             var expectedUnchangedLeader = leavingMember.GetGuild().GetLeader();
             var expectedFinishedMembership = leavingMember.GetActiveMembership();
             var command = PatchMemberCommandFake.LeaveGuildValid(leavingMember.Id).Generate();
@@ -76,7 +76,7 @@ namespace Tests.Application.Members.Commands.LeaveGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<TestMember>();
+            result.Data.Should().NotBeNull().And.BeOfType<MemberTestProxy>();
             result.Data.As<Member>().Id.Should().Be(leavingMember.Id);
             result.Data.As<Member>().IsGuildLeader.Should().BeFalse()
                 .And.Be(!expectedUnchangedLeader.IsGuildLeader);

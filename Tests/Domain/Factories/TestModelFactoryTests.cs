@@ -2,7 +2,7 @@
 using Domain.Nulls;
 using FluentAssertions;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers;
 using Xunit;
 
@@ -29,7 +29,7 @@ namespace Tests.Domain.Factories
             var model = _sut.CreateGuild(expectedName, member);
 
             // assert
-            model.Should().NotBeNull().And.BeOfType<TestGuild>();
+            model.Should().NotBeNull().And.BeOfType<GuildTestProxy>();
             model.Id.Should().NotBeEmpty();
             model.Name.Should().NotBeEmpty().And.Be(expectedName);
             model.Members.Should().Contain(member);
@@ -48,7 +48,7 @@ namespace Tests.Domain.Factories
             var model = _sut.CreateInvite(guild, member);
 
             // assert
-            model.Should().NotBeNull().And.BeOfType<TestInvite>();
+            model.Should().NotBeNull().And.BeOfType<InviteTestProxy>();
             model.Id.Should().NotBeEmpty();
             model.GetGuild().Should().NotBeNull().And.Be(guild);
             model.GuildId.Should().NotBeEmpty().And.Be(guild.Id);
@@ -68,7 +68,7 @@ namespace Tests.Domain.Factories
             var model = _sut.CreateMembership(guild, member);
 
             // assert
-            model.Should().NotBeNull().And.BeOfType<TestMembership>();
+            model.Should().NotBeNull().And.BeOfType<MembershipTestProxy>();
             model.Id.Should().NotBeEmpty();
             model.ModifiedDate.Should().BeNull();
             model.GuildName.Should().Be(guild.Name);
@@ -88,7 +88,7 @@ namespace Tests.Domain.Factories
             var model = _sut.CreateMember(expectedName);
 
             // assert
-            model.Should().NotBeNull().And.BeOfType<TestMember>();
+            model.Should().NotBeNull().And.BeOfType<MemberTestProxy>();
             model.Id.Should().NotBeEmpty();
             model.Name.Should().NotBeEmpty().And.Be(expectedName);
             model.IsGuildLeader.Should().BeFalse();

@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -32,7 +32,7 @@ namespace Tests.Application.Members.Commands.CreateMember
             response.Success.Should().BeTrue();
             response.Errors.Should().BeEmpty();
             response.As<SuccessCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
-            response.Data.Should().NotBeNull().And.BeOfType<TestMember>();
+            response.Data.Should().NotBeNull().And.BeOfType<MemberTestProxy>();
             response.Data.As<Member>().Should().Be(expectedMember);
         }
     }

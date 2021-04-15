@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Xunit;
 
 namespace Tests.Domain.Models
@@ -20,7 +20,7 @@ namespace Tests.Domain.Models
             var result = sut.GetDuration();
 
             // assert
-            sut.Should().NotBeNull().And.BeOfType<TestMembership>();
+            sut.Should().NotBeNull().And.BeOfType<MembershipTestProxy>();
             sut.ModifiedDate.Should().NotBeNull();
             result.Should().Be(expectedDuration);
         }
@@ -36,7 +36,7 @@ namespace Tests.Domain.Models
             var result2 = sut.GetDuration();
 
             // assert
-            sut.Should().NotBeNull().And.BeOfType<TestMembership>();
+            sut.Should().NotBeNull().And.BeOfType<MembershipTestProxy>();
             sut.ModifiedDate.Should().BeNull();
             result1.Should().BeLessThan(result2);
         }

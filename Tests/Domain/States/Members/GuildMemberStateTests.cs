@@ -3,7 +3,7 @@ using Domain.Nulls;
 using Domain.States.Members;
 using FluentAssertions;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers;
 using Xunit;
 
@@ -16,13 +16,13 @@ namespace Tests.Domain.States.Members
         public void Constructor_Should_CreateWith_GivenStatus()
         {
             // arrange
-            var member = (TestMember)MemberFake.GuildMember().Generate();
+            var member = (MemberTestProxy)MemberFake.GuildMember().Generate();
 
             // act
             var sut = new GuildMemberState(member, member.GetGuild());
 
             // assert
-            sut.Guild.Should().BeOfType<TestGuild>().And.Be(member.GetGuild());
+            sut.Guild.Should().BeOfType<GuildTestProxy>().And.Be(member.GetGuild());
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             sut.Guild.Members.Should().Contain(member);
         }
@@ -31,8 +31,8 @@ namespace Tests.Domain.States.Members
         public void Join_Should_Change_Guild_And_Memberships()
         {
             // arrange
-            var member = (TestMember)MemberFake.GuildMember().Generate();
-            var guild = (TestGuild)GuildFake.Complete().Generate();
+            var member = (MemberTestProxy)MemberFake.GuildMember().Generate();
+            var guild = (GuildTestProxy)GuildFake.Complete().Generate();
             var monitor = member.Monitor();
             var sut = member.GetState();
             var factory = TestModelFactoryHelper.Factory;
@@ -41,7 +41,7 @@ namespace Tests.Domain.States.Members
             sut.Join(guild, factory);
 
             // assert
-            sut.Guild.Should().NotBeNull().And.BeOfType<TestGuild>().And.NotBe(member.GetGuild());
+            sut.Guild.Should().NotBeNull().And.BeOfType<GuildTestProxy>().And.NotBe(member.GetGuild());
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             sut.Guild.Members.Should().Contain(member);
             guild.Members.Should().Contain(member);
@@ -62,7 +62,7 @@ namespace Tests.Domain.States.Members
         public void BePromoted_Should_Change_IsGuildLeader()
         {
             // arrange
-            var member = (TestMember)MemberFake.GuildMember().Generate();
+            var member = (MemberTestProxy)MemberFake.GuildMember().Generate();
             var monitor = member.Monitor();
             var sut = member.GetState();
 
@@ -70,7 +70,7 @@ namespace Tests.Domain.States.Members
             sut.BePromoted();
 
             // assert
-            sut.Guild.Should().NotBeNull().And.BeOfType<TestGuild>().And.Be(member.GetGuild());
+            sut.Guild.Should().NotBeNull().And.BeOfType<GuildTestProxy>().And.Be(member.GetGuild());
             sut.Guild.Members.Should().Contain(member);
             sut.IsGuildLeader.Should().BeFalse().And.Be(!member.IsGuildLeader);
             member.GuildId.Should().NotBeNull();
@@ -89,7 +89,7 @@ namespace Tests.Domain.States.Members
         public void BeDemoted_Should_Change_Nothing()
         {
             // arrange
-            var member = (TestMember)MemberFake.GuildMember().Generate();
+            var member = (MemberTestProxy)MemberFake.GuildMember().Generate();
             var monitor = member.Monitor();
             var sut = member.GetState();
 
@@ -97,7 +97,7 @@ namespace Tests.Domain.States.Members
             sut.BeDemoted();
 
             // assert
-            sut.Guild.Should().NotBeNull().And.BeOfType<TestGuild>().And.Be(member.GetGuild());
+            sut.Guild.Should().NotBeNull().And.BeOfType<GuildTestProxy>().And.Be(member.GetGuild());
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             sut.Guild.Members.Should().Contain(member);
             member.GuildId.Should().NotBeNull();
@@ -115,9 +115,9 @@ namespace Tests.Domain.States.Members
         public void Leave_Should_Change_Guild()
         {
             // arrange
-            var member = (TestMember)MemberFake.GuildMember().Generate();
+            var member = (MemberTestProxy)MemberFake.GuildMember().Generate();
             var monitor = member.Monitor();
-            var membership = (TestMembership)member.GetActiveMembership();
+            var membership = (MembershipTestProxy)member.GetActiveMembership();
             var membershipMonitor = membership.Monitor();
             var sut = member.GetState();
 
@@ -125,7 +125,7 @@ namespace Tests.Domain.States.Members
             sut.Leave();
 
             // assert
-            sut.Guild.Should().BeOfType<TestGuild>().And.NotBe(member.GetGuild());
+            sut.Guild.Should().BeOfType<GuildTestProxy>().And.NotBe(member.GetGuild());
             sut.Guild.Members.Should().Contain(member);
             sut.IsGuildLeader.Should().BeFalse().And.Be(member.IsGuildLeader);
             member.GetGuild().Should().BeOfType<NullGuild>();

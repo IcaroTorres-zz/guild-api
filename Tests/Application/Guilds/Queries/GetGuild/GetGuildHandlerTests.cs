@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -33,7 +33,7 @@ namespace Tests.Application.Guilds.Queries.GetGuild
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessResult>().StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Data.Should().NotBeNull().And.BeOfType<TestGuild>();
+            result.Data.Should().NotBeNull().And.BeOfType<GuildTestProxy>();
             result.Data.As<Guild>().Id.Should().Be(expectedGuild.Id);
             result.Data.As<Guild>().GetLeader().Id.Should().Be(expectedGuild.GetLeader().Id);
             result.Data.As<Guild>().Members.Should().NotBeEmpty().And.HaveCount(expectedMembersCount);

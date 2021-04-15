@@ -6,7 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers.Builders;
 using Xunit;
 
@@ -40,7 +40,7 @@ namespace Tests.Application.Invites.Commands.InviteMember
             result.Success.Should().BeTrue();
             result.Errors.Should().BeEmpty();
             result.As<SuccessCreatedResult>().StatusCode.Should().Be(StatusCodes.Status201Created);
-            result.Data.Should().NotBeNull().And.BeOfType<TestInvite>();
+            result.Data.Should().NotBeNull().And.BeOfType<InviteTestProxy>();
             result.Data.As<Invite>().Should().Be(expectedInvite);
         }
     }

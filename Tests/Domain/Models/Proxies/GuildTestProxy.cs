@@ -3,9 +3,9 @@ using Domain.Models;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace Tests.Domain.Models.TestModels
+namespace Tests.Domain.Models.Proxies
 {
-    public class TestGuild : Guild, INotifyPropertyChanged, INotifyCollectionChanged
+    public class GuildTestProxy : Guild, INotifyPropertyChanged, INotifyCollectionChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;

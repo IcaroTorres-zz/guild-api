@@ -3,7 +3,7 @@ using Domain.Nulls;
 using Domain.States.Members;
 using FluentAssertions;
 using Tests.Domain.Models.Fakes;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace Tests.Domain.States.Members
         public void Constructor_Should_CreateWith_GivenStatus()
         {
             // arrange
-            var member = (TestMember)MemberFake.WithoutGuild().Generate();
+            var member = (MemberTestProxy)MemberFake.WithoutGuild().Generate();
 
             // act
             var sut = new NoGuildMemberState(member);
@@ -31,9 +31,9 @@ namespace Tests.Domain.States.Members
         public void Join_Should_Change_Guild_And_Memberships()
         {
             // arrange
-            var member = (TestMember)MemberFake.WithoutGuild().Generate();
+            var member = (MemberTestProxy)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
-            var guild = (TestGuild)GuildFake.Complete().Generate();
+            var guild = (GuildTestProxy)GuildFake.Complete().Generate();
             var sut = member.GetState();
             var factory = TestModelFactoryHelper.Factory;
 
@@ -62,7 +62,7 @@ namespace Tests.Domain.States.Members
         public void BePromoted_Should_Change_Nothing()
         {
             // arrange
-            var member = (TestMember)MemberFake.WithoutGuild().Generate();
+            var member = (MemberTestProxy)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
             var sut = member.GetState();
 
@@ -88,7 +88,7 @@ namespace Tests.Domain.States.Members
         public void BeDemoted_Should_Change_Nothing()
         {
             // arrange
-            var member = (TestMember)MemberFake.WithoutGuild().Generate();
+            var member = (MemberTestProxy)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
             var sut = member.GetState();
 
@@ -114,7 +114,7 @@ namespace Tests.Domain.States.Members
         public void Leave_Should_Change_Nothing()
         {
             // arrange
-            var member = (TestMember)MemberFake.WithoutGuild().Generate();
+            var member = (MemberTestProxy)MemberFake.WithoutGuild().Generate();
             var monitor = member.Monitor();
             var sut = member.GetState();
 

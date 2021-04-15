@@ -2,7 +2,7 @@
 using Domain.Enums;
 using Domain.Models;
 using System;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 
 namespace Tests.Domain.Factories
 {
@@ -10,7 +10,7 @@ namespace Tests.Domain.Factories
     {
         public Guild CreateGuild(string name, Member member)
         {
-            var guild = new TestGuild { Id = Guid.NewGuid(), Name = name };
+            var guild = new GuildTestProxy { Id = Guid.NewGuid(), Name = name };
             var invite = guild.InviteMember(member, this);
             invite.BeAccepted(this);
             return guild;
@@ -18,7 +18,7 @@ namespace Tests.Domain.Factories
 
         public Invite CreateInvite(Guild guild, Member member)
         {
-            return new TestInvite
+            return new InviteTestProxy
             {
                 Id = Guid.NewGuid(),
                 guild = guild,
@@ -31,12 +31,12 @@ namespace Tests.Domain.Factories
 
         public Member CreateMember(string name)
         {
-            return new TestMember { Id = Guid.NewGuid(), Name = name };
+            return new MemberTestProxy { Id = Guid.NewGuid(), Name = name };
         }
 
         public Membership CreateMembership(Guild guild, Member member)
         {
-            return new TestMembership
+            return new MembershipTestProxy
             {
                 Id = Guid.NewGuid(),
                 GuildName = guild.Name,

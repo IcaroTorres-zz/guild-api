@@ -2,7 +2,7 @@
 using Domain.Enums;
 using Domain.Models;
 using System;
-using Tests.Domain.Models.TestModels;
+using Tests.Domain.Models.Proxies;
 using Tests.Helpers;
 
 namespace Tests.Domain.Models.Fakes
@@ -13,7 +13,7 @@ namespace Tests.Domain.Models.Fakes
         {
             var member = MemberFake.WithoutGuild().Generate();
 
-            return new Faker<Invite>().CustomInstantiator(_ => new TestInvite
+            return new Faker<Invite>().CustomInstantiator(_ => new InviteTestProxy
             {
                 Id = Guid.NewGuid(),
                 member = member,
@@ -25,7 +25,7 @@ namespace Tests.Domain.Models.Fakes
         {
             var guild = GuildFake.Complete().Generate();
 
-            return new Faker<Invite>().CustomInstantiator(_ => new TestInvite
+            return new Faker<Invite>().CustomInstantiator(_ => new InviteTestProxy
             {
                 Id = Guid.NewGuid(),
                 guild = guild,

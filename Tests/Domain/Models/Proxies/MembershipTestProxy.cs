@@ -1,22 +1,33 @@
-﻿using Domain.Enums;
-using Domain.Models;
+﻿using Domain.Models;
 using System;
 using System.ComponentModel;
 
-namespace Tests.Domain.Models.TestModels
+namespace Tests.Domain.Models.Proxies
 {
-    public class TestInvite : Invite, INotifyPropertyChanged
+    public class MembershipTestProxy : Membership, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public override InviteStatuses Status
+        public override DateTime CreatedDate
         {
-            get => base.Status; protected internal set
+            get => base.CreatedDate; protected internal set
             {
-                if (base.Status != value)
+                if (base.CreatedDate != value)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
-                    base.Status = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CreatedDate)));
+                    base.CreatedDate = value;
+                }
+            }
+        }
+
+        public override DateTime? ModifiedDate
+        {
+            get => base.ModifiedDate; protected internal set
+            {
+                if (base.ModifiedDate != value)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ModifiedDate)));
+                    base.ModifiedDate = value;
                 }
             }
         }
